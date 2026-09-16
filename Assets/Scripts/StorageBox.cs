@@ -1,16 +1,15 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class StorageBox : MonoBehaviour, IDropHandler
+public class StorageBox : MonoBehaviour, IDropTarget
 {
-    public void OnDrop(PointerEventData eventData)
+    public void OnDrop(GameObject droppedObject)
     {
-        if(eventData.pointerDrag != null)
+        if (droppedObject != null)
         {
-            Debug.Log($"Item {eventData.pointerDrag.name} dropped on storage box");
-            Destroy(eventData.pointerDrag);
+            Debug.Log($"Item {droppedObject.name} dropped on storage box");
+            Destroy(droppedObject);
             Tweenimation.Impact(this.gameObject);
         }
     }
-
 }
