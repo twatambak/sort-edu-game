@@ -1,30 +1,81 @@
-using System;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 public class StorageBox : MonoBehaviour, IDropTarget
 {
     [SerializeField] private ItemType _storageType;
+    [SerializeField] private float _repulseForce = 10f;
+
+    private Collider2D _collider;
+
+    private void Awake()
+    {
+        _collider = GetComponent<Collider2D>();
+    }
 
     public void OnDrop(GameObject droppedObject)
     {
         if (!droppedObject)
             return;
 
-        if (droppedObject.TryGetComponent(out StorageItem storageItem))
-        {
-            if (storageItem.ItemType != _storageType)
-            {
-                if(droppedObject.TryGetComponent(out Rigidbody2D rigidbody2D))
-                {
-                    rigidbody2D.bodyType = RigidbodyType2D.Dynamic;
-                    rigidbody2D.AddForce(Vector2.up * 5f, ForceMode2D.Impulse);
-                }
-                return;
-            }
+        if (!droppedObject.TryGetComponent(out StorageItem storageItem))
+            return;
 
-            Destroy(droppedObject);
-            Tweenimation.Impact(this.gameObject);
+        if (storageItem.ItemType != _storageType)
+        {
+            EjectItem(droppedObject);
+            Tweenimation.Spring(gameObject);
+            return;
         }
+
+        Destroy(droppedObject);
+        Tweenimation.Nod(gameObject);
+    }
+
+    private void EjectItem(GameObject droppedObject)
+    {
+        if (!droppedObject.TryGetComponent(out Rigidbody2D rigidbody2D))
+            return;
+
+        rigidbody2D.bodyType = RigidbodyType2D.Dynamic;
+
+        Vector2 itemPosition = droppedObject.transform.position;
+        Vector2 closestPoint = _collider.ClosestPoint(itemPosition);
+
+        Vector2 direction = itemPosition - closestPoint;
+
+        if (direction == Vector2.zero)
+            direction = itemPosition - (Vector2)_collider.bounds.center;
+
+        direction = GetValidEjectionDirection(direction);
+
+        rigidbody2D.AddForce(direction * _repulseForce, ForceMode2D.Impulse);
+    }
+
+    private Vector2 GetValidEjectionDirection(Vector2 direction)
+    {
+        Vector2 normalizedDirection = direction.normalized;
+
+        Vector2[] validDirections =
+        {
+            Vector2.left,
+            Vector2.right,
+            Vector2.up
+        };
+
+        Vector2 bestDirection = Vector2.up;
+        float bestDot = float.NegativeInfinity;
+
+        foreach (Vector2 validDirection in validDirections)
+        {
+            float dot = Vector2.Dot(normalizedDirection, validDirection);
+
+            if (dot > bestDot)
+            {
+                bestDot = dot;
+                bestDirection = validDirection;
+            }
+        }
+
+        return bestDirection;
     }
 }
