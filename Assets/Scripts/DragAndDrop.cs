@@ -14,14 +14,18 @@ public class DragAndDrop : MonoBehaviour, IPointerDownHandler, IBeginDragHandler
     private Vector3 _dragOffset;
     private float _zDistance;
     private Rigidbody2D _rigidbody;
+    private RigidbodyType2D _originalBodyType;
 
     private void Awake()
     {
         _camera = Camera.main;
         _collider = GetComponent<Collider2D>();
 
-        if(gameObject.TryGetComponent(out Rigidbody2D rigid))
-            _rigidbody = rigid;
+        if (TryGetComponent(out Rigidbody2D rigidbody))
+        {
+            _rigidbody = rigidbody;
+            _originalBodyType = _rigidbody.bodyType;
+        }
     }
 
     public void OnPointerDown(PointerEventData eventData)
@@ -34,22 +38,32 @@ public class DragAndDrop : MonoBehaviour, IPointerDownHandler, IBeginDragHandler
     public void OnBeginDrag(PointerEventData eventData)
     {
         if (_rigidbody)
-            _rigidbody.gravityScale = 0f;
+        {
+            _rigidbody.linearVelocity = Vector2.zero;
+            _rigidbody.angularVelocity = 0f;
+            _rigidbody.bodyType = RigidbodyType2D.Kinematic;
+        }
+
         _onBeginDrag?.Invoke();
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        Vector3 pointerWorldPosition = _camera.ScreenToWorldPoint(new Vector3(eventData.position.x, eventData.position.y, _zDistance));
+        Vector3 pointerWorldPosition = _camera.ScreenToWorldPoint(new Vector3(eventData.position.x, eventData.position.y, _zDistance)
+        );
+
         transform.position = pointerWorldPosition + _dragOffset;
+
         _onDrag?.Invoke();
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
         if (_rigidbody)
-            _rigidbody.gravityScale = 1f;
+            _rigidbody.bodyType = _originalBodyType;
+
         TryDrop();
+
         _onEndDrag?.Invoke();
     }
 
