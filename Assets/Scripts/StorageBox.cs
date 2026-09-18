@@ -24,9 +24,10 @@ public class StorageBox : MonoBehaviour, IDropTarget
         {
             EjectItem(droppedObject);
             Tweenimation.Spring(gameObject);
+            StorageGameController.Instance.HandleIncorrectStorage();
             return;
         }
-
+        StorageGameController.Instance.HandleCorrectStorage();
         Destroy(droppedObject);
         Tweenimation.Nod(gameObject);
     }

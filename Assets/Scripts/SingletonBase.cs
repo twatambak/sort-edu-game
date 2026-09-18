@@ -38,12 +38,6 @@ public class SingletonBase<T> : MonoBehaviour where T : Component
 
         _sourceToken = new CancellationTokenSource();
         CancellationToken = _sourceToken.Token;
-
-        Init();
-    }
-
-    public virtual void Init()
-    {
     }
 
     protected virtual void OnDestroy()
