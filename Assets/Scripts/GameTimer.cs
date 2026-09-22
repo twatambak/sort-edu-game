@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class StorageGameTimeController : MonoBehaviour
+public class GameTimer : MonoBehaviour
 {
     [SerializeField] private int _matchTime = 30;
     [SerializeField] private Slider _slider;
