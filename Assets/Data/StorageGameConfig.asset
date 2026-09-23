@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: StorageGameConfig
   m_EditorClassIdentifier: Assembly-CSharp::StorageGameConfig
   MatchTime: 30
-  MaxItems: 4
+  MaxItems: 5
   Items:
   - ItemType: 0
     Prefab:

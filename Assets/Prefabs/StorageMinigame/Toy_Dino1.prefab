@@ -52,10 +52,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: Toy_Dino1
       objectReference: {fileID: 0}
+    - target: {fileID: 6447946347528084233, guid: ddf895a58537b7d48b76690cf4bdf612, type: 3}
+      propertyPath: m_TagString
+      value: StorageItem
+      objectReference: {fileID: 0}
     - target: {fileID: 7737323665701574807, guid: ddf895a58537b7d48b76690cf4bdf612, type: 3}
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 2058426389, guid: 5284ad42bbf0f1147b10536fca373a79, type: 3}
+    - target: {fileID: 7737323665701574807, guid: ddf895a58537b7d48b76690cf4bdf612, type: 3}
+      propertyPath: m_SortingOrder
+      value: 5
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 5445686825423438792, guid: ddf895a58537b7d48b76690cf4bdf612, type: 3}
     m_RemovedGameObjects: []

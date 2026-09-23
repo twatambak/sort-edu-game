@@ -1,11 +1,15 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class StorageBox : MonoBehaviour, IDropTarget
 {
     [SerializeField] private ItemType _storageType;
-    [SerializeField] private float _repulseForce;
+    [SerializeField] private SpriteRenderer _spriteRenderer;
+    [SerializeField] private Sprite _chestOpenSprite;
+    [SerializeField] private Sprite _chestClosedSprite;
 
     private Collider2D _collider;
+    private float _repulseForce = 20f;
 
     private void Awake()
     {
@@ -29,7 +33,7 @@ public class StorageBox : MonoBehaviour, IDropTarget
         }
         StorageGameController.Instance.HandleCorrectStorage();
         Destroy(droppedObject);
-        Tweenimation.Nod(gameObject);
+        Tweenimation.Jelly(gameObject);
     }
 
     private void EjectItem(GameObject droppedObject)
@@ -52,31 +56,18 @@ public class StorageBox : MonoBehaviour, IDropTarget
         rigidbody2D.AddForce(direction * _repulseForce, ForceMode2D.Impulse);
     }
 
-    private Vector2 GetValidEjectionDirection(Vector2 direction)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        Vector2 normalizedDirection = direction.normalized;
-
-        Vector2[] validDirections =
-        {
-            Vector2.left,
-            Vector2.right,
-            Vector2.up
-        };
-
-        Vector2 bestDirection = Vector2.up;
-        float bestDot = float.NegativeInfinity;
-
-        foreach (Vector2 validDirection in validDirections)
-        {
-            float dot = Vector2.Dot(normalizedDirection, validDirection);
-
-            if (dot > bestDot)
-            {
-                bestDot = dot;
-                bestDirection = validDirection;
-            }
-        }
-
-        return bestDirection;
+        if(collision.gameObject.tag == "StorageItem")
+            _spriteRenderer.sprite = _chestOpenSprite;
     }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.gameObject.tag == "StorageItem")
+        {
+            _spriteRenderer.sprite = _chestClosedSprite;
+        }
+    }
+
 }

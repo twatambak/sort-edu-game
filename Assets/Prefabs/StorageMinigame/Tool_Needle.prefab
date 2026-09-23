@@ -52,6 +52,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Tool_Needle
       objectReference: {fileID: 0}
+    - target: {fileID: 6447946347528084233, guid: ddf895a58537b7d48b76690cf4bdf612, type: 3}
+      propertyPath: m_TagString
+      value: StorageItem
+      objectReference: {fileID: 0}
     - target: {fileID: 6653632063819600161, guid: ddf895a58537b7d48b76690cf4bdf612, type: 3}
       propertyPath: _itemType
       value: 2
@@ -60,6 +64,10 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 100649053, guid: 9fa5f4f6d14ea6f47823e5ecc2842501, type: 3}
+    - target: {fileID: 7737323665701574807, guid: ddf895a58537b7d48b76690cf4bdf612, type: 3}
+      propertyPath: m_SortingOrder
+      value: 5
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 5445686825423438792, guid: ddf895a58537b7d48b76690cf4bdf612, type: 3}
     m_RemovedGameObjects: []
