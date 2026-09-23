@@ -3,7 +3,7 @@ using UnityEngine;
 public class StorageBox : MonoBehaviour, IDropTarget
 {
     [SerializeField] private ItemType _storageType;
-    [SerializeField] private float _repulseForce = 10f;
+    [SerializeField] private float _repulseForce;
 
     private Collider2D _collider;
 
@@ -47,7 +47,7 @@ public class StorageBox : MonoBehaviour, IDropTarget
         if (direction == Vector2.zero)
             direction = itemPosition - (Vector2)_collider.bounds.center;
 
-        direction = GetValidEjectionDirection(direction);
+        //direction = GetValidEjectionDirection(direction);
 
         rigidbody2D.AddForce(direction * _repulseForce, ForceMode2D.Impulse);
     }

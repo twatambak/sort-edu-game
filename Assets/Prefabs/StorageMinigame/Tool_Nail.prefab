@@ -1,0 +1,136 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &7115039643370280260
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 6323358370400519656, guid: ddf895a58537b7d48b76690cf4bdf612, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6323358370400519656, guid: ddf895a58537b7d48b76690cf4bdf612, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6323358370400519656, guid: ddf895a58537b7d48b76690cf4bdf612, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6323358370400519656, guid: ddf895a58537b7d48b76690cf4bdf612, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6323358370400519656, guid: ddf895a58537b7d48b76690cf4bdf612, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6323358370400519656, guid: ddf895a58537b7d48b76690cf4bdf612, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6323358370400519656, guid: ddf895a58537b7d48b76690cf4bdf612, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6323358370400519656, guid: ddf895a58537b7d48b76690cf4bdf612, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6323358370400519656, guid: ddf895a58537b7d48b76690cf4bdf612, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6323358370400519656, guid: ddf895a58537b7d48b76690cf4bdf612, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6447946347528084233, guid: ddf895a58537b7d48b76690cf4bdf612, type: 3}
+      propertyPath: m_Name
+      value: Tool_Nail
+      objectReference: {fileID: 0}
+    - target: {fileID: 6653632063819600161, guid: ddf895a58537b7d48b76690cf4bdf612, type: 3}
+      propertyPath: _itemType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7737323665701574807, guid: ddf895a58537b7d48b76690cf4bdf612, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -879861119, guid: 9fa5f4f6d14ea6f47823e5ecc2842501, type: 3}
+    m_RemovedComponents:
+    - {fileID: 5445686825423438792, guid: ddf895a58537b7d48b76690cf4bdf612, type: 3}
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6447946347528084233, guid: ddf895a58537b7d48b76690cf4bdf612, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3050684626237704607}
+  m_SourcePrefab: {fileID: 100100000, guid: ddf895a58537b7d48b76690cf4bdf612, type: 3}
+--- !u!1 &4307138690520976973 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6447946347528084233, guid: ddf895a58537b7d48b76690cf4bdf612, type: 3}
+  m_PrefabInstance: {fileID: 7115039643370280260}
+  m_PrefabAsset: {fileID: 0}
+--- !u!60 &3050684626237704607
+PolygonCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4307138690520976973}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.51, y: 0.68}
+    newSize: {x: 1, y: 1}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Points:
+    m_Paths:
+    - - {x: -0.185, y: 0.25}
+      - {x: -0.195, y: 0.21}
+      - {x: -0.081909046, y: 0.13811502}
+      - {x: -0.21613425, y: -0.106089614}
+      - {x: -0.26973695, y: -0.20028391}
+      - {x: -0.255, y: -0.34}
+      - {x: -0.105567135, y: -0.2817014}
+      - {x: 0.091776036, y: 0.064026214}
+      - {x: 0.19392526, y: 0.02053736}
+      - {x: 0.26610452, y: 0.17507441}
+      - {x: 0.14171629, y: 0.23728344}
+      - {x: -0.11064157, y: 0.34277612}
+      - {x: -0.14395507, y: 0.2988955}
+  m_UseDelaunayMesh: 1

@@ -7,21 +7,20 @@ public class StorageGameConfig : ScriptableObject
 {
     public int MatchTime = 30;
     public int MaxItems = 10;
-    public List<ItemSpritePack> ItemSprites;
+    public List<ItemPrefabs> Items;
 }
 
 [Serializable]
-public struct ItemSpritePack
+public struct ItemPrefabs
 {
     public ItemType ItemType;  
-    public Sprite[] Sprites;
-    public Color BackgroundColor;
+    public GameObject[] Prefab;
 
-    public Sprite GetRandomSprite()
+    public GameObject GetRandomGameObject()
     {
-        if (Sprites == null || Sprites.Length == 0)
+        if (Prefab == null || Prefab.Length == 0)
             return null;
-        int randomIndex = UnityEngine.Random.Range(0, Sprites.Length);
-        return Sprites[randomIndex];
+        int randomIndex = UnityEngine.Random.Range(0, Prefab.Length);
+        return Prefab[randomIndex];
     }
 }

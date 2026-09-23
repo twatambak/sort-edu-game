@@ -167,28 +167,6 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Small Toys_2
-      rect:
-        serializedVersion: 2
-        x: 488
-        y: 602
-        width: 162
-        height: 110
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: fa455b73c13a0eb4095497711eef3ea2
-      internalID: 2097408102
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
       name: Small Toys_3
       rect:
         serializedVersion: 2
@@ -237,9 +215,9 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 1338
-        y: 588
+        y: 594
         width: 175
-        height: 175
+        height: 169
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -299,28 +277,6 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Small Toys_12
-      rect:
-        serializedVersion: 2
-        x: 1190
-        y: 594
-        width: 131
-        height: 155
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 7b217546e7485314f993f04b304c9865
-      internalID: 2092791637
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
       name: Small Toys_16
       rect:
         serializedVersion: 2
@@ -338,28 +294,6 @@ TextureImporter:
       bones: []
       spriteID: 31275a620f28ec74697913b8641ee6fb
       internalID: -857751633
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Small Toys_18
-      rect:
-        serializedVersion: 2
-        x: 682
-        y: 419
-        width: 98
-        height: 156
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 861c14daacc80bd4a8300351b444058a
-      internalID: 9018523
       vertices: []
       indices: 
       edges: []
@@ -387,50 +321,6 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Small Toys_24
-      rect:
-        serializedVersion: 2
-        x: 1149
-        y: 433
-        width: 185
-        height: 125
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: ae23f046f6d2c2546b5ed887d35f0f0a
-      internalID: -72657106
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Small Toys_25
-      rect:
-        serializedVersion: 2
-        x: 1342
-        y: 394
-        width: 121
-        height: 180
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 4267c87277add454ab32575fa8ecbf82
-      internalID: -1455717549
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
       name: Small Toys_26
       rect:
         serializedVersion: 2
@@ -448,50 +338,6 @@ TextureImporter:
       bones: []
       spriteID: dcf14839d3a506e47a46f9500fbee570
       internalID: 232424567
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Small Toys_27
-      rect:
-        serializedVersion: 2
-        x: 474
-        y: 424
-        width: 192
-        height: 133
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 30f0534b8b470124ab480f54066cb4ab
-      internalID: -1859015819
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Small Toys_29
-      rect:
-        serializedVersion: 2
-        x: 962
-        y: 426
-        width: 147
-        height: 138
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 07a339407395bae4eb2d3301f70470ab
-      internalID: 804572254
       vertices: []
       indices: 
       edges: []
@@ -519,50 +365,6 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Small Toys_31
-      rect:
-        serializedVersion: 2
-        x: 803
-        y: 233
-        width: 93
-        height: 148
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 593767b38ca75f24ea80c0334c054a7e
-      internalID: 1262669419
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Small Toys_34
-      rect:
-        serializedVersion: 2
-        x: 935
-        y: 224
-        width: 111
-        height: 169
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 6816474a84e98bd428145ebba521ba50
-      internalID: 1519718278
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
       name: Small Toys_35
       rect:
         serializedVersion: 2
@@ -585,28 +387,6 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Small Toys_36
-      rect:
-        serializedVersion: 2
-        x: 1364
-        y: 226
-        width: 95
-        height: 160
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: d99bd888c321e5c489a7a036d1c732c3
-      internalID: 1730421848
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
       name: Small Toys_38
       rect:
         serializedVersion: 2
@@ -624,28 +404,6 @@ TextureImporter:
       bones: []
       spriteID: a7fa004bb4dbb814796f1e6c4e1b2b91
       internalID: 1703253614
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Small Toys_39
-      rect:
-        serializedVersion: 2
-        x: 628
-        y: 80
-        width: 84
-        height: 135
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 622c7ecc77cfd7641816a548350dc1e9
-      internalID: 839656359
       vertices: []
       indices: 
       edges: []
@@ -690,28 +448,6 @@ TextureImporter:
       bones: []
       spriteID: f983198d7fd9e5749983009283235fea
       internalID: 693702289
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Small Toys_44
-      rect:
-        serializedVersion: 2
-        x: 25
-        y: 124
-        width: 146
-        height: 86
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: a2847cd2e108b7a45a08e60ba4c56180
-      internalID: 1818053727
       vertices: []
       indices: 
       edges: []
@@ -827,28 +563,6 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Small Toys_5
-      rect:
-        serializedVersion: 2
-        x: 193
-        y: 113
-        width: 145
-        height: 89
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 6c757a11faa147146a0faad436067360
-      internalID: 228174444
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
       name: Small Toys_6
       rect:
         serializedVersion: 2
@@ -866,116 +580,6 @@ TextureImporter:
       bones: []
       spriteID: 280ace6b7456ec942b3fecff49d7209b
       internalID: 249586587
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Small Toys_7
-      rect:
-        serializedVersion: 2
-        x: 662
-        y: 246
-        width: 119
-        height: 149
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 27123ab6bb555e943b073b7672b6a53e
-      internalID: 1298299921
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Small Toys_11
-      rect:
-        serializedVersion: 2
-        x: 486
-        y: 258
-        width: 154
-        height: 123
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: d99dcf1a7bd062a438df5a46bcc6032a
-      internalID: 754485306
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Small Toys_13
-      rect:
-        serializedVersion: 2
-        x: 330
-        y: 248
-        width: 138
-        height: 156
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 86d79616188eaed40a843f0c4367e6fa
-      internalID: 1434583973
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Small Toys_14
-      rect:
-        serializedVersion: 2
-        x: 182
-        y: 241
-        width: 134
-        height: 169
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: dd640485326fc4643ba8e1364f69d316
-      internalID: -1273538919
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Small Toys_15
-      rect:
-        serializedVersion: 2
-        x: 365
-        y: 98
-        width: 97
-        height: 123
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 3b1e216ae17c3b6469798e6a99b52398
-      internalID: 708927902
       vertices: []
       indices: 
       edges: []
