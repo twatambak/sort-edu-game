@@ -3,44 +3,89 @@ using UnityEngine.UI;
 
 public class GameTimer : MonoBehaviour
 {
-    [SerializeField] private int _matchTime = 30;
     [SerializeField] private Slider _slider;
 
     private float _remainingTime;
+    private GameController _gameController;
 
     private void Start()
     {
-        _remainingTime = _matchTime;
+        _gameController = GameController.Instance;
+        enabled = false;
+    }
+
+    public void BeginGame(GameConfiguration config)
+    {
+        if (_gameController == null || config == null || _slider == null)
+            return;
+
+        _gameController.OnCorrectStorage -= AddTime;
+        _gameController.OnIncorrectStorage -= ReduceTime;
+        _slider.gameObject.SetActive(config.Mode == GameMode.Timed);
+
+        if (config.Mode != GameMode.Timed)
+        {
+            enabled = false;
+            return;
+        }
+
+        enabled = true;
+        _remainingTime = config.MatchTime;
 
         _slider.minValue = 0f;
-        _slider.maxValue = _matchTime;
+        _slider.maxValue = _remainingTime;
         _slider.value = _remainingTime;
 
-        StorageGameController.Instance.OnCorrectStorage += AddTime;
-        StorageGameController.Instance.OnIncorrectStorage += ReduceTime;
+        _gameController.OnCorrectStorage += AddTime;
+        _gameController.OnIncorrectStorage += ReduceTime;
+    }
+
+    public void ResetTimer()
+    {
+        enabled = false;
+        if (_slider != null)
+            _slider.gameObject.SetActive(false);
     }
 
     private void Update()
     {
-        if (_remainingTime <= 0f)
+        if (_gameController == null || _gameController.IsGameOver || _remainingTime <= 0f)
             return;
 
         _remainingTime -= Time.deltaTime;
         _remainingTime = Mathf.Max(_remainingTime, 0f);
 
         _slider.value = _remainingTime;
+
+        if (_remainingTime <= 0f)
+            _gameController.HandleTimeExpired();
     }
 
     private void AddTime()
     {
         Tweenimation.Jelly(_slider.gameObject);
-        _remainingTime += 5f; 
+        _remainingTime += _gameController.Config.IncreaseOnRight;
+        _slider.maxValue = Mathf.Max(_slider.maxValue, _remainingTime);
+        _slider.value = _remainingTime;
     }
 
     private void ReduceTime()
     {
         Tweenimation.Impact(_slider.gameObject);
-        _remainingTime -= 5f;
+        _remainingTime -= _gameController.Config.DecreaseOnWrong;
         _remainingTime = Mathf.Max(_remainingTime, 0f);
+        _slider.value = _remainingTime;
+
+        if (_remainingTime <= 0f)
+            _gameController.HandleTimeExpired();
+    }
+
+    private void OnDestroy()
+    {
+        if (_gameController == null)
+            return;
+
+        _gameController.OnCorrectStorage -= AddTime;
+        _gameController.OnIncorrectStorage -= ReduceTime;
     }
 }

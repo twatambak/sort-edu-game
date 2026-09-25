@@ -1,9 +1,9 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class StorageBox : MonoBehaviour, IDropTarget
+public class Storage : MonoBehaviour, IDropTarget
 {
-    [SerializeField] private ItemType _storageType;
+    [SerializeField] private GroupType _storageType;
     [SerializeField] private SpriteRenderer _spriteRenderer;
     [SerializeField] private Sprite _chestOpenSprite;
     [SerializeField] private Sprite _chestClosedSprite;
@@ -21,17 +21,17 @@ public class StorageBox : MonoBehaviour, IDropTarget
         if (!droppedObject)
             return;
 
-        if (!droppedObject.TryGetComponent(out StorageItem storageItem))
+        if (!droppedObject.TryGetComponent(out Item storageItem))
             return;
 
         if (storageItem.ItemType != _storageType)
         {
             EjectItem(droppedObject);
             Tweenimation.Spring(gameObject);
-            StorageGameController.Instance.HandleIncorrectStorage();
+            GameController.Instance.HandleIncorrectStorage();
             return;
         }
-        StorageGameController.Instance.HandleCorrectStorage();
+        GameController.Instance.HandleCorrectStorage();
         Destroy(droppedObject);
         Tweenimation.Jelly(gameObject);
     }

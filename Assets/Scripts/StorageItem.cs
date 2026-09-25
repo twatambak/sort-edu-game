@@ -1,23 +1,21 @@
 using UnityEngine;
 
-public class StorageItem : MonoBehaviour
+public class Item : MonoBehaviour
 {
-    [SerializeField] private ItemType _itemType;
+    [SerializeField] private GroupType _itemType;
+    [SerializeField] private bool _shouldScaleWithYPosition = true;
 
-    public ItemType ItemType => _itemType;
+    public GroupType ItemType => _itemType;
 
     private void Update()
     {
-        float normalizedY = Mathf.InverseLerp(-5f, 5f, transform.position.y);
-        float scaleMultiplier = Mathf.Lerp(1f, 0.6f, normalizedY);
+        if (_shouldScaleWithYPosition)
+        {
+            float normalizedY = Mathf.InverseLerp(-5f, 5f, transform.position.y);
+            float scaleMultiplier = Mathf.Lerp(1f, 0.6f, normalizedY);
 
-        transform.localScale = Vector3.one * scaleMultiplier;
+            transform.localScale = Vector3.one * scaleMultiplier;            
+        }
     }
 }
 
-public enum ItemType
-{
-    Toy,
-    Food,
-    Tool
-}
