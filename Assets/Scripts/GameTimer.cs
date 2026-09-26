@@ -11,16 +11,24 @@ public class GameTimer : MonoBehaviour
     private void Start()
     {
         _gameController = GameController.Instance;
-        enabled = false;
     }
 
-    public void BeginGame(GameConfiguration config)
+    private void Update()
     {
-        if (_gameController == null || config == null || _slider == null)
+        if (_gameController == null || _gameController.IsGameOver || _remainingTime <= 0f)
             return;
 
-        //_gameController.OnCorrectStorage -= AddTime;
-        //_gameController.OnIncorrectStorage -= ReduceTime;
+        _remainingTime -= Time.deltaTime;
+        _remainingTime = Mathf.Max(_remainingTime, 0f);
+
+        _slider.value = _remainingTime;
+
+        if (_remainingTime <= 0f)
+            _gameController.HandleTimeExpired();
+    }
+
+    public void InitializeCountdown(GameConfiguration config)
+    {
         _remainingTime = config.MatchTime;
 
         _slider.minValue = 0f;
@@ -36,20 +44,6 @@ public class GameTimer : MonoBehaviour
         enabled = false;
         if (_slider != null)
             _slider.gameObject.SetActive(false);
-    }
-
-    private void Update()
-    {
-        if (_gameController == null || _gameController.IsGameOver || _remainingTime <= 0f)
-            return;
-
-        _remainingTime -= Time.deltaTime;
-        _remainingTime = Mathf.Max(_remainingTime, 0f);
-
-        _slider.value = _remainingTime;
-
-        if (_remainingTime <= 0f)
-            _gameController.HandleTimeExpired();
     }
 
     private void AddTime()

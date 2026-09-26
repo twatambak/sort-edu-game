@@ -9,6 +9,7 @@ public class GameController : SingletonBase<GameController>
     [SerializeField] private GameSetupScreen _setupScreenPrefab;
     [SerializeField] private GameStatusScreen _statusScreenPrefab; */
     [SerializeField] private GameDefinition _gameDefinition;
+    [SerializeField] private GameTimer _gameTimer;
 
     public Action OnCorrectStorage;
     public Action OnIncorrectStorage;
@@ -24,7 +25,6 @@ public class GameController : SingletonBase<GameController>
     private bool _gameStarted;
 
     private GameStatusScreen _statusScreen;
-    private GameTimer _gameTimer;
 
     private void Start()
     {
@@ -120,7 +120,7 @@ public class GameController : SingletonBase<GameController>
         CorrectItemCount = 0;
 
         if (_gameTimer != null)
-            _gameTimer.BeginGame(Config);
+            _gameTimer.InitializeCountdown(Config);
 
 /*         if (_statusScreen == null)
         {
