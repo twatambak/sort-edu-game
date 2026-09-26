@@ -11,10 +11,11 @@ public class GameController : SingletonBase<GameController>
     [SerializeField] private GameDefinition _gameDefinition;
     [SerializeField] private GameTimer _gameTimer;
 
-    public Action OnCorrectStorage;
-    public Action OnIncorrectStorage;
-    public Action OnGameWon;
-    public Action OnGameLost;
+    public Action<GameConfiguration> OnGameStarted { get; set; }
+    public Action OnCorrectStorage { get; set; }
+    public Action OnIncorrectStorage { get; set; }
+    public Action OnGameWon{ get; set; }
+    public Action OnGameLost{ get; set; }
 
     public GameConfiguration Config { get; private set; }
     public int ErrorCount { get; private set; }
@@ -29,7 +30,8 @@ public class GameController : SingletonBase<GameController>
     private void Start()
     {
         Config = GameConfiguration.ClassicMode;
-        BeginGame(Config);
+        OnGameStarted += BeginGame;
+        OnGameStarted?.Invoke(Config);
     }
 
     private void SpawnItems()

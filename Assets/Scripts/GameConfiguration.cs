@@ -25,5 +25,5 @@ public class GameConfiguration
         ItemGroupB = itemGroupB;
     }
 
-    public static GameConfiguration ClassicMode => new GameConfiguration(60, 10, 5, 15, 5, ItemGroup.Toy, ItemGroup.Tool);
+    public static GameConfiguration ClassicMode => new GameConfiguration(60, 8, 5, 15, 5, ItemGroup.Toy, ItemGroup.Tool);
 }

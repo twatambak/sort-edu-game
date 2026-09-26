@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class GameTimer : MonoBehaviour
 {
-    [SerializeField] private Slider _slider;
+    [SerializeField] private Slider _sliderTimer;
 
     private float _remainingTime;
     private GameController _gameController;
@@ -21,7 +21,7 @@ public class GameTimer : MonoBehaviour
         _remainingTime -= Time.deltaTime;
         _remainingTime = Mathf.Max(_remainingTime, 0f);
 
-        _slider.value = _remainingTime;
+        _sliderTimer.value = _remainingTime;
 
         if (_remainingTime <= 0f)
             _gameController.HandleTimeExpired();
@@ -31,33 +31,32 @@ public class GameTimer : MonoBehaviour
     {
         _remainingTime = config.MatchTime;
 
-        _slider.minValue = 0f;
-        _slider.maxValue = _remainingTime;
-        _slider.value = _remainingTime;
+        _sliderTimer.minValue = 0f;
+        _sliderTimer.maxValue = _remainingTime;
+        _sliderTimer.value = _remainingTime;
 
-        //_gameController.OnCorrectStorage += AddTime;
-        //_gameController.OnIncorrectStorage += ReduceTime;
+/*         _gameController.OnCorrectStorage += HandleCorrectStorage;
+        _gameController.OnIncorrectStorage += HandleIncorrectStorage; */
     }
 
     public void ResetTimer()
     {
         enabled = false;
-        if (_slider != null)
-            _slider.gameObject.SetActive(false);
+        if (_sliderTimer != null)
+            _sliderTimer.gameObject.SetActive(false);
     }
 
-    private void AddTime()
+    private void HandleCorrectStorage()
     {
-        Tweenimation.Jelly(_slider.gameObject);
-        _slider.maxValue = Mathf.Max(_slider.maxValue, _remainingTime);
-        _slider.value = _remainingTime;
+        _sliderTimer.maxValue = Mathf.Max(_sliderTimer.maxValue, _remainingTime);
+        _sliderTimer.value = _remainingTime;
     }
 
-    private void ReduceTime()
+    private void HandleIncorrectStorage()
     {
-        Tweenimation.Impact(_slider.gameObject);
+        Tweenimation.Impact(_sliderTimer.gameObject);
         _remainingTime = Mathf.Max(_remainingTime, 0f);
-        _slider.value = _remainingTime;
+        _sliderTimer.value = _remainingTime;
 
         if (_remainingTime <= 0f)
             _gameController.HandleTimeExpired();
