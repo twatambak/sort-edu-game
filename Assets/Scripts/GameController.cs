@@ -19,7 +19,7 @@ public class GameController : SingletonBase<GameController>
 
     public GameConfiguration Config { get; private set; }
     public int ErrorCount { get; private set; }
-    public int CorrectItemCount { get; private set; }
+    public int ScoreCount { get; private set; }
     public bool IsGameOver { get; private set; }
 
     private int _activeItemCount;
@@ -68,11 +68,11 @@ public class GameController : SingletonBase<GameController>
             return;
 
         _activeItemCount--;
-        CorrectItemCount++;
+        ScoreCount++;
 
         OnCorrectStorage?.Invoke();
 
-        if (Config.ItemsToWin > 0 && CorrectItemCount >= Config.ItemsToWin)
+        if (Config.ItemsToWin > 0 && ScoreCount >= Config.ItemsToWin)
         {
             EndGame(true);
             return;
@@ -119,7 +119,7 @@ public class GameController : SingletonBase<GameController>
         _gameStarted = true;
         IsGameOver = false;
         ErrorCount = 0;
-        CorrectItemCount = 0;
+        ScoreCount = 0;
 
         if (_gameTimer != null)
             _gameTimer.InitializeCountdown(Config);
@@ -145,10 +145,11 @@ public class GameController : SingletonBase<GameController>
         _gameStarted = false;
         IsGameOver = false;
         ErrorCount = 0;
-        CorrectItemCount = 0;
+        ScoreCount = 0;
 
         _gameTimer?.ResetTimer();
-        _statusScreen?.Hide();
+
+        BeginGame(Config);
     }
 
     public bool IsGameStarted => _gameStarted;

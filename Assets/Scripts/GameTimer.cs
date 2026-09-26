@@ -20,7 +20,6 @@ public class GameTimer : MonoBehaviour
 
         _remainingTime -= Time.deltaTime;
         _remainingTime = Mathf.Max(_remainingTime, 0f);
-
         _sliderTimer.value = _remainingTime;
 
         if (_remainingTime <= 0f)
