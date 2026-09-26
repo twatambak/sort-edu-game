@@ -11,6 +11,7 @@ public class GameTimer : MonoBehaviour
     private void Start()
     {
         _gameController = GameController.Instance;
+        _gameController.OnGameStarted += InitializeCountdown;
     }
 
     private void Update()
@@ -38,13 +39,6 @@ public class GameTimer : MonoBehaviour
         _gameController.OnIncorrectStorage += HandleIncorrectStorage; */
     }
 
-    public void ResetTimer()
-    {
-        enabled = false;
-        if (_sliderTimer != null)
-            _sliderTimer.gameObject.SetActive(false);
-    }
-
     private void HandleCorrectStorage()
     {
         _sliderTimer.maxValue = Mathf.Max(_sliderTimer.maxValue, _remainingTime);
@@ -65,6 +59,8 @@ public class GameTimer : MonoBehaviour
     {
         if (_gameController == null)
             return;
+            
+        _gameController.OnGameStarted -= InitializeCountdown;
 
         //_gameController.OnCorrectStorage -= AddTime;
         //_gameController.OnIncorrectStorage -= ReduceTime;

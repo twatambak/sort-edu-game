@@ -9,7 +9,6 @@ public class GameController : SingletonBase<GameController>
     [SerializeField] private GameSetupScreen _setupScreenPrefab;
     [SerializeField] private GameStatusScreen _statusScreenPrefab; */
     [SerializeField] private GameDefinition _gameDefinition;
-    [SerializeField] private GameTimer _gameTimer;
 
     public Action<GameConfiguration> OnGameStarted { get; set; }
     public Action OnCorrectStorage { get; set; }
@@ -121,19 +120,6 @@ public class GameController : SingletonBase<GameController>
         ErrorCount = 0;
         ScoreCount = 0;
 
-        if (_gameTimer != null)
-            _gameTimer.InitializeCountdown(Config);
-
-/*         if (_statusScreen == null)
-        {
-            _statusScreen = Instantiate(_statusScreenPrefab, _uiCanvas.transform);
-            _statusScreen.Initialize(this);
-        }
-        else
-        {
-            _statusScreen.ShowGameView();
-        } */
-
         SpawnItems();
     }
 
@@ -146,8 +132,6 @@ public class GameController : SingletonBase<GameController>
         IsGameOver = false;
         ErrorCount = 0;
         ScoreCount = 0;
-
-        _gameTimer?.ResetTimer();
 
         BeginGame(Config);
     }
