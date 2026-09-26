@@ -5,9 +5,9 @@ using UnityEngine.UI;
 public class GameController : SingletonBase<GameController>
 {
     [SerializeField] private Transform[] _spawnPoints;
-    [SerializeField] private Canvas _uiCanvas;
+/*     [SerializeField] private Canvas _uiCanvas;
     [SerializeField] private GameSetupScreen _setupScreenPrefab;
-    [SerializeField] private GameStatusScreen _statusScreenPrefab;
+    [SerializeField] private GameStatusScreen _statusScreenPrefab; */
     [SerializeField] private GameDefinition _gameDefinition;
 
     public Action OnCorrectStorage;
@@ -29,21 +29,7 @@ public class GameController : SingletonBase<GameController>
     private void Start()
     {
         Config = GameConfiguration.ClassicMode;
-        if (_uiCanvas == null)
-            _uiCanvas = FindFirstObjectByType<Canvas>();
-
-        _gameTimer = FindFirstObjectByType<GameTimer>();
-        if (_setupScreenPrefab == null)
-            _setupScreenPrefab = Resources.Load<GameSetupScreen>("StorageGameUI/GameSetupScreen");
-        if (_statusScreenPrefab == null)
-            _statusScreenPrefab = Resources.Load<GameStatusScreen>("StorageGameUI/GameStatusScreen");
-
-        if (_uiCanvas == null || _setupScreenPrefab == null || _statusScreenPrefab == null)
-        {
-            Debug.LogError("Assign the UI Canvas and Storage Game UI prefabs, or generate them from the Editor menu.", this);
-            enabled = false;
-            return;
-        }
+        BeginGame(Config);
     }
 
     private void SpawnItems()
@@ -127,9 +113,6 @@ public class GameController : SingletonBase<GameController>
 
     public void BeginGame(GameConfiguration selectedConfig)
     {
-        if (_gameStarted || selectedConfig == null || _statusScreenPrefab == null)
-            return;
-
         Config = selectedConfig;
         _gameStarted = true;
         IsGameOver = false;
@@ -139,7 +122,7 @@ public class GameController : SingletonBase<GameController>
         if (_gameTimer != null)
             _gameTimer.BeginGame(Config);
 
-        if (_statusScreen == null)
+/*         if (_statusScreen == null)
         {
             _statusScreen = Instantiate(_statusScreenPrefab, _uiCanvas.transform);
             _statusScreen.Initialize(this);
@@ -147,7 +130,7 @@ public class GameController : SingletonBase<GameController>
         else
         {
             _statusScreen.ShowGameView();
-        }
+        } */
 
         SpawnItems();
     }

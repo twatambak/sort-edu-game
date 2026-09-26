@@ -27,7 +27,7 @@ public struct ItemGroupDefinition
 {
     public ItemGroup ItemType;  
     public GameObject[] Prefabs;
-    public Storage StoragePrefab;
+    //public Storage StoragePrefab;
 }
 
 public enum ItemGroup
