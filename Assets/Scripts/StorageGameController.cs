@@ -1,40 +1,56 @@
 using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameController : SingletonBase<GameController>
 {
-    [SerializeField] private GameConfiguration _config;
     [SerializeField] private Transform[] _spawnPoints;
+    [SerializeField] private Canvas _uiCanvas;
+    [SerializeField] private GameSetupScreen _setupScreenPrefab;
+    [SerializeField] private GameStatusScreen _statusScreenPrefab;
+    [SerializeField] private GameDefinition _gameDefinition;
 
     public Action OnCorrectStorage;
     public Action OnIncorrectStorage;
     public Action OnGameWon;
     public Action OnGameLost;
 
-    public GameConfiguration Config => _config;
+    public GameConfiguration Config { get; private set; }
     public int ErrorCount { get; private set; }
     public int CorrectItemCount { get; private set; }
     public bool IsGameOver { get; private set; }
 
     private int _activeItemCount;
     private bool _gameStarted;
-    private GameConfiguration _baseConfig;
+
     private GameStatusScreen _statusScreen;
     private GameTimer _gameTimer;
 
     private void Start()
     {
-        _baseConfig = _config;
+        Config = GameConfiguration.ClassicMode;
+        if (_uiCanvas == null)
+            _uiCanvas = FindFirstObjectByType<Canvas>();
+
         _gameTimer = FindFirstObjectByType<GameTimer>();
-        GameSetupScreen setupScreen = gameObject.AddComponent<GameSetupScreen>();
-        setupScreen.Initialize(_config, BeginGame);
+        if (_setupScreenPrefab == null)
+            _setupScreenPrefab = Resources.Load<GameSetupScreen>("StorageGameUI/GameSetupScreen");
+        if (_statusScreenPrefab == null)
+            _statusScreenPrefab = Resources.Load<GameStatusScreen>("StorageGameUI/GameStatusScreen");
+
+        if (_uiCanvas == null || _setupScreenPrefab == null || _statusScreenPrefab == null)
+        {
+            Debug.LogError("Assign the UI Canvas and Storage Game UI prefabs, or generate them from the Editor menu.", this);
+            enabled = false;
+            return;
+        }
     }
 
     private void SpawnItems()
     {
         _activeItemCount = 0;
 
-        for (int i = 0; i < _config.MaxItemsOnScreen; i++)
+        for (int i = 0; i < Config.MaxItemsOnScreen; i++)
         {
             if (SpawnRandomItem())
                 _activeItemCount++;
@@ -43,17 +59,8 @@ public class GameController : SingletonBase<GameController>
 
     private bool SpawnRandomItem()
     {
-        if (_config.Items == null || _config.Items.Count == 0)
-            return false;
-
-        int randomIndex = UnityEngine.Random.Range(0, _config.Items.Count);
-        ItemGroupDefinition itemPrefab = _config.Items[randomIndex];
-
-        GameObject randomItemPrefab = itemPrefab.GetRandomGameObject();
-
-        if (randomItemPrefab == null)
-            return false;
-
+        ItemGroup randomGroup = UnityEngine.Random.value < 0.5f ? Config.ItemGroupA : Config.ItemGroupB;
+        GameObject randomItemPrefab = _gameDefinition.GetRandomGameObject(randomGroup);
         Instantiate(randomItemPrefab, GetRandomSpawnPosition(), Quaternion.identity);
         return true;
     }
@@ -77,7 +84,7 @@ public class GameController : SingletonBase<GameController>
 
         OnCorrectStorage?.Invoke();
 
-        if (_config.ItemsToWin > 0 && CorrectItemCount >= _config.ItemsToWin)
+        if (Config.ItemsToWin > 0 && CorrectItemCount >= Config.ItemsToWin)
         {
             EndGame(true);
             return;
@@ -96,13 +103,13 @@ public class GameController : SingletonBase<GameController>
 
         OnIncorrectStorage?.Invoke();
 
-        if (_config.Mode == GameMode.ErrorLimit && _config.ErrorLimit > 0 && ErrorCount >= _config.ErrorLimit)
+        if (ErrorCount >= Config.ErrorLimit)
             EndGame(false);
     }
 
     public void HandleTimeExpired()
     {
-        if (IsGameOver || _config.Mode != GameMode.Timed)
+        if (IsGameOver)
             return;
 
         EndGame(false);
@@ -118,23 +125,23 @@ public class GameController : SingletonBase<GameController>
             OnGameLost?.Invoke();
     }
 
-    private void BeginGame(GameConfiguration selectedConfig)
+    public void BeginGame(GameConfiguration selectedConfig)
     {
-        if (_gameStarted || selectedConfig == null)
+        if (_gameStarted || selectedConfig == null || _statusScreenPrefab == null)
             return;
 
-        _config = selectedConfig;
+        Config = selectedConfig;
         _gameStarted = true;
         IsGameOver = false;
         ErrorCount = 0;
         CorrectItemCount = 0;
 
         if (_gameTimer != null)
-            _gameTimer.BeginGame(_config);
+            _gameTimer.BeginGame(Config);
 
         if (_statusScreen == null)
         {
-            _statusScreen = gameObject.AddComponent<GameStatusScreen>();
+            _statusScreen = Instantiate(_statusScreenPrefab, _uiCanvas.transform);
             _statusScreen.Initialize(this);
         }
         else
@@ -149,10 +156,7 @@ public class GameController : SingletonBase<GameController>
     {
         RemoveActiveItems();
 
-        if (_config != _baseConfig && _config != null)
-            Destroy(_config);
-
-        _config = _baseConfig;
+        Config = GameConfiguration.ClassicMode;
         _gameStarted = false;
         IsGameOver = false;
         ErrorCount = 0;
@@ -160,9 +164,6 @@ public class GameController : SingletonBase<GameController>
 
         _gameTimer?.ResetTimer();
         _statusScreen?.Hide();
-
-        GameSetupScreen setupScreen = gameObject.AddComponent<GameSetupScreen>();
-        setupScreen.Initialize(_baseConfig, BeginGame);
     }
 
     public bool IsGameStarted => _gameStarted;

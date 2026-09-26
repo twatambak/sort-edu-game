@@ -2,10 +2,10 @@ using UnityEngine;
 
 public class Item : MonoBehaviour
 {
-    [SerializeField] private GroupType _itemType;
+    [SerializeField] private ItemGroup _itemType;
     [SerializeField] private bool _shouldScaleWithYPosition = true;
 
-    public GroupType ItemType => _itemType;
+    public ItemGroup ItemType => _itemType;
 
     private void Update()
     {

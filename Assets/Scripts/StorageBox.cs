@@ -3,7 +3,7 @@ using UnityEngine.EventSystems;
 
 public class Storage : MonoBehaviour, IDropTarget
 {
-    [SerializeField] private GroupType _storageType;
+    [SerializeField] private ItemGroup _storageType;
     [SerializeField] private SpriteRenderer _spriteRenderer;
     [SerializeField] private Sprite _chestOpenSprite;
     [SerializeField] private Sprite _chestClosedSprite;

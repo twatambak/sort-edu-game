@@ -4,54 +4,26 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using NaughtyAttributes;
 
-[CreateAssetMenu(fileName = "GameConfig", menuName = "Scriptable Objects/GameConfig")]
-public class GameConfiguration : ScriptableObject
+public class GameConfiguration
 {
-    public GameMode Mode;
-    
-    [ShowIf("IsTimedMode")] public int MatchTime;
-    [ShowIf("IsTimedMode")] public int IncreaseOnRight;
-    [ShowIf("IsTimedMode")] public int DecreaseOnWrong;
+    public int MatchTime {get; set;}
+    public int ErrorLimit {get; set;}
+    public int MaxItemsOnScreen {get; set;}
+    public int ItemsToWin {get; set;}
+    public int DelayBetweenSpawns {get; set;}
+    public ItemGroup ItemGroupA {get; set;}
+    public ItemGroup ItemGroupB {get; set;}
 
-    [ShowIf("IsErrorLimitMode")] public int ErrorLimit;
-
-    [FormerlySerializedAs("MaxItems")] public int MaxItemsOnScreen;
-    public int ItemsToWin = 10;
-    public int DelayBetweenItemSpawn;
-
-    public List<ItemGroupDefinition> Items;
-
-    private bool IsTimedMode => Mode == GameMode.Timed;
-    private bool IsErrorLimitMode => Mode == GameMode.ErrorLimit;
-}
-
-public enum GroupType
-{
-    Toy,
-    Food,
-    Tool,
-    Animal
-}
-
-public enum GameMode
-{
-    Timed,
-    ErrorLimit
-}
-
-[Serializable]
-public struct ItemGroupDefinition
-{
-    public GroupType ItemType;  
-    [FormerlySerializedAs("Prefab")] 
-    public GameObject[] Prefabs;
-    public Storage StoragePrefab;
-
-    public GameObject GetRandomGameObject()
+    public GameConfiguration(int matchTime, int errorLimit, int maxItemsOnScreen, int itemsToWin, int delayBetweenSpawns, ItemGroup itemGroupA, ItemGroup itemGroupB)
     {
-        if (Prefabs == null || Prefabs.Length == 0)
-            return null;
-        int randomIndex = UnityEngine.Random.Range(0, Prefabs.Length);
-        return Prefabs[randomIndex];
+        MatchTime = matchTime;
+        ErrorLimit = errorLimit;
+        MaxItemsOnScreen = maxItemsOnScreen;
+        ItemsToWin = itemsToWin;
+        DelayBetweenSpawns = delayBetweenSpawns;
+        ItemGroupA = itemGroupA;
+        ItemGroupB = itemGroupB;
     }
+
+    public static GameConfiguration ClassicMode => new GameConfiguration(60, 10, 5, 15, 5, ItemGroup.Toy, ItemGroup.Tool);
 }

@@ -19,25 +19,16 @@ public class GameTimer : MonoBehaviour
         if (_gameController == null || config == null || _slider == null)
             return;
 
-        _gameController.OnCorrectStorage -= AddTime;
-        _gameController.OnIncorrectStorage -= ReduceTime;
-        _slider.gameObject.SetActive(config.Mode == GameMode.Timed);
-
-        if (config.Mode != GameMode.Timed)
-        {
-            enabled = false;
-            return;
-        }
-
-        enabled = true;
+        //_gameController.OnCorrectStorage -= AddTime;
+        //_gameController.OnIncorrectStorage -= ReduceTime;
         _remainingTime = config.MatchTime;
 
         _slider.minValue = 0f;
         _slider.maxValue = _remainingTime;
         _slider.value = _remainingTime;
 
-        _gameController.OnCorrectStorage += AddTime;
-        _gameController.OnIncorrectStorage += ReduceTime;
+        //_gameController.OnCorrectStorage += AddTime;
+        //_gameController.OnIncorrectStorage += ReduceTime;
     }
 
     public void ResetTimer()
@@ -64,7 +55,6 @@ public class GameTimer : MonoBehaviour
     private void AddTime()
     {
         Tweenimation.Jelly(_slider.gameObject);
-        _remainingTime += _gameController.Config.IncreaseOnRight;
         _slider.maxValue = Mathf.Max(_slider.maxValue, _remainingTime);
         _slider.value = _remainingTime;
     }
@@ -72,7 +62,6 @@ public class GameTimer : MonoBehaviour
     private void ReduceTime()
     {
         Tweenimation.Impact(_slider.gameObject);
-        _remainingTime -= _gameController.Config.DecreaseOnWrong;
         _remainingTime = Mathf.Max(_remainingTime, 0f);
         _slider.value = _remainingTime;
 
@@ -85,7 +74,7 @@ public class GameTimer : MonoBehaviour
         if (_gameController == null)
             return;
 
-        _gameController.OnCorrectStorage -= AddTime;
-        _gameController.OnIncorrectStorage -= ReduceTime;
+        //_gameController.OnCorrectStorage -= AddTime;
+        //_gameController.OnIncorrectStorage -= ReduceTime;
     }
 }
