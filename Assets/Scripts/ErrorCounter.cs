@@ -10,7 +10,7 @@ public class ErrorCounter : MonoBehaviour
 
     private GameController _gameController;
 
-    private List<Image> _errorCounters = new();
+    private List<GameObject> _errorCounters = new();
     private int _currentErrorIndex;
 
     private void Start()
@@ -23,8 +23,10 @@ public class ErrorCounter : MonoBehaviour
 
     public void InitializeCounters(GameConfiguration config)
     {
-        foreach (Image gb in _errorCounters)
-            Destroy(gb.gameObject);
+        foreach (GameObject gb in _errorCounters)
+            Destroy(gb);
+
+        _errorCounters.Clear();
 
         _currentErrorIndex = 0;
         for (int i = 0; i < config.ErrorLimit; i++)
@@ -33,25 +35,25 @@ public class ErrorCounter : MonoBehaviour
             if(newCounter.TryGetComponent(out Image img))
             {
                 img.color = Color.black;
-                _errorCounters.Add(img);
+                _errorCounters.Add(newCounter);
             }
         }
     }
 
-    public void ResetCounter()
-    {
-        
-    }
-
     private void HandleCorrectStorage()
     {
-
     }
 
     private void HandleIncorrectStorage()
     {
-        _errorCounters[_currentErrorIndex].color = _errorColor;
-        Tweenimation.Pop(_errorCounters[_currentErrorIndex].gameObject, initialScale: 0.5f, overshoot: 1.8f, duration: 0.3f);
+        GameObject counter = _errorCounters[_currentErrorIndex];
+        if(counter == null)
+            return;
+
+        if (counter.TryGetComponent(out Image img))
+            img.color = _errorColor;
+
+        Tweenimation.Pop(counter, initialScale: 0.5f, overshoot: 1.8f, duration: 0.3f);
         _currentErrorIndex++;
 
     }

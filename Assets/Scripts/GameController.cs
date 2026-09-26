@@ -29,8 +29,7 @@ public class GameController : SingletonBase<GameController>
     private void Start()
     {
         Config = GameConfiguration.ClassicMode;
-        OnGameStarted += BeginGame;
-        OnGameStarted?.Invoke(Config);
+        BeginGame(Config);
     }
 
     private void SpawnItems()
@@ -48,7 +47,8 @@ public class GameController : SingletonBase<GameController>
     {
         ItemGroup randomGroup = UnityEngine.Random.value < 0.5f ? Config.ItemGroupA : Config.ItemGroupB;
         GameObject randomItemPrefab = _gameDefinition.GetRandomGameObject(randomGroup);
-        Instantiate(randomItemPrefab, GetRandomSpawnPosition(), Quaternion.identity);
+        GameObject newItem = Instantiate(randomItemPrefab, GetRandomSpawnPosition(), Quaternion.identity);
+        Tweenimation.Pop(newItem, initialScale: 0.3f, duration: 0.3f);
         return true;
     }
 
@@ -121,6 +121,9 @@ public class GameController : SingletonBase<GameController>
         ScoreCount = 0;
 
         SpawnItems();
+
+        OnGameStarted?.Invoke(Config);
+
     }
 
     public void ResetGame()

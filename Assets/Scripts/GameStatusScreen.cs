@@ -32,7 +32,7 @@ public class GameStatusScreen : MonoBehaviour
 
     private void ShowLoss()
     {
-        ShowResult("MUITOS ERROS", new Color(1f, 0.4f, 0.35f, 1f));
+        ShowResult("FIM DE JOGO", new Color(1f, 0.4f, 0.35f, 1f));
     }
 
     private void ShowResult(string title, Color titleColor)
@@ -42,6 +42,8 @@ public class GameStatusScreen : MonoBehaviour
         _resultTitle.text = title;
         _resultTitle.color = titleColor;
         _scoreText.text = _gameController.ScoreCount.ToString();
+        _errorText.text = _gameController.ErrorCount.ToString();
+
     }
 
     public void Hide()
