@@ -99,7 +99,7 @@ public class GameController : SingletonBase<GameController>
         if (IsGameOver)
             return;
 
-        EndGame(false);
+        EndGame(true);
     }
 
     private void EndGame(bool won)
