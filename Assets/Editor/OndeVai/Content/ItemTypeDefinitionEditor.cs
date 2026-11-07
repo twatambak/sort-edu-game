@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using OndeVai.Content;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
+using OndeVai.Gameplay;
 
 namespace OndeVai.EditorTools
 {

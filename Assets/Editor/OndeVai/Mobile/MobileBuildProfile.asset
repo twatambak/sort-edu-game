@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1edd9ba3dd8f03f45bdcea7f52915888, type: 3}
+  m_Name: MobileBuildProfile
+  m_EditorClassIdentifier: Assembly-CSharp-Editor::OndeVai.EditorTools.Mobile.MobileBuildProfile
+  ProductName: Onde Vai?
+  CompanyName: TLW
+  BundleIdentifier: com.b2b.ondevai
+  Version: 0.1.0
+  BuildNumber: 1
+  AppIcon: {fileID: 0}
+  PortraitOnly: 1
+  ApplyBeforeBuild: 1
+  MinimumSdk: 25
+  TargetSdk: 0
+  Architectures: 3
+  KeystorePath: 
+  KeyAliasName: 
+  MinimumIOSVersion: 15.0
+  OutputFolder: Builds

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace OndeVai.Content
+namespace OndeVai.Gameplay
 {
     /// <summary>How the collider of an item is built from its sprite.</summary>
     public enum ItemColliderShape

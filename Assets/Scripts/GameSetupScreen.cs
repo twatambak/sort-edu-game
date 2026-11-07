@@ -2,45 +2,52 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using OndeVai.Gameplay;
 
-public class GameSetupScreen : MonoBehaviour
+namespace OndeVai.UI
 {
-    [SerializeField] private TMP_InputField _itemsToWinInput;
-    [SerializeField] private TMP_InputField _matchTimeInput;
-    [SerializeField] private TMP_InputField _delayBetweenSpawnsInput;
-    [SerializeField] private TMP_InputField _errorLimitInput;
-    [SerializeField] private TMP_InputField _maxItemsInput;
-
-    [SerializeField] private Button _startButton;
-
-    public void StartGame()
+    /// <summary>
+    /// Screen that allows the user to configure the game before starting it.
+    /// </summary>
+    public class GameSetupScreen : MonoBehaviour
     {
-        int itemsToWin = ReadNumber(_itemsToWinInput, 10);
-        int maxItems = ReadNumber(_maxItemsInput, 5);
-        int matchTime = ReadNumber(_matchTimeInput, 30);
-        int errorLimit = ReadNumber(_errorLimitInput, 3);
-        int delayBetweenSpawns = ReadNumber(_delayBetweenSpawnsInput, 3);
+        [SerializeField] private TMP_InputField _itemsToWinInput;
+        [SerializeField] private TMP_InputField _matchTimeInput;
+        [SerializeField] private TMP_InputField _delayBetweenSpawnsInput;
+        [SerializeField] private TMP_InputField _errorLimitInput;
+        [SerializeField] private TMP_InputField _maxItemsInput;
 
-        GameConfiguration selectedConfig = new(matchTime, errorLimit, maxItems, itemsToWin, delayBetweenSpawns, ItemGroup.Toy, ItemGroup.Tool);
+        [SerializeField] private Button _startButton;
 
-        GameController.Instance.BeginGame(selectedConfig);
+        public void StartGame()
+        {
+            int itemsToWin = ReadNumber(_itemsToWinInput, 10);
+            int maxItems = ReadNumber(_maxItemsInput, 5);
+            int matchTime = ReadNumber(_matchTimeInput, 30);
+            int errorLimit = ReadNumber(_errorLimitInput, 3);
+            int delayBetweenSpawns = ReadNumber(_delayBetweenSpawnsInput, 3);
 
-        gameObject.SetActive(false);
-    }
+            GameConfiguration selectedConfig = new(matchTime, errorLimit, maxItems, itemsToWin, delayBetweenSpawns, ItemGroup.Toy, ItemGroup.Tool);
 
-    private void SetFields(int itemsToWin, int maxItems, int matchTime, int errorLimit, int delayBetweenSpawns)
-    {
-        _itemsToWinInput.text = itemsToWin.ToString();
-        _maxItemsInput.text = maxItems.ToString();
-        _matchTimeInput.text = matchTime.ToString();
-        _errorLimitInput.text = errorLimit.ToString();
-        _delayBetweenSpawnsInput.text = delayBetweenSpawns.ToString();
-    }
+            GameController.Instance.BeginGame(selectedConfig);
+
+            gameObject.SetActive(false);
+        }
+
+        private void SetFields(int itemsToWin, int maxItems, int matchTime, int errorLimit, int delayBetweenSpawns)
+        {
+            _itemsToWinInput.text = itemsToWin.ToString();
+            _maxItemsInput.text = maxItems.ToString();
+            _matchTimeInput.text = matchTime.ToString();
+            _errorLimitInput.text = errorLimit.ToString();
+            _delayBetweenSpawnsInput.text = delayBetweenSpawns.ToString();
+        }
 
 
 
-    private static int ReadNumber(TMP_InputField input, int fallback)
-    {
-        return int.TryParse(input.text, out int value) ? Mathf.Max(1, value) : fallback;
+        private static int ReadNumber(TMP_InputField input, int fallback)
+        {
+            return int.TryParse(input.text, out int value) ? Mathf.Max(1, value) : fallback;
+        }
     }
 }

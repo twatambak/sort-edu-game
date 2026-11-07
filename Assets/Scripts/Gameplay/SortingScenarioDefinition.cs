@@ -1,4 +1,3 @@
-using OndeVai.Content;
 using UnityEngine;
 
 namespace OndeVai.Gameplay

@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using OndeVai.Content;
-using OndeVai.Gameplay;
 using UnityEngine;
 
-/// <summary>
+namespace OndeVai.Gameplay
+{
+    /// <summary>
 /// Content catalog for the game: the single item prefab, the item types (each with its variants)
 /// and the sorting scenarios that pair two types.
 /// </summary>
@@ -108,18 +108,17 @@ public class GameDefinition : ScriptableObject
 /// </summary>
 public enum ItemGroup
 {
-    Toy = 0,
-    Food = 1,
-    Tool = 2,
-    Animal = 3,
-    Letter = 4,
-    Number = 5,
-    HealthyFood = 6,
-    UnhealthyFood = 7,
-    GoodBehavior = 8,
-    BadBehavior = 9,
-    Vowel = 10,
-    Consonant = 11,
-    FarmAnimal = 12,
-    JungleAnimal = 13
+    Toy,
+    Tool,
+    Letter,
+    Number,
+    HealthyFood,
+    UnhealthyFood,
+    Vowel,
+    Consonant,
+    FarmAnimal,
+    JungleAnimal
 }
+
+}
+

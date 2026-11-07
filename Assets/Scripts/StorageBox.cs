@@ -3,6 +3,8 @@ using DG.Tweening;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
+namespace OndeVai.Gameplay
+{
 /// <summary>
 /// A destination that accepts items of one <see cref="ItemGroup"/>. Receives drops in drag mode and
 /// taps in question mode, forwards them to <see cref="GameController"/> and plays its own feedback.
@@ -194,4 +196,6 @@ public class Storage : MonoBehaviour, IDropTarget, IPointerClickHandler
         if (_itemsInside == 0 && _spriteRenderer != null && _chestClosedSprite != null)
             _spriteRenderer.sprite = _chestClosedSprite;
     }
+}
+    
 }

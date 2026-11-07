@@ -6,6 +6,7 @@ using OndeVai.Data;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using OndeVai.Gameplay;
 
 namespace OndeVai.UI
 {

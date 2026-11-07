@@ -21,4 +21,53 @@ MonoBehaviour:
   _colliderShape: 0
   _gravityScale: 1
   _mass: 1
-  _variants: []
+  _variants:
+  - Id: Animals 1_2
+    Sprite: {fileID: -971542708, guid: 4a6a03928a316814d9db897ca0ee0da5, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: Animals 1_8
+    Sprite: {fileID: 1066535573, guid: 4a6a03928a316814d9db897ca0ee0da5, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: Animals 1_10
+    Sprite: {fileID: -1363668126, guid: 4a6a03928a316814d9db897ca0ee0da5, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: Animals 1_11
+    Sprite: {fileID: 1239873467, guid: 4a6a03928a316814d9db897ca0ee0da5, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: Animals 1_13
+    Sprite: {fileID: 1709592817, guid: 4a6a03928a316814d9db897ca0ee0da5, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: Animals 1_14
+    Sprite: {fileID: -1162416313, guid: 4a6a03928a316814d9db897ca0ee0da5, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: Animals 1_3
+    Sprite: {fileID: -911047733, guid: 4a6a03928a316814d9db897ca0ee0da5, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0

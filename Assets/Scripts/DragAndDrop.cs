@@ -3,7 +3,9 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
 
-[RequireComponent(typeof(Collider2D))]
+namespace OndeVai.Gameplay
+{
+  [RequireComponent(typeof(Collider2D))]
 public class DragAndDrop : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     private const float LiftedScale = 1.15f;
@@ -201,4 +203,6 @@ public class DragAndDrop : MonoBehaviour, IPointerDownHandler, IBeginDragHandler
             return;
         }
     }
+}
+  
 }

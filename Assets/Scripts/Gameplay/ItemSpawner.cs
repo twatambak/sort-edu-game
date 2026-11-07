@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using DG.Tweening;
-using OndeVai.Content;
 using UnityEngine;
 
 namespace OndeVai.Gameplay

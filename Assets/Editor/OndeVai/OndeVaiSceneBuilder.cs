@@ -11,6 +11,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using OndeVai.Gameplay;
 
 namespace OndeVai.EditorTools
 {

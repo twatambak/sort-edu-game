@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using DG.Tweening;
-using OndeVai.Content;
 using UnityEngine;
 
-/// <summary>
+namespace OndeVai.Gameplay
+{
+ /// <summary>
 /// A sortable object. A single prefab is reused for every item; <see cref="Initialize"/> applies the
 /// sprite, collider, scale and physics of an <see cref="ItemTypeDefinition"/> variant.
 /// Owns its presentation scale so spawn and absorb animations do not fight the depth scaling.
@@ -229,4 +230,6 @@ public class Item : MonoBehaviour
 
         return true;
     }
+}
+   
 }

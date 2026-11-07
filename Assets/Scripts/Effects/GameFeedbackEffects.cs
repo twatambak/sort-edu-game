@@ -1,5 +1,6 @@
 using DG.Tweening;
 using UnityEngine;
+using OndeVai.Gameplay;
 
 namespace OndeVai.Effects
 {

@@ -10,7 +10,7 @@ namespace OndeVai.UI
         {
             if (definition != null)
             {
-                OndeVai.Content.ItemTypeDefinition type = definition.GetItemType(group);
+                ItemTypeDefinition type = definition.GetItemType(group);
                 if (type != null)
                     return type.DisplayName;
             }
@@ -23,15 +23,11 @@ namespace OndeVai.UI
             return group switch
             {
                 ItemGroup.Toy => "Brinquedos",
-                ItemGroup.Food => "Comidas",
                 ItemGroup.Tool => "Ferramentas",
-                ItemGroup.Animal => "Animais",
                 ItemGroup.Letter => "Letras",
                 ItemGroup.Number => "Números",
                 ItemGroup.HealthyFood => "Comidas saudáveis",
                 ItemGroup.UnhealthyFood => "Comidas não saudáveis",
-                ItemGroup.GoodBehavior => "Bom comportamento",
-                ItemGroup.BadBehavior => "Mau comportamento",
                 ItemGroup.Vowel => "Vogais",
                 ItemGroup.Consonant => "Consoantes",
                 ItemGroup.FarmAnimal => "Animais da fazenda",
