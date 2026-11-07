@@ -1,0 +1,94 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb8d37f610eb4ed4877fdf8eb36bc96b, type: 3}
+  m_Name: Tools
+  m_EditorClassIdentifier: 
+  _group: 2
+  _displayName: Ferramentas
+  _icon: {fileID: 0}
+  _color: {r: 0.33, g: 0.63, b: 1, a: 1}
+  _scale: 1
+  _scaleWithDepth: 1
+  _colliderShape: 0
+  _gravityScale: 1
+  _mass: 1
+  _variants:
+  - Id: box_cutter
+    Sprite: {fileID: -724382368, guid: 9fa5f4f6d14ea6f47823e5ecc2842501, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: hammer
+    Sprite: {fileID: -390268395, guid: 9fa5f4f6d14ea6f47823e5ecc2842501, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: knife
+    Sprite: {fileID: -735535232, guid: 9fa5f4f6d14ea6f47823e5ecc2842501, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: nail
+    Sprite: {fileID: -879861119, guid: 9fa5f4f6d14ea6f47823e5ecc2842501, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: needle
+    Sprite: {fileID: 100649053, guid: 9fa5f4f6d14ea6f47823e5ecc2842501, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: pliers
+    Sprite: {fileID: 1617224020, guid: 9fa5f4f6d14ea6f47823e5ecc2842501, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: saw
+    Sprite: {fileID: -980865190, guid: 9fa5f4f6d14ea6f47823e5ecc2842501, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: saw_2
+    Sprite: {fileID: -559734570, guid: 9fa5f4f6d14ea6f47823e5ecc2842501, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: wrench
+    Sprite: {fileID: 1892010526, guid: 9fa5f4f6d14ea6f47823e5ecc2842501, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: wrench_2
+    Sprite: {fileID: -328192375, guid: 9fa5f4f6d14ea6f47823e5ecc2842501, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0

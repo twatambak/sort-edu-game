@@ -77,19 +77,22 @@ para o modo clássico.
 
 ## Configuração e conteúdo
 
-`GameDefinition` é um `ScriptableObject` que associa cada `ItemGroup` a uma
-lista de prefabs. O asset usado pela cena é
-[`Assets/Data/GameDefinition.asset`](Assets/Data/GameDefinition.asset). Para
-adicionar itens à seleção aleatória:
+Todo o conteúdo é definido por `ScriptableObject`s em [`Assets/Data`](Assets/Data).
+Existe um único prefab de item ([`Assets/Prefabs/Items/Item.prefab`](Assets/Prefabs/Items/Item.prefab));
+o sprite, o colisor, a escala e a física são aplicados a partir dos dados quando
+o item surge.
 
-1. Crie ou ajuste um prefab de item.
-2. Defina seu tipo (`ItemGroup`) no componente `Item`.
-3. Adicione o prefab à lista do grupo correspondente no asset `GameDefinition`.
-4. Configure uma caixa (`Storage`) com o mesmo tipo para aceitar o item.
+| Asset | Conteúdo |
+|---|---|
+| `GameDefinition` | Prefab de item, lista de tipos de item e lista de cenários. |
+| `ItemTypes/*.asset` (`ItemTypeDefinition`) | Grupo (`ItemGroup`), nome em português, ícone, cor, escala, forma do colisor, física e a lista de **variantes** (sprite, id, peso de sorteio, escala, cor, colisor, ativo). |
+| `Scenarios/*.asset` (`SortingScenarioDefinition`) | Id, nome em português e os dois tipos de item a separar. |
 
-Os prefabs de brinquedos, ferramentas e caixas ficam em
-[`Assets/Prefabs/Items`](Assets/Prefabs/Items). A cena fornece os pontos de
-surgimento e referencia o asset `GameDefinition`.
+Para adicionar itens, abra o tipo (por exemplo `Toys`) e arraste sprites ou
+folhas de sprites para a área indicada no Inspector. Cada sprite vira uma
+variante. Um cenário só aparece nas opções quando os dois tipos têm ao menos uma
+variante ativa com sprite. Atalhos em **Tools > Onde Vai > Content**: abrir o
+`GameDefinition`, criar tipo, criar cenário e validar o conteúdo.
 
 ## Implementação
 

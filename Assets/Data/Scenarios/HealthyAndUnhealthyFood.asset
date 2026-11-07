@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 481bccccc95597d4d85bc0d47a1e8331, type: 3}
+  m_Name: HealthyAndUnhealthyFood
+  m_EditorClassIdentifier: 
+  _id: healthy-unhealthy-food
+  _displayName: Comidas saudáveis e não saudáveis
+  _typeA: {fileID: 11400000, guid: 1bf7f62b9349410bbbc2b47f5c8fe211, type: 2}
+  _typeB: {fileID: 11400000, guid: 18f6b158c4c74a6f88dafb99d348b60c, type: 2}

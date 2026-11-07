@@ -1,24 +1,43 @@
 # Game history database
 
-Completed games are stored in the local SQLite database `game-history.db3` under
-`Application.persistentDataPath`. The database is created automatically and is
-kept between app launches; it is local to the device and is not synchronized to
-other devices.
+All data is stored in the local SQLite database `game-history.db3` under
+`Application.persistentDataPath`. It is created automatically, kept between app
+launches, never synchronized and never sent anywhere.
 
-Each completed game stores its UTC start and finish times, duration, selected
-game configuration, item groups, score, error count, result, and finish reason.
-Games that are still in progress are not recorded.
+## Tables
 
-Use the public methods on `GameController.Instance` to query saved games:
+| Table | Content |
+|---|---|
+| `ChildProfileRecord` | Children registered on the device: name, age, avatar color, creation time. |
+| `GameSessionRecord` | One row per match: UTC start/finish, duration, configuration, groups, score, errors, result, finish reason, child id, game mode, scenario id, tutorial item count. |
+| `ItemAttemptRecord` | One row per sorting attempt: session id, child id, correct group, chosen group, item name, correct flag, response time, tutorial flag. |
+
+`ChildProfileId = 0` means the match was played without a selected child.
+Matches left early with at least one attempt are saved with
+`FinishReason = "Abandoned"`. Columns added after the first release are migrated
+automatically by SQLite-net.
+
+## Access
+
+Gameplay and UI use `GameController.Instance.Data` (`GameDataService`):
 
 ```csharp
-var recent =
-    GameController.Instance.GetRecentGameSessions(20);
+GameDataService data = GameController.Instance.Data;
+data.SetActiveChild(profile);
+List<ChildProfileRecord> children = data.GetProfiles();
+ChildProgressSummary summary = data.BuildSummary(childId);
+List<GameSessionRecord> recent = data.GetRecentSessions(childId, 20);
+data.DeleteHistory(profile);   // keeps the profile
+data.DeleteProfile(profile);   // removes profile, matches and attempts
+```
 
+The legacy helpers on `GameController` still work:
+
+```csharp
+var recent = GameController.Instance.GetRecentGameSessions(20);
 int completedGames = GameController.Instance.GetCompletedGameCount();
 GameSessionRecord session = GameController.Instance.GetGameSessionById(1);
 ```
 
-`GetRecentGameSessions` returns the newest records first and accepts a positive
-maximum result count. `GetGameSessionById` returns `null` when the ID does not
-exist. Each record's `Id` can be used to retrieve it again.
+Settings and the privacy disclaimer acceptance are stored in PlayerPrefs, not in
+this database.

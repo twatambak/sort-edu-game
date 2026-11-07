@@ -1,0 +1,205 @@
+using System;
+using System.Collections.Generic;
+using OndeVai.Gameplay;
+using OndeVai.Settings;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace OndeVai.UI
+{
+    /// <summary>
+    /// Adult facing options: audio, vibration, tutorial, game mode, scenario and match rules.
+    /// Every change is saved immediately.
+    /// </summary>
+    public sealed class OptionsScreen : UIScreen
+    {
+        private static readonly int[] MatchTimes = { 15, 30, 45, 60, 90, 120 };
+        private static readonly int[] ErrorLimits = { 1, 2, 3, 5, 10 };
+        private static readonly int[] ItemsOnScreen = { 2, 3, 4, 5, 6 };
+        private static readonly int[] TutorialItems = { 1, 2, 3, 5 };
+
+        [Header("Audio and feedback")]
+        [SerializeField] private Slider _musicSlider;
+        [SerializeField] private Slider _sfxSlider;
+        [SerializeField] private Toggle _vibrationToggle;
+
+        [Header("Tutorial")]
+        [SerializeField] private Toggle _tutorialToggle;
+        [SerializeField] private OptionSelector _tutorialItemsSelector;
+
+        [Header("Match")]
+        [SerializeField] private OptionSelector _modeSelector;
+        [SerializeField] private OptionSelector _scenarioSelector;
+        [SerializeField] private OptionSelector _matchTimeSelector;
+        [SerializeField] private OptionSelector _errorLimitSelector;
+        [SerializeField] private OptionSelector _itemsOnScreenSelector;
+
+        [Header("Navigation")]
+        [SerializeField] private Button _backButton;
+        [SerializeField] private Button _privacyButton;
+        [SerializeField] private HoldToConfirmButton _resetButton;
+
+        private readonly List<SortingScenarioDefinition> _scenarios = new();
+        private readonly List<string> _labels = new();
+        private GameSettingsService _settings;
+        private bool _isRefreshing;
+
+        public event Action Closed;
+        public event Action PrivacyRequested;
+
+        protected override void Awake()
+        {
+            base.Awake();
+            if (_backButton != null)
+                _backButton.onClick.AddListener(() => Closed?.Invoke());
+
+            if (_privacyButton != null)
+                _privacyButton.onClick.AddListener(() => PrivacyRequested?.Invoke());
+
+            if (_resetButton != null)
+                _resetButton.OnConfirmed.AddListener(ResetDefaults);
+
+            BindSlider(_musicSlider, value => Apply(s => s.MusicVolume = value, false));
+            BindSlider(_sfxSlider, value => Apply(s => s.SfxVolume = value, false));
+            BindToggle(_vibrationToggle, value => Apply(s => s.VibrationEnabled = value));
+            BindToggle(_tutorialToggle, value => Apply(s => s.TutorialEnabled = value));
+
+            BindSelector(_tutorialItemsSelector, index => Apply(s => s.TutorialItemCount = TutorialItems[index]));
+            BindSelector(_modeSelector, index => Apply(s => s.Mode = (GameMode)index));
+            BindSelector(_scenarioSelector, index => Apply(s => s.ScenarioId = _scenarios[index].Id));
+            BindSelector(_matchTimeSelector, index => Apply(s => s.MatchTimeSeconds = MatchTimes[index]));
+            BindSelector(_errorLimitSelector, index => Apply(s => s.ErrorLimit = ErrorLimits[index]));
+            BindSelector(_itemsOnScreenSelector, index => Apply(s => s.ItemsOnScreen = ItemsOnScreen[index]));
+        }
+
+        protected override void OnShown()
+        {
+            GameController controller = GameController.Instance;
+            if (controller == null)
+            {
+                Debug.LogError("OptionsScreen could not find the GameController.", this);
+                return;
+            }
+
+            _settings = controller.Settings;
+            if (controller.Definition != null)
+                controller.Definition.GetPlayableScenarios(_scenarios);
+            else
+                _scenarios.Add(SortingScenarioDefinition.Default);
+
+            Refresh(_settings.Current, controller.Definition);
+        }
+
+        private void Refresh(GameSettings settings, GameDefinition definition)
+        {
+            _isRefreshing = true;
+
+            if (_musicSlider != null)
+                _musicSlider.SetValueWithoutNotify(settings.MusicVolume);
+
+            if (_sfxSlider != null)
+                _sfxSlider.SetValueWithoutNotify(settings.SfxVolume);
+
+            if (_vibrationToggle != null)
+                _vibrationToggle.SetIsOnWithoutNotify(settings.VibrationEnabled);
+
+            if (_tutorialToggle != null)
+                _tutorialToggle.SetIsOnWithoutNotify(settings.TutorialEnabled);
+
+            SetNumberOptions(_tutorialItemsSelector, TutorialItems, settings.TutorialItemCount, value => value == 1 ? "1 objeto" : $"{value} objetos");
+            SetNumberOptions(_matchTimeSelector, MatchTimes, settings.MatchTimeSeconds, value => $"{value} s");
+            SetNumberOptions(_errorLimitSelector, ErrorLimits, settings.ErrorLimit, value => value.ToString());
+            SetNumberOptions(_itemsOnScreenSelector, ItemsOnScreen, settings.ItemsOnScreen, value => value.ToString());
+
+            if (_modeSelector != null)
+            {
+                _labels.Clear();
+                _labels.Add("Arrastar e soltar");
+                _labels.Add("Perguntas");
+                _modeSelector.SetOptions(_labels, (int)settings.Mode);
+            }
+
+            if (_scenarioSelector != null)
+            {
+                SortingScenarioDefinition current = definition != null
+                    ? definition.GetScenarioOrDefault(settings.ScenarioId)
+                    : SortingScenarioDefinition.Default;
+
+                _labels.Clear();
+                int selected = 0;
+                for (int i = 0; i < _scenarios.Count; i++)
+                {
+                    _labels.Add(_scenarios[i].DisplayName);
+                    if (_scenarios[i].Id == current.Id)
+                        selected = i;
+                }
+
+                _scenarioSelector.SetOptions(_labels, selected);
+            }
+
+            _isRefreshing = false;
+        }
+
+        private void SetNumberOptions(OptionSelector selector, int[] values, int current, Func<int, string> format)
+        {
+            if (selector == null)
+                return;
+
+            _labels.Clear();
+            int selected = 0;
+            int bestDistance = int.MaxValue;
+            for (int i = 0; i < values.Length; i++)
+            {
+                _labels.Add(format(values[i]));
+                int distance = Mathf.Abs(values[i] - current);
+                if (distance < bestDistance)
+                {
+                    bestDistance = distance;
+                    selected = i;
+                }
+            }
+
+            selector.SetOptions(_labels, selected);
+        }
+
+        private void ResetDefaults()
+        {
+            if (_settings == null)
+                return;
+
+            _settings.ResetToDefaults();
+            Refresh(_settings.Current, GameController.Instance != null ? GameController.Instance.Definition : null);
+        }
+
+        protected override void OnHidden()
+        {
+            _settings?.Flush();
+        }
+
+        private void Apply(Action<GameSettings> modify, bool persist = true)
+        {
+            if (_isRefreshing || _settings == null)
+                return;
+
+            _settings.Apply(modify, persist);
+        }
+
+        private static void BindSlider(Slider slider, Action<float> onChanged)
+        {
+            if (slider != null)
+                slider.onValueChanged.AddListener(value => onChanged(value));
+        }
+
+        private static void BindToggle(Toggle toggle, Action<bool> onChanged)
+        {
+            if (toggle != null)
+                toggle.onValueChanged.AddListener(value => onChanged(value));
+        }
+
+        private static void BindSelector(OptionSelector selector, Action<int> onChanged)
+        {
+            if (selector != null)
+                selector.Changed += onChanged;
+        }
+    }
+}
