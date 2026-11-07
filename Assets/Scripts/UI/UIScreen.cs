@@ -80,6 +80,15 @@ namespace OndeVai.UI
             gameObject.SetActive(false);
         }
 
+        /// <summary>
+        /// Gives the screen a chance to consume the back button (e.g. to close an inner dialog).
+        /// Return false to let the flow close the screen.
+        /// </summary>
+        public virtual bool HandleBack()
+        {
+            return false;
+        }
+
         /// <summary>Called every time the screen opens. Refresh displayed data here.</summary>
         protected virtual void OnShown()
         {

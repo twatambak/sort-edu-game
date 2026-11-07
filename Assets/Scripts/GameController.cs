@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using OndeVai.Data;
 using OndeVai.Gameplay;
+using OndeVai.Platform;
 using OndeVai.Settings;
 using UnityEngine;
 
@@ -161,6 +162,7 @@ public class GameController : SingletonBase<GameController>
         _runner = CreateRunner(selectedConfig.Mode);
         _runner.Begin(selectedConfig);
 
+        MobilePlatformRuntime.SetKeepAwake(true);
         OnGameStarted?.Invoke(Config);
     }
 
@@ -190,6 +192,7 @@ public class GameController : SingletonBase<GameController>
         _gameStarted = false;
         IsGameOver = true;
         SetPausedInternal(false);
+        MobilePlatformRuntime.SetKeepAwake(false);
 
         if (wasRunning)
             OnGameAborted?.Invoke();
@@ -393,6 +396,7 @@ public class GameController : SingletonBase<GameController>
 
         IsGameOver = true;
         LastGameWon = won;
+        MobilePlatformRuntime.SetKeepAwake(false);
         _runner?.End();
         GameSessionRecord record = SaveSession(won, finishReason);
 
@@ -518,6 +522,10 @@ public class GameController : SingletonBase<GameController>
 
     private void OnApplicationPause(bool pauseStatus)
     {
+        // Mobile apps can be killed while in the background without further callbacks.
+        if (pauseStatus)
+            Settings?.Flush();
+
         if (pauseStatus && _autoPauseOnFocusLoss)
             SetPaused(true);
     }

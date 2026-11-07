@@ -150,6 +150,16 @@ namespace OndeVai.UI
             RefreshPreview();
         }
 
+        /// <summary>Back closes the add/edit form before closing the screen.</summary>
+        public override bool HandleBack()
+        {
+            if (_formRoot == null || !_formRoot.activeSelf)
+                return false;
+
+            CloseForm();
+            return true;
+        }
+
         private void CloseForm()
         {
             _editing = null;

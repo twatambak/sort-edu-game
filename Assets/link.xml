@@ -1,0 +1,13 @@
+<!--
+  IL2CPP (Android, iOS, WebGL) strips code that is only reached through reflection.
+  SQLite-net reads and writes the record types below by reflection, so their properties
+  and constructors must be preserved or the history database silently loses columns.
+-->
+<linker>
+  <assembly fullname="Assembly-CSharp">
+    <type fullname="GameSessionRecord" preserve="all" />
+    <type fullname="OndeVai.Data.ChildProfileRecord" preserve="all" />
+    <type fullname="OndeVai.Data.ItemAttemptRecord" preserve="all" />
+  </assembly>
+  <assembly fullname="Gilzoide.SqliteNet" preserve="all" />
+</linker>

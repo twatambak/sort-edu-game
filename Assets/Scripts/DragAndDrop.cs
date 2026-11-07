@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem.UI;
 
 [RequireComponent(typeof(Collider2D))]
 public class DragAndDrop : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
@@ -11,6 +12,12 @@ public class DragAndDrop : MonoBehaviour, IPointerDownHandler, IBeginDragHandler
     [SerializeField] private UnityEvent _onBeginDrag;
     [SerializeField] private UnityEvent _onDrag;
     [SerializeField] private UnityEvent _onEndDrag;
+
+    [Tooltip("World units the item is raised above the finger on touch screens, so the child can see it while dragging.")]
+    [SerializeField, Min(0f)] private float _touchLiftOffset = 0.6f;
+
+    // Only one item can be dragged at a time, so a palm or several fingers cannot grab many items.
+    private static DragAndDrop _activeDrag;
 
     private Camera _camera;
     private Collider2D _collider;
@@ -24,6 +31,12 @@ public class DragAndDrop : MonoBehaviour, IPointerDownHandler, IBeginDragHandler
     private SpriteRenderer[] _renderers;
 
     private readonly System.Collections.Generic.List<Collider2D> _overlapBuffer = new(16);
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatics()
+    {
+        _activeDrag = null;
+    }
 
     private void Awake()
     {
@@ -54,13 +67,17 @@ public class DragAndDrop : MonoBehaviour, IPointerDownHandler, IBeginDragHandler
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        if (!CanInteract())
+        if (!CanInteract() || (_activeDrag != null && _activeDrag != this))
         {
             eventData.pointerDrag = null;
             return;
         }
 
         _isDragging = true;
+        _activeDrag = this;
+        if (IsTouch(eventData))
+            _dragOffset += Vector3.up * _touchLiftOffset;
+
         if (_rigidbody)
         {
             _rigidbody.linearVelocity = Vector2.zero;
@@ -90,6 +107,7 @@ public class DragAndDrop : MonoBehaviour, IPointerDownHandler, IBeginDragHandler
             return;
 
         _isDragging = false;
+        ReleaseActiveDrag();
         if (_rigidbody)
             _rigidbody.bodyType = _originalBodyType;
 
@@ -105,10 +123,22 @@ public class DragAndDrop : MonoBehaviour, IPointerDownHandler, IBeginDragHandler
     private void CancelDrag()
     {
         _isDragging = false;
+        ReleaseActiveDrag();
         if (_rigidbody)
             _rigidbody.bodyType = _originalBodyType;
 
         SetLifted(false);
+    }
+
+    private void ReleaseActiveDrag()
+    {
+        if (_activeDrag == this)
+            _activeDrag = null;
+    }
+
+    private static bool IsTouch(PointerEventData eventData)
+    {
+        return eventData is ExtendedPointerEventData extended && extended.pointerType == UIPointerType.Touch;
     }
 
     private bool CanInteract()

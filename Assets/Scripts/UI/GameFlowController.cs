@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace OndeVai.UI
@@ -23,6 +24,78 @@ namespace OndeVai.UI
 
         private GameController _gameController;
         private bool _disclaimerFromOptions;
+
+        // Android delivers the system back button (and back gesture) as the Escape key.
+        private InputAction _backAction;
+
+        private void OnEnable()
+        {
+            _backAction ??= new InputAction("Back", InputActionType.Button, "<Keyboard>/escape");
+            _backAction.performed += HandleBackPerformed;
+            _backAction.Enable();
+        }
+
+        private void OnDisable()
+        {
+            if (_backAction == null)
+                return;
+
+            _backAction.performed -= HandleBackPerformed;
+            _backAction.Disable();
+        }
+
+        private void HandleBackPerformed(InputAction.CallbackContext context)
+        {
+            HandleBack();
+        }
+
+        /// <summary>
+        /// Back navigation: closes the open dialog or screen, pauses or resumes a match, and leaves the
+        /// results screen. Does nothing on the title and disclaimer screens so a child cannot close the app by accident.
+        /// </summary>
+        public void HandleBack()
+        {
+            if (_gameController == null || IsVisible(_disclaimerScreen))
+                return;
+
+            if (IsVisible(_pauseScreen))
+            {
+                _gameController.SetPaused(false);
+                return;
+            }
+
+            if (_gameController.IsGameStarted && !_gameController.IsGameOver)
+            {
+                _gameController.SetPaused(true);
+                return;
+            }
+
+            if (_gameController.IsGameStarted && _gameController.IsGameOver)
+            {
+                ReturnToTitle();
+                return;
+            }
+
+            UIScreen current = CurrentSubScreen();
+            if (current != null && !current.HandleBack())
+                ShowTitle();
+        }
+
+        private UIScreen CurrentSubScreen()
+        {
+            if (IsVisible(_profileScreen))
+                return _profileScreen;
+
+            if (IsVisible(_optionsScreen))
+                return _optionsScreen;
+
+            return IsVisible(_progressScreen) ? _progressScreen : null;
+        }
+
+        private static bool IsVisible(UIScreen screen)
+        {
+            return screen != null && screen.IsVisible;
+        }
 
         private void Start()
         {
@@ -181,6 +254,8 @@ namespace OndeVai.UI
 
         private void OnDestroy()
         {
+            _backAction?.Dispose();
+            _backAction = null;
             if (_gameController == null)
                 return;
 

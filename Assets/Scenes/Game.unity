@@ -476,6 +476,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameTimer
   _sliderTimer: {fileID: 736349636}
+  _warningThreshold: 5
+  _fillImage: {fileID: 0}
+  _warningColor: {r: 1, g: 0.4, b: 0.35, a: 1}
 --- !u!1 &251484114
 GameObject:
   m_ObjectHideFlags: 0
@@ -938,6 +941,7 @@ MonoBehaviour:
   _errorCounterParent: {fileID: 1027984352}
   _errorCounterPrefab: {fileID: 8586283466966068793, guid: 52fd765304616c3448f26243344f41d3, type: 3}
   _errorColor: {r: 0.9882353, g: 0.47058824, b: 0.47058824, a: 1}
+  _emptyColor: {r: 0, g: 0, b: 0, a: 1}
 --- !u!1 &400392588
 GameObject:
   m_ObjectHideFlags: 0
@@ -2486,6 +2490,12 @@ MonoBehaviour:
   - {fileID: 166696743}
   - {fileID: 1883380500}
   _gameDefinition: {fileID: 11400000, guid: f1504081df3488542a25d36850dfcb2e, type: 2}
+  _beginOnStart: 1
+  _autoPauseOnFocusLoss: 0
+  _storageA: {fileID: 0}
+  _storageB: {fileID: 0}
+  _questionPoint: {fileID: 0}
+  _questionItemScale: 1.6
 --- !u!4 &1040873904
 Transform:
   m_ObjectHideFlags: 0
@@ -3837,6 +3847,9 @@ MonoBehaviour:
   _resultTitle: {fileID: 2798921931230433640}
   _scoreText: {fileID: 1881645555}
   _errorText: {fileID: 1029938293}
+  _stars: []
+  _starOnColor: {r: 1, g: 0.85, b: 0.2, a: 1}
+  _starOffColor: {r: 1, g: 1, b: 1, a: 0.25}
 --- !u!4 &1865907101
 Transform:
   m_ObjectHideFlags: 0

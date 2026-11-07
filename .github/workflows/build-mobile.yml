@@ -1,0 +1,66 @@
+name: Build mobile (Android)
+
+# Builds an Android App Bundle when the signing secrets exist, otherwise a test APK.
+# Player settings (bundle id, orientation, SDK levels...) come from
+# Assets/Editor/OndeVai/Mobile/MobileBuildProfile.asset and are applied by a pre-build hook.
+#
+# Secrets used:
+#   UNITY_LICENSE, UNITY_EMAIL, UNITY_PASSWORD   Unity activation (see game-ci docs)
+#   ANDROID_KEYSTORE_BASE64                      keystore file, base64 encoded (optional)
+#   ANDROID_KEYSTORE_PASS, ANDROID_KEYALIAS_NAME, ANDROID_KEYALIAS_PASS
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@v1.3.1
+        with:
+          android: false
+          large-packages: false
+
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Cache Library
+        uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-Android-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: Library-Android-
+
+      - name: Build Android player
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          targetPlatform: Android
+          unityVersion: 6000.3.16f1
+          buildsPath: build
+          buildName: OndeVai
+          versioning: None
+          androidVersionCode: ${{ github.run_number }}
+          androidExportType: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' && 'androidAppBundle' || 'androidPackage' }}
+          androidKeystoreName: user.keystore
+          androidKeystoreBase64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          androidKeystorePass: ${{ secrets.ANDROID_KEYSTORE_PASS }}
+          androidKeyaliasName: ${{ secrets.ANDROID_KEYALIAS_NAME }}
+          androidKeyaliasPass: ${{ secrets.ANDROID_KEYALIAS_PASS }}
+
+      - name: Upload build
+        uses: actions/upload-artifact@v4
+        with:
+          name: OndeVai-Android
+          path: build/Android

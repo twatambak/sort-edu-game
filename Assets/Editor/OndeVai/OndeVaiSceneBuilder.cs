@@ -156,6 +156,7 @@ namespace OndeVai.EditorTools
             GameFeedbackEffects effects = effectsObject.AddComponent<GameFeedbackEffects>();
             UIBuilderKit.Wire(effects, "_burstPool", pool);
             UIBuilderKit.Wire(effects, "_camera", Camera.main);
+            EnsureCameraFitter(Camera.main);
 
             GameObject tutorialObject = new("Tutorial");
             tutorialObject.transform.SetParent(root.transform, false);
@@ -255,6 +256,30 @@ namespace OndeVai.EditorTools
                 RectTransform rect = (RectTransform)copy.transform;
                 rect.anchoredPosition += new Vector2(0f, -(rect.rect.height + 30f));
             }
+        }
+
+        /// <summary>Adds the aspect ratio fitter to the gameplay camera so tall phones do not crop the storages.</summary>
+        private static void EnsureCameraFitter(Camera camera)
+        {
+            if (camera == null)
+            {
+                Debug.LogWarning("No main camera found. Add a CameraFitter to the gameplay camera manually.");
+                return;
+            }
+
+            if (camera.GetComponent<OndeVai.Platform.CameraFitter>() != null)
+                return;
+
+            OndeVai.Platform.CameraFitter fitter = Undo.AddComponent<OndeVai.Platform.CameraFitter>(camera.gameObject);
+            SerializedObject serialized = new(fitter);
+            serialized.FindProperty("_designOrthographicSize").floatValue = camera.orthographicSize;
+            serialized.ApplyModifiedProperties();
+        }
+
+        [MenuItem(MenuRoot + "Mobile/Add Camera Fitter To Main Camera", priority = 40)]
+        public static void AddCameraFitterMenu()
+        {
+            EnsureCameraFitter(Camera.main);
         }
 
         private static void EnsureEventSystem()

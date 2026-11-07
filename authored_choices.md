@@ -88,3 +88,32 @@ Assumptions and judgement calls made during development. Review and revise as ne
 - Items are pooled because there is only one prefab now. `Item.Despawn()` returns an item to the pool instead of destroying it. Pooled items live under a scene object named `Items`.
 - Group names on the progress screen now come from the item type asset.
 - The scene builder no longer fills in scenarios, since they are assets now.
+
+## Mobile port
+
+- Android is the main target. Its build module is installed and the Android code paths compile. The iOS module is not installed, and this is a Windows machine, so iOS is only configured (settings plus an Xcode export menu) and has not been built.
+- All store and player settings live in one editable asset, `MobileBuildProfile` (`Assets/Editor/OndeVai/Mobile/`). Unity creates it on first use, so commit it. It is applied before every Android/iOS build, and you can also apply it from `Tools > Onde Vai > Mobile`. I used the API instead of editing `ProjectSettings.asset` by hand, because the open editor would overwrite manual edits.
+- Defaults I chose:
+  - Product name "Onde Vai?", bundle id `com.tlw.ondevai` (the company in Player Settings is TLW), version 0.1.0, build 1.
+  - Portrait only, upside-down portrait allowed, because the whole layout is 1080x1920.
+  - IL2CPP with Low stripping.
+  - Android min SDK 25 (unchanged), target SDK automatic, ARM64 + ARMv7. ARMv7 keeps older, cheaper tablets that kids use.
+  - iOS 15.0, full screen, status bar hidden.
+  - **Please review the bundle id before the first store upload. It cannot change afterwards.**
+- Version codes never go down. The profile value, the `BUILD_NUMBER` environment variable, and a value set by CI (`github.run_number`) all feed in, and the highest one wins.
+- Keystore passwords are never stored in assets. They are read from environment variables (or CI secrets).
+- `link.xml` keeps the SQLite record types and the SQLite-net assembly from being stripped by IL2CPP. SQLite-net reaches them only by reflection. This also protects the WebGL build.
+- The frame rate is set to 60 on Android/iOS. They default to 30, which made dragging choppy. Web is not changed.
+- The screen stays awake during a match and goes back to the system setting outside matches.
+- Settings are saved when the app goes to the background, because mobile apps can be killed there without further notice.
+- When the device reports low memory, unused assets are unloaded.
+- Back button (Android delivers it as Escape):
+  - It closes the profile form, then the open screen.
+  - During a match it pauses or resumes. On the results screen it goes home.
+  - It does nothing on the title and disclaimer screens, so a child can't close the app by accident.
+- Only one item can be dragged at a time, so a palm or several fingers can't grab many items.
+- On touch, the dragged item is raised 0.6 units above the finger so the child can see it. Change it with `DragAndDrop._touchLiftOffset` on the Item prefab.
+- `CameraFitter` (added by the scene builder, or via `Tools > Onde Vai > Mobile > Add Camera Fitter To Main Camera`) widens the orthographic size on screens taller than 9:16 so the storages are never cut off. Wider screens such as tablets show more background. It checks the screen size each frame (two integer comparisons) because Unity has no resize event for world cameras.
+- In `Mobile_RPAsset`, render scale went from 0.8 to 1 (0.8 blurred the sprites) and HDR was turned off (a 2D game doesn't need it, and it costs bandwidth). The Web build uses the same quality level.
+- New CI workflow `build-mobile.yml` (manual run or `v*` tags): it builds a signed AAB when the keystore secrets exist and a test APK otherwise. I have not run it. Like the existing WebGL workflow, it needs the Unity license secrets.
+- The app icon still uses the Unity default. Assign `AppIcon` in the profile when the art exists.

@@ -23,9 +23,29 @@ partidas concluídas.
 2. Abra `Assets/Scenes/Game.unity`.
 3. Execute a cena pelo botão **Play** do Editor.
 
-`Game` é a única cena habilitada nas configurações de build. A configuração do
-projeto permite orientação retrato e paisagem; o arraste por eventos de ponteiro
-também permite testar a interação no Editor.
+`Game` é a única cena habilitada nas configurações de build. O arraste por
+eventos de ponteiro também permite testar a interação no Editor.
+
+### Celular (Android e iOS)
+
+As configurações de loja e de player ficam no asset
+`Assets/Editor/OndeVai/Mobile/MobileBuildProfile.asset` (nome, bundle id,
+versão, ícone, orientação, SDKs, arquiteturas, keystore). Elas são aplicadas
+automaticamente antes de toda build Android/iOS, ou manualmente em
+**Tools > Onde Vai > Mobile > Apply Mobile Player Settings**.
+
+- **APK de teste:** *Tools > Onde Vai > Mobile > Build Android APK (Development)*.
+- **App Bundle para a Play Store:** *Build Android App Bundle (Release)*. Requer
+  `KeystorePath` e `KeyAliasName` no perfil e as variáveis de ambiente
+  `ANDROID_KEYSTORE_PASS` e `ANDROID_KEYALIAS_PASS`.
+- **iOS:** *Export iOS Xcode Project* (precisa do módulo iOS instalado); a
+  assinatura e o envio são feitos no Xcode, em um Mac.
+- **Linha de comando / CI:** `-executeMethod OndeVai.EditorTools.Mobile.MobileBuild.BuildAndroidRelease`.
+  O workflow `.github/workflows/build-mobile.yml` gera a build Android em tags `v*`
+  ou manualmente.
+
+O jogo roda apenas em retrato. A câmera se ajusta à proporção da tela
+(`CameraFitter`) para que as caixas não sejam cortadas em celulares altos.
 
 ## Como jogar
 
