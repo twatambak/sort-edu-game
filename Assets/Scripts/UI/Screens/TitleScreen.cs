@@ -16,8 +16,12 @@ namespace OndeVai.UI
         [SerializeField] private Button _playButton;
         [SerializeField] private Button _dragModeButton;
         [SerializeField] private Button _questionModeButton;
+        [SerializeField] private Button _swipeModeButton;
+        [SerializeField] private Button _fourWaySwipeModeButton;
         [SerializeField] private Image _dragModeHighlight;
         [SerializeField] private Image _questionModeHighlight;
+        [SerializeField] private Image _swipeModeHighlight;
+        [SerializeField] private Image _fourWaySwipeModeHighlight;
         [SerializeField] private Button _profileButton;
         [SerializeField] private AvatarBadge _profileBadge;
         [SerializeField] private HoldToConfirmButton _optionsButton;
@@ -41,6 +45,8 @@ namespace OndeVai.UI
             Bind(_playButton, () => PlayRequested?.Invoke());
             Bind(_dragModeButton, () => SelectMode(GameMode.DragAndDrop));
             Bind(_questionModeButton, () => SelectMode(GameMode.Question));
+            Bind(_swipeModeButton, () => SelectMode(GameMode.SwipeCard));
+            Bind(_fourWaySwipeModeButton, () => SelectMode(GameMode.FourWaySwipe));
             Bind(_profileButton, () => ProfilesRequested?.Invoke());
 
             if (_optionsButton != null)
@@ -73,6 +79,8 @@ namespace OndeVai.UI
             GameMode mode = _gameController.Settings.Current.Mode;
             SetHighlight(_dragModeHighlight, mode == GameMode.DragAndDrop);
             SetHighlight(_questionModeHighlight, mode == GameMode.Question);
+            SetHighlight(_swipeModeHighlight, mode == GameMode.SwipeCard);
+            SetHighlight(_fourWaySwipeModeHighlight, mode == GameMode.FourWaySwipe);
 
             ChildProfileRecord child = _gameController.Data.ActiveChild;
             if (_profileBadge != null)

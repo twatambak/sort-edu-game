@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb8d37f610eb4ed4877fdf8eb36bc96b, type: 3}
   m_Name: Tools
   m_EditorClassIdentifier: 
-  _group: 2
+  _group: 1
   _displayName: Ferramentas
   _icon: {fileID: 0}
   _color: {r: 0.33, g: 0.63, b: 1, a: 1}

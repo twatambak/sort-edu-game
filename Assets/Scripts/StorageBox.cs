@@ -71,6 +71,13 @@ public class Storage : MonoBehaviour, IDropTarget, IPointerClickHandler
         _groupIconRenderer.enabled = icon != null;
     }
 
+    /// <summary>Shows this target only in modes that use physical storages.</summary>
+    public void SetGameModeVisible(bool visible)
+    {
+        if (gameObject.activeSelf != visible)
+            gameObject.SetActive(visible);
+    }
+
     public void OnDrop(GameObject droppedObject)
     {
         if (!droppedObject || !droppedObject.TryGetComponent(out Item item))

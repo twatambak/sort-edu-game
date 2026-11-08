@@ -69,7 +69,8 @@ namespace OndeVai.Tutorial
                 return;
             }
 
-            if (_targetStorage == null)
+            bool swipeMode = IsSwipeMode(_gameController.Config.Mode);
+            if (!swipeMode && _targetStorage == null)
                 return;
 
             _cycleTime += Time.deltaTime;
@@ -80,7 +81,9 @@ namespace OndeVai.Tutorial
             }
 
             float time = Mathf.Repeat(_cycleTime, CycleDuration);
-            if (_gameController.Config.Mode == GameMode.Question)
+            if (swipeMode)
+                AnimateSwipe(time);
+            else if (_gameController.Config.Mode == GameMode.Question)
                 AnimateTap(time);
             else
                 AnimateDrag(time);
@@ -135,6 +138,9 @@ namespace OndeVai.Tutorial
             SetVisible(false);
 
             if (_targetItem == null)
+                return;
+
+            if (IsSwipeMode(_gameController.Config.Mode))
                 return;
 
             if (_gameController.TryGetStorageFor(_targetItem.ItemType, out _targetStorage))
@@ -194,6 +200,33 @@ namespace OndeVai.Tutorial
             ShowRing(target, Mathf.Repeat(time * 2f / CycleDuration, 1f));
         }
 
+        private void AnimateSwipe(float time)
+        {
+            if (!SwipeDirectionUtility.TryGetDirection(_gameController.Config, _targetItem.ItemType, out SwipeDirection direction))
+                return;
+
+            Vector3 from = _targetItem.transform.position;
+            Vector3 to = from + (Vector3)SwipeDirectionUtility.Vector(direction) * 1.6f;
+            if (time < PressDuration)
+            {
+                float t = time / PressDuration;
+                ShowPointer(from, 1f - 0.2f * t, t);
+                ShowRing(from, t);
+                return;
+            }
+
+            time -= PressDuration;
+            if (time < MoveDuration)
+            {
+                float t = Mathf.SmoothStep(0f, 1f, time / MoveDuration);
+                ShowPointer(Vector3.Lerp(from, to, t), 0.8f, 1f);
+                HideRing();
+                return;
+            }
+
+            SetVisible(false);
+        }
+
         private void ShowPointer(Vector3 position, float scale, float alpha)
         {
             _pointer.enabled = true;
@@ -238,6 +271,11 @@ namespace OndeVai.Tutorial
         {
             if (_targetStorage != null)
                 _targetStorage.SetHighlighted(false);
+        }
+
+        private static bool IsSwipeMode(GameMode mode)
+        {
+            return mode == GameMode.SwipeCard || mode == GameMode.FourWaySwipe;
         }
 
         private void EnsureVisuals()

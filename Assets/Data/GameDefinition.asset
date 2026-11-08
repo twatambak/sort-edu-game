@@ -11,6 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 97648d493086c0048949f47595f38ba7, type: 3}
   m_Name: GameDefinition
+  m_EditorClassIdentifier: 
   _itemPrefab: {fileID: 6653632063819600161, guid: ddf895a58537b7d48b76690cf4bdf612, type: 3}
   _itemTypes:
   - {fileID: 11400000, guid: 9f0f7a742f0640aa96015633d0106dc1, type: 2}
@@ -19,16 +20,11 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b8d65368646d43be96be9e808d673e19, type: 2}
   - {fileID: 11400000, guid: 1bf7f62b9349410bbbc2b47f5c8fe211, type: 2}
   - {fileID: 11400000, guid: 18f6b158c4c74a6f88dafb99d348b60c, type: 2}
-  - {fileID: 11400000, guid: f80d07fdbac34eaf943368e5e24eab47, type: 2}
-  - {fileID: 11400000, guid: ec342cfd64294d2db78a10079c666e7d, type: 2}
-  - {fileID: 11400000, guid: 848350e751c24488a7ba388c844b59ea, type: 2}
-  - {fileID: 11400000, guid: 8c34268c4bf44e1db66f890e0fdce5a1, type: 2}
   - {fileID: 11400000, guid: 16d392f91f434e7684060d75f1ad60ef, type: 2}
   - {fileID: 11400000, guid: 2132cf90606b47698836cdbe0245635a, type: 2}
   _scenarios:
   - {fileID: 11400000, guid: 529f43966a55471aa791e789ed52e68f, type: 2}
   - {fileID: 11400000, guid: 3c8f1f59b64742179ceb68985adf2196, type: 2}
   - {fileID: 11400000, guid: da5f37da3b7c4f4b87c2cf3f15854f43, type: 2}
-  - {fileID: 11400000, guid: 9f7191d3e613403dbaed8089784b8051, type: 2}
-  - {fileID: 11400000, guid: 900032544c894cfaa58ac2e2f6d61a77, type: 2}
   - {fileID: 11400000, guid: 05296f1134004c148b427286c23459f8, type: 2}
+  - {fileID: 11400000, guid: 92ec74f7af6048ada28aee3576ee9957, type: 2}

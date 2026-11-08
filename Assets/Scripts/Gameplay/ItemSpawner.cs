@@ -41,6 +41,26 @@ namespace OndeVai.Gameplay
 
         public int ActiveCount => _activeItems.Count;
 
+        /// <summary>Average authored spawn position, used when a single-card point is not assigned.</summary>
+        public Vector3 DefaultSpawnPosition
+        {
+            get
+            {
+                Vector3 total = Vector3.zero;
+                int count = 0;
+                foreach (Transform spawnPoint in _spawnPoints)
+                {
+                    if (spawnPoint == null)
+                        continue;
+
+                    total += spawnPoint.position;
+                    count++;
+                }
+
+                return count > 0 ? total / count : Vector3.zero;
+            }
+        }
+
         /// <summary>
         /// Spawns <paramref name="count"/> items at distinct spawn points. When the wave has two or more
         /// items it always contains both groups, so every wave asks the child to really sort.
@@ -63,6 +83,18 @@ namespace OndeVai.Gameplay
         {
             ItemGroup group = Random.value < 0.5f ? groupA : groupB;
             return Spawn(group, position);
+        }
+
+        /// <summary>Spawns one item from the supplied category set at <paramref name="position"/>.</summary>
+        public Item SpawnSingle(Vector3 position, IReadOnlyList<ItemGroup> groups)
+        {
+            if (groups == null || groups.Count == 0)
+            {
+                Debug.LogError("Cannot spawn an item without at least one group.");
+                return null;
+            }
+
+            return Spawn(groups[Random.Range(0, groups.Count)], position);
         }
 
         /// <summary>Stops tracking an item. Does not despawn it.</summary>
@@ -105,6 +137,8 @@ namespace OndeVai.Gameplay
             Item item = Rent();
             Transform itemTransform = item.transform;
             itemTransform.position = position;
+            if (item.TryGetComponent(out SwipeCardInput swipeInput))
+                swipeInput.enabled = false;
             item.Initialize(type, variant);
             item.gameObject.SetActive(true);
 

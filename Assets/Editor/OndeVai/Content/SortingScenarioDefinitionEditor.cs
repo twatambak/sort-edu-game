@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace OndeVai.EditorTools
 {
-    /// <summary>Scenario inspector with a side by side preview of both item types and a playability check.</summary>
+    /// <summary>Scenario inspector with previews of its categories and playability checks.</summary>
     [CustomEditor(typeof(SortingScenarioDefinition))]
     public sealed class SortingScenarioDefinitionEditor : Editor
     {
@@ -19,23 +19,35 @@ namespace OndeVai.EditorTools
             SortingScenarioDefinition scenario = (SortingScenarioDefinition)target;
             EditorGUILayout.Space();
             EditorGUILayout.BeginHorizontal();
-            DrawType(scenario.TypeA);
-            GUILayout.Label("vs", EditorStyles.boldLabel, GUILayout.Width(24f), GUILayout.Height(Preview));
-            DrawType(scenario.TypeB);
+            DrawType(scenario.TypeA, "Right");
+            DrawType(scenario.TypeB, "Left");
+            if (scenario.TypeC != null || scenario.TypeD != null)
+            {
+                DrawType(scenario.TypeC, "Up");
+                DrawType(scenario.TypeD, "Down");
+            }
             EditorGUILayout.EndHorizontal();
 
-            if (scenario.IsPlayable)
-                EditorGUILayout.HelpBox("Playable.", MessageType.Info);
-            else
+            if (!scenario.IsPlayable)
                 EditorGUILayout.HelpBox($"Not playable: {ContentEditorUtility.DescribeScenarioProblem(scenario)}.", MessageType.Warning);
+            else if (scenario.TypeC != null || scenario.TypeD != null)
+            {
+                if (scenario.IsFourWayPlayable)
+                    EditorGUILayout.HelpBox("Playable in two- and four-direction modes.", MessageType.Info);
+                else
+                    EditorGUILayout.HelpBox($"Playable in two-direction modes only: {ContentEditorUtility.DescribeFourWayScenarioProblem(scenario)}.", MessageType.Warning);
+            }
+            else
+                EditorGUILayout.HelpBox("Playable in two-direction modes.", MessageType.Info);
         }
 
-        private static void DrawType(ItemTypeDefinition type)
+        private static void DrawType(ItemTypeDefinition type, string direction)
         {
             EditorGUILayout.BeginVertical(GUILayout.Width(Preview + 60f));
             Rect rect = GUILayoutUtility.GetRect(Preview, Preview, GUILayout.Width(Preview), GUILayout.Height(Preview));
             ContentEditorUtility.DrawSprite(rect, type != null ? type.Icon : null);
             string label = type != null ? $"{type.DisplayName}\n{type.Variants.Count} variant(s)" : "(none)";
+            GUILayout.Label(direction, EditorStyles.boldLabel);
             GUILayout.Label(label, EditorStyles.miniLabel);
             EditorGUILayout.EndVertical();
         }

@@ -42,7 +42,11 @@ namespace OndeVai.EditorTools
                     continue;
 
                 string status = scenario.IsPlayable ? "Playable" : "Needs content";
-                EditorGUILayout.LabelField(scenario.DisplayName, $"{Count(scenario.TypeA)} x {Count(scenario.TypeB)} variants   {status}");
+                string details = $"{Count(scenario.TypeA)} x {Count(scenario.TypeB)} variants";
+                if (scenario.TypeC != null || scenario.TypeD != null)
+                    details += $" / 4-way: {(scenario.IsFourWayPlayable ? "Playable" : "Needs content")}";
+
+                EditorGUILayout.LabelField(scenario.DisplayName, $"{details}   {status}");
             }
         }
 

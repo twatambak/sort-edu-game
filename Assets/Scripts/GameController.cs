@@ -10,6 +10,7 @@ using UnityEngine;
 public readonly struct ItemSortResult
 {
     public readonly Item Item;
+    /// <summary>Selected storage, or null when the answer is a swipe-selected category.</summary>
     public readonly Storage Storage;
     public readonly bool Correct;
     public readonly bool DuringTutorial;
@@ -23,6 +24,7 @@ public readonly struct ItemSortResult
         DuringTutorial = duringTutorial;
         Position = position;
     }
+
 }
 
 /// <summary>
@@ -110,6 +112,7 @@ public class GameController : SingletonBase<GameController>
     private ItemSpawner _spawner;
     private IGameModeRunner _runner;
     private readonly List<ItemAttemptRecord> _attempts = new();
+    private readonly List<Storage> _knownStorages = new();
 
     protected override void Awake()
     {
@@ -134,8 +137,14 @@ public class GameController : SingletonBase<GameController>
     {
         GameSettings settings = Settings.Current;
         SortingScenarioDefinition scenario = _gameDefinition != null
-            ? _gameDefinition.GetScenarioOrDefault(settings.ScenarioId)
-            : SortingScenarioDefinition.Default;
+            ? _gameDefinition.GetScenarioOrDefault(settings.ScenarioId, settings.Mode == GameMode.FourWaySwipe ? 4 : 2)
+            : settings.Mode == GameMode.FourWaySwipe ? null : SortingScenarioDefinition.Default;
+
+        if (scenario == null)
+        {
+            Debug.LogError("No playable four-category sorting scenario is registered in the GameDefinition.", this);
+            return;
+        }
 
         BeginGame(GameConfiguration.FromSettings(settings, scenario));
     }
@@ -144,6 +153,12 @@ public class GameController : SingletonBase<GameController>
     {
         if (selectedConfig == null)
             throw new ArgumentNullException(nameof(selectedConfig));
+
+        if (selectedConfig.Mode == GameMode.FourWaySwipe && !HasPlayableFourWayGroups(selectedConfig))
+        {
+            Debug.LogError("Four-way swipe requires four distinct groups with playable content in the GameDefinition.", this);
+            return;
+        }
 
         StopCurrentMatch();
 
@@ -189,6 +204,7 @@ public class GameController : SingletonBase<GameController>
             SaveSession(false, GameSessionRecord.ReasonAbandoned);
 
         StopCurrentMatch();
+        SetStoragesVisible(true);
         _gameStarted = false;
         IsGameOver = true;
         SetPausedInternal(false);
@@ -207,18 +223,32 @@ public class GameController : SingletonBase<GameController>
     }
 
     /// <summary>
-    /// Evaluates an item placed in (or chosen for) a storage. Plays storage feedback and updates the match.
+    /// Evaluates an item placed in a storage or assigned to a category. Updates the match and feedback.
     /// </summary>
-    /// <returns>True when the item belongs to the storage.</returns>
+    /// <returns>True when the item belongs to the selected category.</returns>
     public bool SubmitItem(Item item, Storage storage)
     {
-        if (item == null || storage == null || !CanAcceptInput || item.IsResolving)
+        if (storage == null)
             return false;
 
-        bool correct = item.ItemType == storage.StorageType;
+        return SubmitItem(item, storage.StorageType, storage);
+    }
+
+    /// <summary>Evaluates a selected category when the mode has no physical storage targets.</summary>
+    public bool SubmitItem(Item item, ItemGroup chosenGroup)
+    {
+        return SubmitItem(item, chosenGroup, null);
+    }
+
+    private bool SubmitItem(Item item, ItemGroup chosenGroup, Storage storage)
+    {
+        if (item == null || !CanAcceptInput || item.IsResolving)
+            return false;
+
+        bool correct = item.ItemType == chosenGroup;
         bool duringTutorial = TutorialItemsRemaining > 0;
         Vector3 position = item.transform.position;
-        RecordAttempt(item, storage, correct, duringTutorial);
+        RecordAttempt(item, chosenGroup, correct, duringTutorial);
 
         if (correct)
             ResolveCorrect(item, storage, duringTutorial, position);
@@ -334,7 +364,15 @@ public class GameController : SingletonBase<GameController>
     private void ResolveCorrect(Item item, Storage storage, bool duringTutorial, Vector3 position)
     {
         _spawner.Remove(item);
-        storage.AcceptItem(item);
+        if (storage != null)
+        {
+            storage.AcceptItem(item);
+        }
+        else
+        {
+            item.BeginResolve();
+            item.SetKinematic(true);
+        }
         ScoreCount++;
 
         bool tutorialFinished = false;
@@ -358,7 +396,8 @@ public class GameController : SingletonBase<GameController>
 
     private void ResolveIncorrect(Item item, Storage storage, bool duringTutorial, Vector3 position)
     {
-        storage.RejectItem(item, _runner.EjectOnError);
+        if (storage != null)
+            storage.RejectItem(item, _runner.EjectOnError);
         if (!duringTutorial)
             ErrorCount++;
 
@@ -435,12 +474,12 @@ public class GameController : SingletonBase<GameController>
         return Data.SaveSession(record, _attempts) > 0 ? record : null;
     }
 
-    private void RecordAttempt(Item item, Storage storage, bool correct, bool duringTutorial)
+    private void RecordAttempt(Item item, ItemGroup chosenGroup, bool correct, bool duringTutorial)
     {
         _attempts.Add(new ItemAttemptRecord
         {
             ItemGroup = (int)item.ItemType,
-            ChosenGroup = (int)storage.StorageType,
+            ChosenGroup = (int)chosenGroup,
             ItemName = item.name,
             Correct = correct,
             ResponseSeconds = Mathf.Max(0f, Time.time - item.AvailableSince),
@@ -453,6 +492,17 @@ public class GameController : SingletonBase<GameController>
 
     private void ConfigureStorages()
     {
+        foreach (Storage storage in Storage.Active)
+        {
+            if (storage != null && !_knownStorages.Contains(storage))
+                _knownStorages.Add(storage);
+        }
+
+        RegisterStorage(_storageA);
+        RegisterStorage(_storageB);
+        bool showStorages = Config.Mode != GameMode.SwipeCard && Config.Mode != GameMode.FourWaySwipe;
+        SetStoragesVisible(showStorages);
+
         if (_storageA == null && _storageB == null)
             return;
 
@@ -468,6 +518,34 @@ public class GameController : SingletonBase<GameController>
             _storageB.Configure(Config.ItemGroupB, scenarioMatches ? scenario.IconB : null);
     }
 
+    private void RegisterStorage(Storage storage)
+    {
+        if (storage != null && !_knownStorages.Contains(storage))
+            _knownStorages.Add(storage);
+    }
+
+    private void SetStoragesVisible(bool visible)
+    {
+        foreach (Storage storage in _knownStorages)
+        {
+            if (storage != null)
+                storage.SetGameModeVisible(visible);
+        }
+    }
+
+    private bool HasPlayableFourWayGroups(GameConfiguration config)
+    {
+        HashSet<ItemGroup> groups = new();
+        for (int i = 0; i < 4; i++)
+        {
+            ItemGroup group = config.GetGroup(i);
+            if (!groups.Add(group) || _gameDefinition == null || !_gameDefinition.HasContent(group))
+                return false;
+        }
+
+        return true;
+    }
+
     private IGameModeRunner CreateRunner(GameMode mode)
     {
         GameModeContext context = new()
@@ -476,13 +554,18 @@ public class GameController : SingletonBase<GameController>
             QuestionPoint = _questionPoint,
             QuestionItemScale = _questionItemScale,
             NotifySpawned = item => OnItemSpawned?.Invoke(item),
-            Submit = SubmitItem,
+            Submit = (item, storage) => SubmitItem(item, storage),
+            SubmitGroup = (item, group) => SubmitItem(item, group),
+            NotifyPicked = NotifyItemPicked,
+            NotifyReleased = NotifyItemReleased,
             CanAcceptInput = () => CanAcceptInput
         };
 
         return mode switch
         {
             GameMode.Question => new QuestionModeRunner(context),
+            GameMode.SwipeCard => new SwipeCardModeRunner(context),
+            GameMode.FourWaySwipe => new SwipeCardModeRunner(context),
             _ => new DragAndDropModeRunner(context)
         };
     }

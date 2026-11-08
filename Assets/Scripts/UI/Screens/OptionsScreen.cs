@@ -63,9 +63,8 @@ namespace OndeVai.UI
             BindSlider(_sfxSlider, value => Apply(s => s.SfxVolume = value, false));
             BindToggle(_vibrationToggle, value => Apply(s => s.VibrationEnabled = value));
             BindToggle(_tutorialToggle, value => Apply(s => s.TutorialEnabled = value));
-
             BindSelector(_tutorialItemsSelector, index => Apply(s => s.TutorialItemCount = TutorialItems[index]));
-            BindSelector(_modeSelector, index => Apply(s => s.Mode = (GameMode)index));
+            BindSelector(_modeSelector, HandleModeChanged);
             BindSelector(_scenarioSelector, index => Apply(s => s.ScenarioId = _scenarios[index].Id));
             BindSelector(_matchTimeSelector, index => Apply(s => s.MatchTimeSeconds = MatchTimes[index]));
             BindSelector(_errorLimitSelector, index => Apply(s => s.ErrorLimit = ErrorLimits[index]));
@@ -82,11 +81,6 @@ namespace OndeVai.UI
             }
 
             _settings = controller.Settings;
-            if (controller.Definition != null)
-                controller.Definition.GetPlayableScenarios(_scenarios);
-            else
-                _scenarios.Add(SortingScenarioDefinition.Default);
-
             Refresh(_settings.Current, controller.Definition);
         }
 
@@ -111,26 +105,38 @@ namespace OndeVai.UI
             SetNumberOptions(_errorLimitSelector, ErrorLimits, settings.ErrorLimit, value => value.ToString());
             SetNumberOptions(_itemsOnScreenSelector, ItemsOnScreen, settings.ItemsOnScreen, value => value.ToString());
 
+            int requiredGroupCount = settings.Mode == GameMode.FourWaySwipe ? 4 : 2;
+            if (definition != null)
+                definition.GetPlayableScenarios(_scenarios, requiredGroupCount);
+            else
+            {
+                _scenarios.Clear();
+                if (requiredGroupCount == 2)
+                    _scenarios.Add(SortingScenarioDefinition.Default);
+            }
+
             if (_modeSelector != null)
             {
                 _labels.Clear();
                 _labels.Add("Arrastar e soltar");
                 _labels.Add("Perguntas");
+                _labels.Add("Cartas (2 direções)");
+                _labels.Add("Cartas (4 direções)");
                 _modeSelector.SetOptions(_labels, (int)settings.Mode);
             }
 
             if (_scenarioSelector != null)
             {
                 SortingScenarioDefinition current = definition != null
-                    ? definition.GetScenarioOrDefault(settings.ScenarioId)
-                    : SortingScenarioDefinition.Default;
+                    ? definition.GetScenarioOrDefault(settings.ScenarioId, requiredGroupCount)
+                    : requiredGroupCount == 2 ? SortingScenarioDefinition.Default : null;
 
                 _labels.Clear();
                 int selected = 0;
                 for (int i = 0; i < _scenarios.Count; i++)
                 {
                     _labels.Add(_scenarios[i].DisplayName);
-                    if (_scenarios[i].Id == current.Id)
+                    if (current != null && _scenarios[i].Id == current.Id)
                         selected = i;
                 }
 
@@ -138,6 +144,16 @@ namespace OndeVai.UI
             }
 
             _isRefreshing = false;
+        }
+
+        private void HandleModeChanged(int index)
+        {
+            if (_isRefreshing || _settings == null)
+                return;
+
+            GameMode mode = (GameMode)index;
+            _settings.Apply(settings => settings.Mode = mode);
+            Refresh(_settings.Current, GameController.Instance != null ? GameController.Instance.Definition : null);
         }
 
         private void SetNumberOptions(OptionSelector selector, int[] values, int current, Func<int, string> format)

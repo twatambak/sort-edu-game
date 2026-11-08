@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb8d37f610eb4ed4877fdf8eb36bc96b, type: 3}
   m_Name: Numbers
   m_EditorClassIdentifier: 
-  _group: 5
-  _displayName: Números
+  _group: 3
+  _displayName: "N\xFAmeros"
   _icon: {fileID: 0}
   _color: {r: 0.3, g: 0.78, b: 0.45, a: 1}
   _scale: 1
@@ -21,4 +21,151 @@ MonoBehaviour:
   _colliderShape: 0
   _gravityScale: 1
   _mass: 1
-  _variants: []
+  _variants:
+  - Id: numbers_0
+    Sprite: {fileID: -676374595, guid: 4bc977f698101bc47b6e7dfcc42c8a22, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: numbers_1
+    Sprite: {fileID: -1164347804, guid: 4bc977f698101bc47b6e7dfcc42c8a22, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: numbers_2
+    Sprite: {fileID: -112725554, guid: 4bc977f698101bc47b6e7dfcc42c8a22, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: numbers_3
+    Sprite: {fileID: 973216814, guid: 4bc977f698101bc47b6e7dfcc42c8a22, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: numbers_4
+    Sprite: {fileID: 1356012420, guid: 4bc977f698101bc47b6e7dfcc42c8a22, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: numbers_5
+    Sprite: {fileID: 1951325668, guid: 4bc977f698101bc47b6e7dfcc42c8a22, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: numbers_6
+    Sprite: {fileID: 49456837, guid: 4bc977f698101bc47b6e7dfcc42c8a22, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: numbers_7
+    Sprite: {fileID: 982489579, guid: 4bc977f698101bc47b6e7dfcc42c8a22, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: numbers_8
+    Sprite: {fileID: 761592039, guid: 4bc977f698101bc47b6e7dfcc42c8a22, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: numbers_9
+    Sprite: {fileID: -1332585763, guid: 4bc977f698101bc47b6e7dfcc42c8a22, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: numbers_10
+    Sprite: {fileID: -711628267, guid: 4bc977f698101bc47b6e7dfcc42c8a22, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: numbers_13
+    Sprite: {fileID: -1409677852, guid: 4bc977f698101bc47b6e7dfcc42c8a22, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: numbers_14
+    Sprite: {fileID: 1997396447, guid: 4bc977f698101bc47b6e7dfcc42c8a22, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: numbers_16
+    Sprite: {fileID: -152849627, guid: 4bc977f698101bc47b6e7dfcc42c8a22, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: numbers_18
+    Sprite: {fileID: 188900917, guid: 4bc977f698101bc47b6e7dfcc42c8a22, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: numbers_20
+    Sprite: {fileID: 708693038, guid: 4bc977f698101bc47b6e7dfcc42c8a22, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: numbers_22
+    Sprite: {fileID: -1310431324, guid: 4bc977f698101bc47b6e7dfcc42c8a22, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: numbers_24
+    Sprite: {fileID: -980983909, guid: 4bc977f698101bc47b6e7dfcc42c8a22, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: numbers_26
+    Sprite: {fileID: -1411727891, guid: 4bc977f698101bc47b6e7dfcc42c8a22, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: numbers_28
+    Sprite: {fileID: -1066900259, guid: 4bc977f698101bc47b6e7dfcc42c8a22, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: numbers_30
+    Sprite: {fileID: -1282606060, guid: 4bc977f698101bc47b6e7dfcc42c8a22, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0

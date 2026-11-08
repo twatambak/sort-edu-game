@@ -42,6 +42,8 @@ namespace OndeVai.UI
             {
                 GameMode.DragAndDrop => "Arrastar",
                 GameMode.Question => "Perguntas",
+                GameMode.SwipeCard => "Cartas (2 direções)",
+                GameMode.FourWaySwipe => "Cartas (4 direções)",
                 _ => "?"
             };
         }

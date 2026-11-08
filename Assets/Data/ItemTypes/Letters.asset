@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb8d37f610eb4ed4877fdf8eb36bc96b, type: 3}
   m_Name: Letters
   m_EditorClassIdentifier: 
-  _group: 4
+  _group: 2
   _displayName: Letras
   _icon: {fileID: 0}
   _color: {r: 0.95, g: 0.4, b: 0.4, a: 1}
@@ -21,4 +21,186 @@ MonoBehaviour:
   _colliderShape: 0
   _gravityScale: 1
   _mass: 1
-  _variants: []
+  _variants:
+  - Id: letters-and-numbers_0
+    Sprite: {fileID: 780317980, guid: cae3b7f303e492f47aab9e7dc1af54c6, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: letters-and-numbers_1
+    Sprite: {fileID: -446005064, guid: cae3b7f303e492f47aab9e7dc1af54c6, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: letters-and-numbers_2
+    Sprite: {fileID: 2056811060, guid: cae3b7f303e492f47aab9e7dc1af54c6, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: letters-and-numbers_3
+    Sprite: {fileID: -1798728270, guid: cae3b7f303e492f47aab9e7dc1af54c6, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: letters-and-numbers_4
+    Sprite: {fileID: 458383147, guid: cae3b7f303e492f47aab9e7dc1af54c6, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: letters-and-numbers_5
+    Sprite: {fileID: -1442674253, guid: cae3b7f303e492f47aab9e7dc1af54c6, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: letters-and-numbers_6
+    Sprite: {fileID: 1712311246, guid: cae3b7f303e492f47aab9e7dc1af54c6, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: letters-and-numbers_7
+    Sprite: {fileID: -893435587, guid: cae3b7f303e492f47aab9e7dc1af54c6, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: letters-and-numbers_8
+    Sprite: {fileID: 407257641, guid: cae3b7f303e492f47aab9e7dc1af54c6, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: letters-and-numbers_9
+    Sprite: {fileID: 715721522, guid: cae3b7f303e492f47aab9e7dc1af54c6, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: letters-and-numbers_10
+    Sprite: {fileID: -1872020228, guid: cae3b7f303e492f47aab9e7dc1af54c6, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: letters-and-numbers_11
+    Sprite: {fileID: 1010434551, guid: cae3b7f303e492f47aab9e7dc1af54c6, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: letters-and-numbers_12
+    Sprite: {fileID: -1028751183, guid: cae3b7f303e492f47aab9e7dc1af54c6, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: letters-and-numbers_13
+    Sprite: {fileID: -2093581262, guid: cae3b7f303e492f47aab9e7dc1af54c6, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: letters-and-numbers_14
+    Sprite: {fileID: -494696583, guid: cae3b7f303e492f47aab9e7dc1af54c6, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: letters-and-numbers_15
+    Sprite: {fileID: 2135413214, guid: cae3b7f303e492f47aab9e7dc1af54c6, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: letters-and-numbers_16
+    Sprite: {fileID: -713390772, guid: cae3b7f303e492f47aab9e7dc1af54c6, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: letters-and-numbers_17
+    Sprite: {fileID: -1283895015, guid: cae3b7f303e492f47aab9e7dc1af54c6, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: letters-and-numbers_18
+    Sprite: {fileID: 1371904280, guid: cae3b7f303e492f47aab9e7dc1af54c6, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: letters-and-numbers_19
+    Sprite: {fileID: 1983128559, guid: cae3b7f303e492f47aab9e7dc1af54c6, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: letters-and-numbers_20
+    Sprite: {fileID: 1214440907, guid: cae3b7f303e492f47aab9e7dc1af54c6, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: letters-and-numbers_21
+    Sprite: {fileID: -2024892443, guid: cae3b7f303e492f47aab9e7dc1af54c6, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: letters-and-numbers_22
+    Sprite: {fileID: 1103733558, guid: cae3b7f303e492f47aab9e7dc1af54c6, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: letters-and-numbers_23
+    Sprite: {fileID: -288698563, guid: cae3b7f303e492f47aab9e7dc1af54c6, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: letters-and-numbers_24
+    Sprite: {fileID: -1052001404, guid: cae3b7f303e492f47aab9e7dc1af54c6, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: letters-and-numbers_25
+    Sprite: {fileID: -1568540399, guid: cae3b7f303e492f47aab9e7dc1af54c6, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0

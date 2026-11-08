@@ -40,6 +40,15 @@ namespace OndeVai.Gameplay
         /// <summary>Evaluates an answer. Returns true when correct.</summary>
         public Func<Item, Storage, bool> Submit;
 
+        /// <summary>Evaluates a selected category without requiring a physical storage.</summary>
+        public Func<Item, ItemGroup, bool> SubmitGroup;
+
+        /// <summary>Notifies listeners that an item was picked up.</summary>
+        public Action<Item> NotifyPicked;
+
+        /// <summary>Notifies listeners that an item was released.</summary>
+        public Action<Item> NotifyReleased;
+
         /// <summary>True while input is allowed (not paused, not game over).</summary>
         public Func<bool> CanAcceptInput;
     }

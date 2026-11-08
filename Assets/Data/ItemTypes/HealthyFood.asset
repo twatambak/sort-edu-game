@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb8d37f610eb4ed4877fdf8eb36bc96b, type: 3}
   m_Name: HealthyFood
   m_EditorClassIdentifier: 
-  _group: 6
-  _displayName: Comidas saudáveis
+  _group: 4
+  _displayName: "Comidas saud\xE1veis"
   _icon: {fileID: 0}
   _color: {r: 0.45, g: 0.82, b: 0.45, a: 1}
   _scale: 1
