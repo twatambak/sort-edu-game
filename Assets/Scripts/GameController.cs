@@ -512,10 +512,10 @@ public class GameController : SingletonBase<GameController>
 
         bool scenarioMatches = scenario.GroupA == Config.ItemGroupA && scenario.GroupB == Config.ItemGroupB;
         if (_storageA != null)
-            _storageA.Configure(Config.ItemGroupA, scenarioMatches ? scenario.IconA : null);
+            _storageA.Configure(Config.ItemGroupA, scenarioMatches ? scenario.IconA : null, scenarioMatches ? scenario.TypeA.Background : null);
 
         if (_storageB != null)
-            _storageB.Configure(Config.ItemGroupB, scenarioMatches ? scenario.IconB : null);
+            _storageB.Configure(Config.ItemGroupB, scenarioMatches ? scenario.IconB : null,  scenarioMatches ? scenario.TypeB.Background : null);
     }
 
     private void RegisterStorage(Storage storage)

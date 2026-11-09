@@ -72,7 +72,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -126,10 +126,10 @@ TextureImporter:
       name: letters-and-numbers_0
       rect:
         serializedVersion: 2
-        x: 97
-        y: 1673
-        width: 278
-        height: 301
+        x: 274
+        y: 2201
+        width: 229
+        height: 232
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -148,10 +148,10 @@ TextureImporter:
       name: letters-and-numbers_1
       rect:
         serializedVersion: 2
-        x: 462
-        y: 1677
-        width: 251
-        height: 296
+        x: 621
+        y: 2201
+        width: 199
+        height: 231
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -170,10 +170,10 @@ TextureImporter:
       name: letters-and-numbers_2
       rect:
         serializedVersion: 2
-        x: 802
-        y: 1673
-        width: 270
-        height: 301
+        x: 937
+        y: 2201
+        width: 205
+        height: 233
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -192,10 +192,10 @@ TextureImporter:
       name: letters-and-numbers_3
       rect:
         serializedVersion: 2
-        x: 1169
-        y: 1677
-        width: 257
-        height: 293
+        x: 1259
+        y: 2201
+        width: 206
+        height: 228
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -214,10 +214,10 @@ TextureImporter:
       name: letters-and-numbers_4
       rect:
         serializedVersion: 2
-        x: 1526
-        y: 1673
-        width: 236
-        height: 297
+        x: 1582
+        y: 2201
+        width: 194
+        height: 231
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -236,10 +236,10 @@ TextureImporter:
       name: letters-and-numbers_5
       rect:
         serializedVersion: 2
-        x: 1853
-        y: 1673
-        width: 224
-        height: 297
+        x: 1894
+        y: 2201
+        width: 184
+        height: 230
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -258,10 +258,10 @@ TextureImporter:
       name: letters-and-numbers_6
       rect:
         serializedVersion: 2
-        x: 2153
-        y: 1673
-        width: 285
-        height: 301
+        x: 2196
+        y: 2201
+        width: 219
+        height: 233
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -280,10 +280,10 @@ TextureImporter:
       name: letters-and-numbers_7
       rect:
         serializedVersion: 2
-        x: 113
-        y: 1273
-        width: 255
-        height: 303
+        x: 271
+        y: 1852
+        width: 209
+        height: 231
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -302,10 +302,10 @@ TextureImporter:
       name: letters-and-numbers_8
       rect:
         serializedVersion: 2
-        x: 479
-        y: 1268
-        width: 95
-        height: 308
+        x: 598
+        y: 1852
+        width: 159
+        height: 231
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -324,10 +324,10 @@ TextureImporter:
       name: letters-and-numbers_9
       rect:
         serializedVersion: 2
-        x: 665
-        y: 1273
-        width: 211
-        height: 302
+        x: 875
+        y: 1852
+        width: 209
+        height: 232
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -346,10 +346,10 @@ TextureImporter:
       name: letters-and-numbers_10
       rect:
         serializedVersion: 2
-        x: 983
-        y: 1273
-        width: 258
-        height: 302
+        x: 1201
+        y: 1852
+        width: 205
+        height: 231
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -368,10 +368,10 @@ TextureImporter:
       name: letters-and-numbers_11
       rect:
         serializedVersion: 2
-        x: 1339
-        y: 1275
-        width: 224
-        height: 300
+        x: 1522
+        y: 1852
+        width: 184
+        height: 229
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -390,10 +390,10 @@ TextureImporter:
       name: letters-and-numbers_12
       rect:
         serializedVersion: 2
-        x: 1647
-        y: 1273
-        width: 288
-        height: 297
+        x: 1823
+        y: 1852
+        width: 266
+        height: 231
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -412,10 +412,10 @@ TextureImporter:
       name: letters-and-numbers_13
       rect:
         serializedVersion: 2
-        x: 2039
-        y: 1273
-        width: 256
-        height: 302
+        x: 2207
+        y: 1852
+        width: 212
+        height: 229
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -434,10 +434,10 @@ TextureImporter:
       name: letters-and-numbers_14
       rect:
         serializedVersion: 2
-        x: 102
-        y: 870
-        width: 289
-        height: 308
+        x: 280
+        y: 1502
+        width: 217
+        height: 231
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -456,10 +456,10 @@ TextureImporter:
       name: letters-and-numbers_15
       rect:
         serializedVersion: 2
-        x: 487
-        y: 870
-        width: 236
-        height: 301
+        x: 615
+        y: 1503
+        width: 192
+        height: 229
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -478,10 +478,10 @@ TextureImporter:
       name: letters-and-numbers_16
       rect:
         serializedVersion: 2
-        x: 803
-        y: 855
-        width: 305
-        height: 323
+        x: 924
+        y: 1502
+        width: 222
+        height: 233
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -500,10 +500,10 @@ TextureImporter:
       name: letters-and-numbers_17
       rect:
         serializedVersion: 2
-        x: 1193
-        y: 870
-        width: 251
-        height: 301
+        x: 1264
+        y: 1503
+        width: 198
+        height: 228
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -522,10 +522,10 @@ TextureImporter:
       name: letters-and-numbers_18
       rect:
         serializedVersion: 2
-        x: 1530
-        y: 870
-        width: 246
-        height: 308
+        x: 1579
+        y: 1503
+        width: 188
+        height: 232
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -544,10 +544,10 @@ TextureImporter:
       name: letters-and-numbers_19
       rect:
         serializedVersion: 2
-        x: 1850
-        y: 870
-        width: 256
-        height: 301
+        x: 1884
+        y: 1503
+        width: 202
+        height: 229
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -566,10 +566,10 @@ TextureImporter:
       name: letters-and-numbers_20
       rect:
         serializedVersion: 2
-        x: 2190
-        y: 870
-        width: 255
-        height: 308
+        x: 2203
+        y: 1503
+        width: 206
+        height: 229
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -588,10 +588,10 @@ TextureImporter:
       name: letters-and-numbers_21
       rect:
         serializedVersion: 2
-        x: 97
-        y: 473
-        width: 263
-        height: 307
+        x: 265
+        y: 1143
+        width: 216
+        height: 228
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -610,10 +610,10 @@ TextureImporter:
       name: letters-and-numbers_22
       rect:
         serializedVersion: 2
-        x: 432
-        y: 472
-        width: 356
-        height: 303
+        x: 598
+        y: 1143
+        width: 283
+        height: 227
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -632,10 +632,10 @@ TextureImporter:
       name: letters-and-numbers_23
       rect:
         serializedVersion: 2
-        x: 856
-        y: 473
-        width: 242
-        height: 302
+        x: 999
+        y: 1143
+        width: 211
+        height: 227
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -654,10 +654,10 @@ TextureImporter:
       name: letters-and-numbers_24
       rect:
         serializedVersion: 2
-        x: 1167
-        y: 473
-        width: 246
-        height: 302
+        x: 1328
+        y: 1143
+        width: 217
+        height: 227
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -676,10 +676,10 @@ TextureImporter:
       name: letters-and-numbers_25
       rect:
         serializedVersion: 2
-        x: 1478
-        y: 478
-        width: 262
-        height: 293
+        x: 1662
+        y: 1143
+        width: 196
+        height: 228
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -690,6 +690,468 @@ TextureImporter:
       bones: []
       spriteID: d66b9c5fbf188cf41bdcb541e243e4e5
       internalID: -1568540399
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: letters-and-numbers_26
+      rect:
+        serializedVersion: 2
+        x: 1976
+        y: 1143
+        width: 200
+        height: 243
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f4833fb155fcf8b4c82146dacc7e3929
+      internalID: 1016307585
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: letters-and-numbers_27
+      rect:
+        serializedVersion: 2
+        x: 2293
+        y: 1143
+        width: 132
+        height: 242
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e1ca0a0af68bbac47a2e50a355f649d9
+      internalID: -633235281
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: letters-and-numbers_28
+      rect:
+        serializedVersion: 2
+        x: 344
+        y: 783
+        width: 180
+        height: 240
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c21f8e61f9d78784199cf2854cfe776a
+      internalID: -903934067
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: letters-and-numbers_29
+      rect:
+        serializedVersion: 2
+        x: 642
+        y: 783
+        width: 178
+        height: 243
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d89e4c8079c078d44aece3e228b30f30
+      internalID: 125842798
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: letters-and-numbers_30
+      rect:
+        serializedVersion: 2
+        x: 937
+        y: 783
+        width: 203
+        height: 243
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 06e5e7f28eea0824094ee52bc5695ef4
+      internalID: -475652590
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: letters-and-numbers_31
+      rect:
+        serializedVersion: 2
+        x: 1257
+        y: 783
+        width: 181
+        height: 240
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6188c2eb9257dfe4fad440bc024d9129
+      internalID: -938815412
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: letters-and-numbers_32
+      rect:
+        serializedVersion: 2
+        x: 1555
+        y: 783
+        width: 192
+        height: 243
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a162dbac3e9271345bb2fe0196e95b4e
+      internalID: 1600477057
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: letters-and-numbers_33
+      rect:
+        serializedVersion: 2
+        x: 1864
+        y: 783
+        width: 177
+        height: 240
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 93a090efc086bc94796e0218babb4288
+      internalID: -1951486369
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: letters-and-numbers_34
+      rect:
+        serializedVersion: 2
+        x: 2159
+        y: 783
+        width: 188
+        height: 243
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9ea95fbce729ba14ca70cb4e1e46443a
+      internalID: -53868959
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: letters-and-numbers_35
+      rect:
+        serializedVersion: 2
+        x: 62
+        y: 423
+        width: 187
+        height: 243
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dc5e46239240c294e91735c32c6eca75
+      internalID: -1521780119
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: letters-and-numbers_36
+      rect:
+        serializedVersion: 2
+        x: 367
+        y: 423
+        width: 320
+        height: 243
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 184eb4fbef7352f48996e785dbdfc301
+      internalID: 953929022
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: letters-and-numbers_37
+      rect:
+        serializedVersion: 2
+        x: 804
+        y: 423
+        width: 230
+        height: 242
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 01f1fcec89bbc0047934d136e9e8423b
+      internalID: 644784941
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: letters-and-numbers_38
+      rect:
+        serializedVersion: 2
+        x: 1151
+        y: 423
+        width: 279
+        height: 242
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0b19f8f720e018a4f85a84a7b3a7e5a4
+      internalID: -1811371334
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: letters-and-numbers_39
+      rect:
+        serializedVersion: 2
+        x: 1547
+        y: 423
+        width: 276
+        height: 242
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f3da31c7c55f9b64eba9a858db98b293
+      internalID: -1291520444
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: letters-and-numbers_40
+      rect:
+        serializedVersion: 2
+        x: 1941
+        y: 423
+        width: 293
+        height: 242
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 174e0c4a85684ff4a9aa41d26bac13e3
+      internalID: 1768025289
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: letters-and-numbers_41
+      rect:
+        serializedVersion: 2
+        x: 2352
+        y: 423
+        width: 275
+        height: 242
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 02fd0c2ec0d413347a5efbb921076dec
+      internalID: -1769059379
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: letters-and-numbers_42
+      rect:
+        serializedVersion: 2
+        x: 389
+        y: 62
+        width: 278
+        height: 243
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 24dd1065d0d1edf4eace3cccdb37b729
+      internalID: 374289596
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: letters-and-numbers_43
+      rect:
+        serializedVersion: 2
+        x: 785
+        y: 63
+        width: 268
+        height: 242
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 700e9491b190c8f4eb1095a2f11deab7
+      internalID: 1372098937
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: letters-and-numbers_44
+      rect:
+        serializedVersion: 2
+        x: 1171
+        y: 63
+        width: 282
+        height: 242
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6cc8492433024474d90fc6d1953be800
+      internalID: 1771565165
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: letters-and-numbers_45
+      rect:
+        serializedVersion: 2
+        x: 1571
+        y: 62
+        width: 286
+        height: 242
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f0067c277bbb39148a85b34b21220b0d
+      internalID: 1818153038
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: letters-and-numbers_46
+      rect:
+        serializedVersion: 2
+        x: 1975
+        y: 62
+        width: 326
+        height: 242
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9bfeabdea999ed54ab0194a17216ebc2
+      internalID: -1431319534
       vertices: []
       indices: 
       edges: []
@@ -708,7 +1170,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries:
       - key: SpriteEditor.SliceSettings
-        value: '{"sliceOnImport":false,"gridCellCount":{"x":19.0,"y":8.0},"gridSpriteSize":{"x":50.0,"y":50.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
       letters-and-numbers_0: 780317980
       letters-and-numbers_1: -446005064
@@ -740,7 +1202,18 @@ TextureImporter:
       letters-and-numbers_33: -1951486369
       letters-and-numbers_34: -53868959
       letters-and-numbers_35: -1521780119
+      letters-and-numbers_36: 953929022
+      letters-and-numbers_37: 644784941
+      letters-and-numbers_38: -1811371334
+      letters-and-numbers_39: -1291520444
       letters-and-numbers_4: 458383147
+      letters-and-numbers_40: 1768025289
+      letters-and-numbers_41: -1769059379
+      letters-and-numbers_42: 374289596
+      letters-and-numbers_43: 1372098937
+      letters-and-numbers_44: 1771565165
+      letters-and-numbers_45: 1818153038
+      letters-and-numbers_46: -1431319534
       letters-and-numbers_5: -1442674253
       letters-and-numbers_6: 1712311246
       letters-and-numbers_7: -893435587

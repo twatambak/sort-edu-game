@@ -16,77 +16,77 @@ MonoBehaviour:
   _displayName: Ferramentas
   _icon: {fileID: 0}
   _color: {r: 0.33, g: 0.63, b: 1, a: 1}
-  _scale: 1
+  _scale: 0.3
   _scaleWithDepth: 1
   _colliderShape: 0
   _gravityScale: 1
   _mass: 1
   _variants:
-  - Id: box_cutter
-    Sprite: {fileID: -724382368, guid: 9fa5f4f6d14ea6f47823e5ecc2842501, type: 3}
+  - Id: toys-and-tools_12
+    Sprite: {fileID: 1542341870, guid: cbd6093ec84add0469680a4a64e0b17f, type: 3}
     Enabled: 1
     Weight: 1
     Scale: 1
     Tint: {r: 1, g: 1, b: 1, a: 1}
     Collider: 0
-  - Id: hammer
-    Sprite: {fileID: -390268395, guid: 9fa5f4f6d14ea6f47823e5ecc2842501, type: 3}
+  - Id: toys-and-tools_13
+    Sprite: {fileID: 472194848, guid: cbd6093ec84add0469680a4a64e0b17f, type: 3}
     Enabled: 1
     Weight: 1
     Scale: 1
     Tint: {r: 1, g: 1, b: 1, a: 1}
     Collider: 0
-  - Id: knife
-    Sprite: {fileID: -735535232, guid: 9fa5f4f6d14ea6f47823e5ecc2842501, type: 3}
+  - Id: toys-and-tools_14
+    Sprite: {fileID: -1806075940, guid: cbd6093ec84add0469680a4a64e0b17f, type: 3}
     Enabled: 1
     Weight: 1
     Scale: 1
     Tint: {r: 1, g: 1, b: 1, a: 1}
     Collider: 0
-  - Id: nail
-    Sprite: {fileID: -879861119, guid: 9fa5f4f6d14ea6f47823e5ecc2842501, type: 3}
+  - Id: toys-and-tools_15
+    Sprite: {fileID: -1301761791, guid: cbd6093ec84add0469680a4a64e0b17f, type: 3}
     Enabled: 1
     Weight: 1
     Scale: 1
     Tint: {r: 1, g: 1, b: 1, a: 1}
     Collider: 0
-  - Id: needle
-    Sprite: {fileID: 100649053, guid: 9fa5f4f6d14ea6f47823e5ecc2842501, type: 3}
+  - Id: toys-and-tools_16
+    Sprite: {fileID: -1360370992, guid: cbd6093ec84add0469680a4a64e0b17f, type: 3}
     Enabled: 1
     Weight: 1
     Scale: 1
     Tint: {r: 1, g: 1, b: 1, a: 1}
     Collider: 0
-  - Id: pliers
-    Sprite: {fileID: 1617224020, guid: 9fa5f4f6d14ea6f47823e5ecc2842501, type: 3}
+  - Id: toys-and-tools_17
+    Sprite: {fileID: -843197063, guid: cbd6093ec84add0469680a4a64e0b17f, type: 3}
     Enabled: 1
     Weight: 1
     Scale: 1
     Tint: {r: 1, g: 1, b: 1, a: 1}
     Collider: 0
-  - Id: saw
-    Sprite: {fileID: -980865190, guid: 9fa5f4f6d14ea6f47823e5ecc2842501, type: 3}
+  - Id: toys-and-tools_18
+    Sprite: {fileID: -1747367891, guid: cbd6093ec84add0469680a4a64e0b17f, type: 3}
     Enabled: 1
     Weight: 1
     Scale: 1
     Tint: {r: 1, g: 1, b: 1, a: 1}
     Collider: 0
-  - Id: saw_2
-    Sprite: {fileID: -559734570, guid: 9fa5f4f6d14ea6f47823e5ecc2842501, type: 3}
+  - Id: toys-and-tools_19
+    Sprite: {fileID: -412188424, guid: cbd6093ec84add0469680a4a64e0b17f, type: 3}
     Enabled: 1
     Weight: 1
     Scale: 1
     Tint: {r: 1, g: 1, b: 1, a: 1}
     Collider: 0
-  - Id: wrench
-    Sprite: {fileID: 1892010526, guid: 9fa5f4f6d14ea6f47823e5ecc2842501, type: 3}
+  - Id: toys-and-tools_20
+    Sprite: {fileID: 2093292387, guid: cbd6093ec84add0469680a4a64e0b17f, type: 3}
     Enabled: 1
     Weight: 1
     Scale: 1
     Tint: {r: 1, g: 1, b: 1, a: 1}
     Collider: 0
-  - Id: wrench_2
-    Sprite: {fileID: -328192375, guid: 9fa5f4f6d14ea6f47823e5ecc2842501, type: 3}
+  - Id: toys-and-tools_21
+    Sprite: {fileID: -781471501, guid: cbd6093ec84add0469680a4a64e0b17f, type: 3}
     Enabled: 1
     Weight: 1
     Scale: 1

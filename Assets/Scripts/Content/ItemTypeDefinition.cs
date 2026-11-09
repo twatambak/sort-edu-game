@@ -70,6 +70,9 @@ namespace OndeVai.Gameplay
         [Tooltip("Name shown to parents and teachers (Portuguese).")]
         [SerializeField] private string _displayName;
 
+        [Tooltip("Background that represents the items in the group.")]
+        [SerializeField] private Sprite _background;
+
         [Tooltip("Icon representing the category, e.g. above its storage. The first variant sprite is used when empty.")]
         [SerializeField] private Sprite _icon;
 
@@ -94,6 +97,7 @@ namespace OndeVai.Gameplay
         public float GravityScale => _gravityScale;
         public float Mass => _mass;
         public IReadOnlyList<ItemVariant> Variants => _variants;
+        public Sprite Background => _background;
 
         /// <summary>The category icon, or the sprite of the first playable variant.</summary>
         public Sprite Icon

@@ -100,7 +100,6 @@ public class Item : MonoBehaviour
         if (_spriteRenderer != null)
         {
             _spriteRenderer.sprite = variant.Sprite;
-            _spriteRenderer.color = variant.Tint;
         }
         else
         {

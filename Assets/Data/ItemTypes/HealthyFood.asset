@@ -16,9 +16,79 @@ MonoBehaviour:
   _displayName: "Comidas saud\xE1veis"
   _icon: {fileID: 0}
   _color: {r: 0.45, g: 0.82, b: 0.45, a: 1}
-  _scale: 1
+  _scale: 0.3
   _scaleWithDepth: 1
   _colliderShape: 0
   _gravityScale: 1
   _mass: 1
-  _variants: []
+  _variants:
+  - Id: foods_0
+    Sprite: {fileID: -1742390704, guid: 0c52ed2eeb087234e94c62d26fa026b6, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: foods_1
+    Sprite: {fileID: 1432177548, guid: 0c52ed2eeb087234e94c62d26fa026b6, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: foods_2
+    Sprite: {fileID: 1389241496, guid: 0c52ed2eeb087234e94c62d26fa026b6, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: foods_3
+    Sprite: {fileID: -2129093109, guid: 0c52ed2eeb087234e94c62d26fa026b6, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: foods_4
+    Sprite: {fileID: 881370139, guid: 0c52ed2eeb087234e94c62d26fa026b6, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: foods_5
+    Sprite: {fileID: -1968657671, guid: 0c52ed2eeb087234e94c62d26fa026b6, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: foods_6
+    Sprite: {fileID: 1645529481, guid: 0c52ed2eeb087234e94c62d26fa026b6, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: foods_7
+    Sprite: {fileID: -1973307586, guid: 0c52ed2eeb087234e94c62d26fa026b6, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: foods_8
+    Sprite: {fileID: -1418051737, guid: 0c52ed2eeb087234e94c62d26fa026b6, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0
+  - Id: foods_9
+    Sprite: {fileID: 502596631, guid: 0c52ed2eeb087234e94c62d26fa026b6, type: 3}
+    Enabled: 1
+    Weight: 1
+    Scale: 1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Collider: 0

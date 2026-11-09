@@ -16,7 +16,7 @@ MonoBehaviour:
   _displayName: Letras
   _icon: {fileID: 0}
   _color: {r: 0.95, g: 0.4, b: 0.4, a: 1}
-  _scale: 1
+  _scale: 0.3
   _scaleWithDepth: 1
   _colliderShape: 0
   _gravityScale: 1

@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 4a6a03928a316814d9db897ca0ee0da5
+guid: 0c52ed2eeb087234e94c62d26fa026b6
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -72,7 +72,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -123,13 +123,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Animals 1_0
+      name: foods_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 0
-        width: 200
-        height: 200
+        y: 1562
+        width: 391
+        height: 333
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -138,20 +138,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a1d53f8f931dfde408b3b7a96f558acc
-      internalID: 1196480469
+      spriteID: ada5cc7f77b553c49b30a69f86bbee3f
+      internalID: -1742390704
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Animals 1_1
+      name: foods_1
       rect:
         serializedVersion: 2
-        x: 200
-        y: 0
-        width: 200
-        height: 200
+        x: 499
+        y: 1562
+        width: 341
+        height: 380
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -160,20 +160,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: dd31cfe093e589748a9f027eac00a211
-      internalID: 381006530
+      spriteID: 6551f371ae087df4e9a9d998ef84e20e
+      internalID: 1432177548
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Animals 1_2
+      name: foods_2
       rect:
         serializedVersion: 2
-        x: 400
-        y: 0
-        width: 200
-        height: 200
+        x: 958
+        y: 1562
+        width: 309
+        height: 372
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -182,20 +182,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 6fe8dca8e9cca1743ac70674b27dfaba
-      internalID: -971542708
+      spriteID: 1927d688781bddd4cbbc07c7ec0d4c1e
+      internalID: 1389241496
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Animals 1_3
+      name: foods_3
       rect:
         serializedVersion: 2
-        x: 600
-        y: 0
-        width: 200
-        height: 200
+        x: 1385
+        y: 1562
+        width: 343
+        height: 380
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -204,20 +204,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a4e55305e78b7d243912371f8d9439dd
-      internalID: -911047733
+      spriteID: 4b984f88c36b1a44bbd9a0e9c23561ac
+      internalID: -2129093109
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Animals 1_4
+      name: foods_4
       rect:
         serializedVersion: 2
-        x: 800
-        y: 0
-        width: 200
-        height: 200
+        x: 1846
+        y: 1562
+        width: 286
+        height: 380
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -226,20 +226,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 14a5bf3f622286e4a8bcccbc31b6b343
-      internalID: 236308786
+      spriteID: 08d891d94ba9c054489242bbbbdd58ef
+      internalID: 881370139
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Animals 1_5
+      name: foods_5
       rect:
         serializedVersion: 2
-        x: 1000
-        y: 0
-        width: 200
-        height: 200
+        x: 129
+        y: 1026
+        width: 308
+        height: 351
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -248,20 +248,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: dd4e93eeb0376bd4b9ad5702e4abb969
-      internalID: -1039549037
+      spriteID: c2355d78432704549b43113a4ef5199f
+      internalID: -1968657671
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Animals 1_6
+      name: foods_6
       rect:
         serializedVersion: 2
-        x: 1200
-        y: 0
-        width: 200
-        height: 200
+        x: 555
+        y: 1026
+        width: 296
+        height: 353
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -270,20 +270,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e5dba20ccb28e504499d52456aceb980
-      internalID: -2071887416
+      spriteID: dfe3ac8814c88a544b10aea5596da789
+      internalID: 1645529481
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Animals 1_7
+      name: foods_7
       rect:
         serializedVersion: 2
-        x: 1400
-        y: 0
-        width: 200
-        height: 200
+        x: 969
+        y: 1026
+        width: 371
+        height: 367
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -292,20 +292,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c559e0580c59a4a43b89182b5a3a8165
-      internalID: -1092805210
+      spriteID: d145e12c63e706e43b222cd5ec6d65a6
+      internalID: -1973307586
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Animals 1_8
+      name: foods_8
       rect:
         serializedVersion: 2
-        x: 1600
-        y: 0
-        width: 200
-        height: 200
+        x: 1458
+        y: 1026
+        width: 267
+        height: 347
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -314,20 +314,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8c325fd5c8e96f44b9bc202e69db3ba5
-      internalID: 1066535573
+      spriteID: b7bdab23762da954d959c53d6cf6247e
+      internalID: -1418051737
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Animals 1_9
+      name: foods_9
       rect:
         serializedVersion: 2
-        x: 1800
-        y: 0
-        width: 200
-        height: 200
+        x: 1843
+        y: 1026
+        width: 160
+        height: 418
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -336,20 +336,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ecb022490bdf2c043a9e2699a863dec4
-      internalID: 367027651
+      spriteID: 1f928555022280644b283280ef6e188a
+      internalID: 502596631
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Animals 1_10
+      name: foods_10
       rect:
         serializedVersion: 2
-        x: 2000
-        y: 0
-        width: 200
-        height: 200
+        x: 144
+        y: 517
+        width: 362
+        height: 354
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -358,20 +358,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3b09ff57a839db84da46d9f862bed4c7
-      internalID: -1363668126
+      spriteID: 011b8e71a78e99e4b9b5eb7493892e94
+      internalID: -1691365540
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Animals 1_11
+      name: foods_11
       rect:
         serializedVersion: 2
-        x: 2200
-        y: 0
-        width: 200
-        height: 200
+        x: 624
+        y: 517
+        width: 276
+        height: 347
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -380,20 +380,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: baa3850e23afb3e4dbb2c247fc422fcc
-      internalID: 1239873467
+      spriteID: d1b19e38fbf305849b298177b5f2fec3
+      internalID: 1072349200
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Animals 1_12
+      name: foods_12
       rect:
         serializedVersion: 2
-        x: 2400
-        y: 0
-        width: 200
-        height: 200
+        x: 1018
+        y: 517
+        width: 222
+        height: 387
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -402,20 +402,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 23c50fee10a69ec42a4b0136948f3a61
-      internalID: -835481728
+      spriteID: 2caa168dec0e2db4599293564d04e4df
+      internalID: -738145271
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Animals 1_13
+      name: foods_13
       rect:
         serializedVersion: 2
-        x: 2600
-        y: 0
-        width: 200
-        height: 200
+        x: 1358
+        y: 517
+        width: 287
+        height: 391
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -424,20 +424,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3a134123135c3e64198e240325f84816
-      internalID: 1709592817
+      spriteID: 97629c6ecdf12e5408828a91cf24f0b7
+      internalID: -1693510499
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Animals 1_14
+      name: foods_14
       rect:
         serializedVersion: 2
-        x: 2800
-        y: 0
-        width: 200
-        height: 200
+        x: 1763
+        y: 517
+        width: 225
+        height: 384
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -446,20 +446,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 82d339278e89eb440bf46f0e7d0f8f8b
-      internalID: -1162416313
+      spriteID: 578615dfc21de7e49b6b8e94d035269e
+      internalID: 2086382477
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Animals 1_15
+      name: foods_15
       rect:
         serializedVersion: 2
-        x: 3000
+        x: 408
         y: 0
-        width: 200
-        height: 200
+        width: 194
+        height: 386
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -468,8 +468,74 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 7d09bf2cf093ea749b94b0353e341ba4
-      internalID: 755186090
+      spriteID: a81897153ce3b764abd29e039ffc8194
+      internalID: 138279922
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: foods_16
+      rect:
+        serializedVersion: 2
+        x: 720
+        y: 0
+        width: 187
+        height: 396
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 784b6eb4ec356f849a2ccf4218c926f4
+      internalID: 1936643289
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: foods_17
+      rect:
+        serializedVersion: 2
+        x: 1025
+        y: 0
+        width: 289
+        height: 399
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e5c8b58b107e9c74ab8f5dae43031bdc
+      internalID: -1236805351
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: foods_18
+      rect:
+        serializedVersion: 2
+        x: 1432
+        y: 0
+        width: 506
+        height: 379
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ec46cf3c19cfec543a3d47edd35341cc
+      internalID: 2126448773
       vertices: []
       indices: 
       edges: []
@@ -478,7 +544,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 40008292d3a493249a0f8472ccc5be07
+    spriteID: d4cf34a3455d14f48ab05725fbcc347e
     internalID: 0
     vertices: []
     indices: 
@@ -488,24 +554,27 @@ TextureImporter:
     spriteCustomMetadata:
       entries:
       - key: SpriteEditor.SliceSettings
-        value: '{"sliceOnImport":false,"gridCellCount":{"x":16.0,"y":1.0},"gridSpriteSize":{"x":200.0,"y":200.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":2,"keepEmptyRects":false,"isAlternate":false}'
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      Animals 1_0: 1196480469
-      Animals 1_1: 381006530
-      Animals 1_10: -1363668126
-      Animals 1_11: 1239873467
-      Animals 1_12: -835481728
-      Animals 1_13: 1709592817
-      Animals 1_14: -1162416313
-      Animals 1_15: 755186090
-      Animals 1_2: -971542708
-      Animals 1_3: -911047733
-      Animals 1_4: 236308786
-      Animals 1_5: -1039549037
-      Animals 1_6: -2071887416
-      Animals 1_7: -1092805210
-      Animals 1_8: 1066535573
-      Animals 1_9: 367027651
+      foods_0: -1742390704
+      foods_1: 1432177548
+      foods_10: -1691365540
+      foods_11: 1072349200
+      foods_12: -738145271
+      foods_13: -1693510499
+      foods_14: 2086382477
+      foods_15: 138279922
+      foods_16: 1936643289
+      foods_17: -1236805351
+      foods_18: 2126448773
+      foods_2: 1389241496
+      foods_3: -2129093109
+      foods_4: 881370139
+      foods_5: -1968657671
+      foods_6: 1645529481
+      foods_7: -1973307586
+      foods_8: -1418051737
+      foods_9: 502596631
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
