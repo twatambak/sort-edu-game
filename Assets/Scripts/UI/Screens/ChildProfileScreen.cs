@@ -204,8 +204,21 @@ namespace OndeVai.UI
 
         private void DeleteEditing()
         {
-            if (_editing != null)
-                Data?.DeleteProfile(_editing);
+            if (_editing == null)
+                return;
+
+            GameDataService data = Data;
+            if (data == null || !data.IsAvailable)
+            {
+                SetError("Não foi possível acessar os dados deste aparelho.");
+                return;
+            }
+
+            if (!data.DeleteProfile(_editing))
+            {
+                SetError("Não foi possível excluir o perfil. Tente novamente.");
+                return;
+            }
 
             CloseForm();
             RefreshList();

@@ -29,6 +29,10 @@ The parental settings screen and privacy disclaimer are authored as reusable pre
 
 Both use TextMesh Pro UGUI text with the project's LondrinaSolid SDF font. The disclaimer is shown until accepted; the settings screen is reachable from the title through the existing hold-to-confirm parental gate. Settings are persisted locally through `GameSettingsService`.
 
+The settings screen also contains hold-to-confirm actions for the active child profile. **Apagar progresso** removes that child's match and attempt history but keeps the profile. **Excluir perfil** removes the active profile and its history, then switches the next match to guest mode. Both actions are hidden when no child profile is active, and database failures are shown in the screen.
+
+The profile editor can also delete a selected profile; the progress screen can clear history for its selected profile. These existing actions keep the same database behavior and now show an error instead of closing or refreshing as if a failed delete succeeded.
+
 The builder disables the old root-level `TitleScreen` when it installs `AppUI`, preventing two title canvases from displaying at once. Rebuilding replaces generated UI and systems; manually authored changes to those generated objects are not preserved. Changes to the reusable screens should be made in the builder and then rebuilt, rather than editing only a scene instance.
 
 ## Gameplay feedback
@@ -45,6 +49,8 @@ The builder disables the old root-level `TitleScreen` when it installs `AppUI`, 
 
 All effects use generated sprites, so no additional texture or audio assets are required. The camera shake and particle settings can be tuned on `GameFeedbackEffects`; pool capacity and sorting order can be tuned on `SpriteBurstPool`.
 
+Swipe-card mode clears its answer lock whenever it spawns a card. This is required for input to work after the first accepted item; the input component also resets stale pointer gestures when configured or disabled.
+
 ## Scene validation checklist
 
 1. Open `Assets/Scenes/Game.unity` and run **Tools > Onde Vai > Build App UI**.
@@ -55,4 +61,3 @@ All effects use generated sprites, so no additional texture or audio assets are 
 6. Confirm the options and disclaimer objects are prefab instances and their TMP text renders with the intended SDF font.
 7. Test a correct answer, an incorrect answer, the low-time warning, and both match-ending paths.
 8. Save the scene after building. In a player, check both first-launch disclaimer flow and the accepted-disclaimer title flow.
-

@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using OndeVai.Gameplay;
 using OndeVai.Settings;
+using OndeVai.Data;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -39,6 +41,11 @@ namespace OndeVai.UI
         [SerializeField] private Button _privacyButton;
         [SerializeField] private HoldToConfirmButton _resetButton;
 
+        [Header("Active profile data")]
+        [SerializeField] private TMP_Text _profileDataStatus;
+        [SerializeField] private HoldToConfirmButton _clearProgressButton;
+        [SerializeField] private HoldToConfirmButton _deleteProfileButton;
+
         private readonly List<SortingScenarioDefinition> _scenarios = new();
         private readonly List<string> _labels = new();
         private GameSettingsService _settings;
@@ -58,6 +65,12 @@ namespace OndeVai.UI
 
             if (_resetButton != null)
                 _resetButton.OnConfirmed.AddListener(ResetDefaults);
+
+            if (_clearProgressButton != null)
+                _clearProgressButton.OnConfirmed.AddListener(ClearActiveProfileProgress);
+
+            if (_deleteProfileButton != null)
+                _deleteProfileButton.OnConfirmed.AddListener(DeleteActiveProfile);
 
             BindSlider(_musicSlider, value => Apply(s => s.MusicVolume = value, false));
             BindSlider(_sfxSlider, value => Apply(s => s.SfxVolume = value, false));
@@ -82,6 +95,7 @@ namespace OndeVai.UI
 
             _settings = controller.Settings;
             Refresh(_settings.Current, controller.Definition);
+            RefreshProfileActions(controller.Data);
         }
 
         private void Refresh(GameSettings settings, GameDefinition definition)
@@ -185,6 +199,61 @@ namespace OndeVai.UI
 
             _settings.ResetToDefaults();
             Refresh(_settings.Current, GameController.Instance != null ? GameController.Instance.Definition : null);
+        }
+
+        private void ClearActiveProfileProgress()
+        {
+            GameDataService data = GameController.Instance != null ? GameController.Instance.Data : null;
+            ChildProfileRecord profile = data != null ? data.ActiveChild : null;
+            if (profile == null || !data.DeleteHistory(profile))
+            {
+                SetProfileDataStatus(profile == null
+                    ? "Selecione um perfil para apagar o progresso."
+                    : "Não foi possível apagar o progresso. Tente novamente.");
+                return;
+            }
+
+            SetProfileDataStatus("Progresso do perfil apagado.");
+        }
+
+        private void DeleteActiveProfile()
+        {
+            GameDataService data = GameController.Instance != null ? GameController.Instance.Data : null;
+            ChildProfileRecord profile = data != null ? data.ActiveChild : null;
+            if (profile == null || !data.DeleteProfile(profile))
+            {
+                RefreshProfileActions(data);
+                SetProfileDataStatus(profile == null
+                    ? "Selecione um perfil para excluir."
+                    : "Não foi possível excluir o perfil. Tente novamente.");
+                return;
+            }
+
+            RefreshProfileActions(data);
+            SetProfileDataStatus("Perfil excluído. A próxima partida será sem cadastro.");
+        }
+
+        private void RefreshProfileActions(GameDataService data)
+        {
+            bool canManageProfile = data != null && data.IsAvailable && data.ActiveChild != null;
+            if (_clearProgressButton != null)
+                _clearProgressButton.gameObject.SetActive(canManageProfile);
+
+            if (_deleteProfileButton != null)
+                _deleteProfileButton.gameObject.SetActive(canManageProfile);
+
+            if (data == null || !data.IsAvailable)
+                SetProfileDataStatus("Os dados deste aparelho não estão disponíveis.");
+            else if (!canManageProfile)
+                SetProfileDataStatus("Selecione uma criança para gerenciar os dados do perfil.");
+            else
+                SetProfileDataStatus("As ações abaixo afetam apenas o perfil ativo.");
+        }
+
+        private void SetProfileDataStatus(string message)
+        {
+            if (_profileDataStatus != null)
+                _profileDataStatus.text = message;
         }
 
         protected override void OnHidden()

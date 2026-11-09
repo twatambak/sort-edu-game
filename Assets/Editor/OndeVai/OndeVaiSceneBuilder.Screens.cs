@@ -516,6 +516,30 @@ namespace OndeVai.EditorTools
             OptionSelector errorLimit = kit.Selector("ErrorLimit", OptionRow(kit, list, "Erros permitidos", selectorSize), selectorSize, Kit.Blue);
             OptionSelector itemsOnScreen = kit.Selector("ItemsOnScreen", OptionRow(kit, list, "Objetos na tela", selectorSize), selectorSize, Kit.Blue);
 
+            SectionTitle(kit, list, "Dados do perfil ativo");
+            TextMeshProUGUI profileDataStatus = kit.Text(
+                "ProfileDataStatus",
+                list,
+                "As ações abaixo afetam apenas o perfil ativo.",
+                34f,
+                new Color(Kit.Ink.r, Kit.Ink.g, Kit.Ink.b, 0.7f),
+                TextAlignmentOptions.MidlineLeft);
+            Kit.AddLayout(profileDataStatus.gameObject, new Vector2(-1f, 100f));
+            HoldToConfirmButton clearProgress = kit.HoldButton(
+                "ClearProgressButton",
+                list,
+                new Vector2(860f, 120f),
+                Kit.Orange,
+                IconLibrary.Get("icon_replay"),
+                "Segure: apagar progresso");
+            HoldToConfirmButton deleteProfile = kit.HoldButton(
+                "DeleteProfileButton",
+                list,
+                new Vector2(860f, 120f),
+                Kit.Red,
+                IconLibrary.Get("icon_trash"),
+                "Segure: excluir perfil");
+
             foreach (Component control in new Component[] { music, sfx, vibration, tutorial, tutorialItems, mode, scenario, matchTime, errorLimit, itemsOnScreen })
                 Kit.Stretch((RectTransform)control.transform);
 
@@ -537,6 +561,9 @@ namespace OndeVai.EditorTools
             Kit.Wire(screen, "_backButton", back);
             Kit.Wire(screen, "_privacyButton", privacy);
             Kit.Wire(screen, "_resetButton", reset);
+            Kit.Wire(screen, "_profileDataStatus", profileDataStatus);
+            Kit.Wire(screen, "_clearProgressButton", clearProgress);
+            Kit.Wire(screen, "_deleteProfileButton", deleteProfile);
             return SaveScreenPrefab(screen, "OptionsScreen");
         }
 

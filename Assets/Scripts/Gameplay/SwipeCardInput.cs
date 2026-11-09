@@ -30,6 +30,7 @@ namespace OndeVai.Gameplay
             Action<Item> picked,
             Action<Item> released)
         {
+            ResetGesture();
             _allowVertical = allowVertical;
             _minimumDistance = Mathf.Max(1f, minimumDistance);
             _swiped = swiped;
@@ -55,10 +56,16 @@ namespace OndeVai.Gameplay
 
         public void OnEndDrag(PointerEventData eventData)
         {
-            if (!_isDragging || eventData.pointerId != _pointerId)
+            if (!_isDragging)
                 return;
 
-            _isDragging = false;
+            if (eventData.pointerId != _pointerId)
+            {
+                ResetGesture();
+                return;
+            }
+
+            ResetGesture();
             _released?.Invoke(_item);
 
             Vector2 delta = eventData.position - _startPosition;
@@ -77,7 +84,13 @@ namespace OndeVai.Gameplay
 
         private void OnDisable()
         {
+            ResetGesture();
+        }
+
+        private void ResetGesture()
+        {
             _isDragging = false;
+            _pointerId = int.MinValue;
         }
     }
 }

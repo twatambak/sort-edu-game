@@ -244,7 +244,14 @@ namespace OndeVai.UI
             if (child == null)
                 return;
 
-            Data?.DeleteHistory(child);
+            GameDataService data = Data;
+            if (data == null || !data.DeleteHistory(child))
+            {
+                if (_summaryText != null)
+                    _summaryText.text = "Não foi possível apagar o histórico deste perfil.";
+                return;
+            }
+
             ShowSelectedChild();
         }
 

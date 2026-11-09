@@ -87,6 +87,7 @@ namespace OndeVai.Gameplay
 
         private void SpawnCard()
         {
+            _isAnswering = false;
             Vector3 position = _context.QuestionPoint != null
                 ? _context.QuestionPoint.position
                 : _context.Spawner.DefaultSpawnPosition;
