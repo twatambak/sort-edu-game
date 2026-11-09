@@ -9,12 +9,17 @@ Assumptions and judgement calls made during development. Review and revise as ne
 - Flow: Disclaimer (first launch only) > Title > Match > Results. Profiles, Options and Progress open from the Title screen.
 - Kid-facing screens (title, pause, gameplay HUD) use icons only. Adult screens (disclaimer, profiles, options, progress) use Portuguese text.
 - Options and Progress sit behind a 1.5 second hold as a light parental gate. This is not a security barrier.
-- The Kenney icon sheet `Assets/Sprites/Game Icons/sheet_white2x.png` was unused, so the builder re-imports it as a multi-sprite sheet sliced on a 100 px grid with names like `icon_play`. The grid coordinates were read from the image. If any icon looks wrong, adjust the row/column table in `IconLibrary.cs`.
+- The existing pre-sliced icon sheet `Assets/Sprites/sheet_white1x.png` is mapped to semantic names in `IconLibrary.cs`. The unavailable `sheet_white2x.png` path is not imported or modified.
 - Drag mode uses the diagonal arrow icon and question mode uses the question mark icon. Neither is a perfect symbol; replace them when final art exists.
 - The results screen gets a home button by duplicating `PlayAgain_Button`, hiding its label and adding a home icon. If the duplicate overlaps something, move it by hand.
 - The new canvas uses sorting order 1000, above the existing results canvas (999). The pause button sits in the top-right corner and may overlap the existing HUD; I could not see the HUD layout.
 - Title logo text "Onde Vai?" uses LondrinaSolid. I dropped the TMP outline because changing it in edit mode would also change the shared font material.
 - `SafeAreaFitter` keeps screen content clear of notches.
+- The current scene's older root-level `TitleScreen` is disabled when the generated `AppUI` is installed to prevent duplicate menus; the generated title is the active flow screen.
+- The title scenario cards are limited to the requested stable IDs (`farm-jungle-animals`, `letters-numbers`, and `toys-tools`). They save a scenario choice without immediately starting the match.
+- Selecting a two-category card while Four-way Swipe is selected changes the mode to Drag and Drop. Four-way requires four distinct categories, so silently substituting another scenario would make the title selection misleading.
+- The settings and disclaimer screens are saved as `Assets/Prefabs/UI/OptionsScreen.prefab` and `Assets/Prefabs/UI/DisclaimerScreen.prefab` by the scene builder. The builder remains the source of truth for both prefab layouts and their TMP references.
+- Unity updated the referenced TMP SDF font assets while rendering the generated Portuguese UI text; keep those glyph/fallback updates with the prefabs so the displayed characters remain available.
 
 ## Game Mode 2 (Question)
 
@@ -34,6 +39,7 @@ Assumptions and judgement calls made during development. Review and revise as ne
 
 - There are no particle or audio assets, so effects use pooled SpriteRenderers animated with DOTween, with circle, ring and star shapes generated at runtime. Sounds and a calm music loop are generated in code (`ProceduralAudio`). Each clip has an inspector slot on `GameAudio` for a real asset.
 - Effects: sparkles on spawn, stars and a ring on a correct answer, a grey puff, small camera shake and vibration on a mistake, confetti on a win, pulsing timer in the last 5 seconds, the item grows while dragged, items fly into the box when accepted, the box flashes red when wrong, end-screen stars (optional `_stars` field, not wired by the builder), and a rising pitch on correct-answer streaks.
+- Correct sorts also emit small star fireworks; errors outside the tutorial emit blue tears; the camera shake includes a subtle roll; every whole-second timer decrement emits particles; both win and loss ends trigger a confetti/firework celebration. Tutorial mistakes omit tears to keep early feedback gentle.
 - Vibration only runs on Android and iOS (`Handheld.Vibrate`).
 - I have not verified `AudioClip.Create` in the WebGL build. If it fails there, assign real clips.
 

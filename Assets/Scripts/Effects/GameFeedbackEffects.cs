@@ -6,12 +6,13 @@ namespace OndeVai.Effects
 {
     /// <summary>
     /// Visual and haptic reactions to gameplay events: sparkles on spawn, stars on correct answers,
-    /// a soft shake on mistakes and confetti when the match is won.
+    /// a soft shake and tears on mistakes, timer ticks, and a confetti celebration when the match ends.
     /// </summary>
     public sealed class GameFeedbackEffects : MonoBehaviour
     {
         [SerializeField] private SpriteBurstPool _burstPool;
         [SerializeField] private Camera _camera;
+        [SerializeField] private GameTimer _gameTimer;
 
         [Header("Correct")]
         [SerializeField] private Color[] _correctColors =
@@ -23,6 +24,7 @@ namespace OndeVai.Effects
 
         [Header("Wrong")]
         [SerializeField] private Color _wrongColor = new(0.75f, 0.75f, 0.8f, 0.9f);
+        [SerializeField] private Color _tearColor = new(0.35f, 0.72f, 1f, 1f);
         [SerializeField, Min(0f)] private float _shakeStrength = 0.12f;
 
         [Header("Win")]
@@ -37,7 +39,9 @@ namespace OndeVai.Effects
 
         private GameController _gameController;
         private Vector3 _cameraRestPosition;
+        private Quaternion _cameraRestRotation;
         private Color[] _wrongColors;
+        private Color[] _tearColors;
 
         private void Start()
         {
@@ -46,10 +50,16 @@ namespace OndeVai.Effects
 
             _wrongColors = new[] { _wrongColor };
             if (_camera != null)
+            {
                 _cameraRestPosition = _camera.transform.position;
+                _cameraRestRotation = _camera.transform.rotation;
+            }
 
             if (_burstPool == null)
                 Debug.LogError("GameFeedbackEffects has no SpriteBurstPool assigned. Particle effects are disabled.", this);
+
+            if (_gameTimer != null)
+                _gameTimer.SecondElapsed += HandleSecondElapsed;
 
             _gameController = GameController.Instance;
             if (_gameController == null)
@@ -61,6 +71,7 @@ namespace OndeVai.Effects
             _gameController.OnItemSpawned += HandleItemSpawned;
             _gameController.OnItemSorted += HandleItemSorted;
             _gameController.OnGameWon += HandleGameWon;
+            _gameController.OnGameLost += HandleGameLost;
         }
 
         private void HandleItemSpawned(Item item)
@@ -115,6 +126,9 @@ namespace OndeVai.Effects
                 StartSize = 1.6f,
                 AngleRange = Vector2.zero
             });
+
+            EmitFirework(position + new Vector3(-0.55f, 0.45f, 0f));
+            EmitFirework(position + new Vector3(0.55f, 0.65f, 0f));
         }
 
         private void PlayWrong(ItemSortResult result)
@@ -132,11 +146,82 @@ namespace OndeVai.Effects
                 AngleRange = new Vector2(0f, 360f)
             });
 
+            if (!result.DuringTutorial)
+                EmitTears(result.Position, 3);
+
             ShakeCamera();
             Vibrate();
         }
 
         private void HandleGameWon()
+        {
+            Celebrate();
+        }
+
+        private void HandleGameLost()
+        {
+            if (_camera != null)
+                EmitTears(_camera.transform.position + Vector3.up * 0.6f, 14);
+
+            Celebrate();
+        }
+
+        private void HandleSecondElapsed(int secondsRemaining)
+        {
+            if (_camera == null || !_camera.orthographic)
+                return;
+
+            Vector3 position = _camera.transform.position + Vector3.up * (_camera.orthographicSize - 0.35f);
+            Color[] colors = secondsRemaining <= 5 ? _confettiColors : _correctColors;
+            Emit(position, new BurstSettings
+            {
+                Sprite = secondsRemaining <= 5 ? ProceduralSprites.Star : ProceduralSprites.Circle,
+                Colors = colors,
+                Count = secondsRemaining <= 5 ? 5 : 2,
+                MinSpeed = 0.3f,
+                MaxSpeed = 0.9f,
+                Lifetime = 0.45f,
+                StartSize = 0.16f,
+                AngleRange = new Vector2(235f, 305f)
+            });
+        }
+
+        private void EmitFirework(Vector3 position)
+        {
+            Emit(position, new BurstSettings
+            {
+                Sprite = ProceduralSprites.Star,
+                Colors = _confettiColors,
+                Count = 10,
+                MinSpeed = 1.8f,
+                MaxSpeed = 3.4f,
+                Lifetime = 0.9f,
+                Gravity = 1.2f,
+                StartSize = 0.24f,
+                Spin = 540f,
+                AngleRange = new Vector2(0f, 360f)
+            });
+        }
+
+        private void EmitTears(Vector3 position, int count)
+        {
+            _tearColors ??= new[] { _tearColor };
+            Emit(position, new BurstSettings
+            {
+                Sprite = ProceduralSprites.Tear,
+                Colors = _tearColors,
+                Count = count,
+                MinSpeed = 0.7f,
+                MaxSpeed = 1.5f,
+                Lifetime = 0.8f,
+                Gravity = 2.8f,
+                StartSize = 0.28f,
+                Spin = 18f,
+                AngleRange = new Vector2(230f, 310f)
+            });
+        }
+
+        private void Celebrate()
         {
             if (_camera == null || !_camera.orthographic)
                 return;
@@ -147,6 +232,7 @@ namespace OndeVai.Effects
             for (int i = 0; i < 6; i++)
             {
                 Vector3 position = top + Vector3.right * Mathf.Lerp(-halfWidth, halfWidth, (i + 0.5f) / 6f);
+                EmitFirework(position);
                 Emit(position, new BurstSettings
                 {
                     Sprite = i % 2 == 0 ? ProceduralSprites.Star : ProceduralSprites.Circle,
@@ -171,9 +257,22 @@ namespace OndeVai.Effects
             Transform cameraTransform = _camera.transform;
             cameraTransform.DOKill(true);
             cameraTransform.position = _cameraRestPosition;
-            cameraTransform.DOShakePosition(0.25f, new Vector3(_shakeStrength, _shakeStrength, 0f), 20, 90f, false, true)
-                .SetLink(_camera.gameObject)
-                .OnKill(() => cameraTransform.position = _cameraRestPosition);
+            cameraTransform.rotation = _cameraRestRotation;
+            Sequence shake = DOTween.Sequence();
+            shake.Join(cameraTransform.DOShakePosition(0.25f, new Vector3(_shakeStrength, _shakeStrength, 0f), 20, 90f, false, true));
+            shake.Join(cameraTransform.DOShakeRotation(0.25f, new Vector3(0f, 0f, 2.5f), 16, 90f, false));
+            shake.SetLink(_camera.gameObject)
+                .OnComplete(RestoreCamera)
+                .OnKill(RestoreCamera);
+        }
+
+        private void RestoreCamera()
+        {
+            if (_camera == null)
+                return;
+
+            _camera.transform.position = _cameraRestPosition;
+            _camera.transform.rotation = _cameraRestRotation;
         }
 
         private void Vibrate()
@@ -193,12 +292,16 @@ namespace OndeVai.Effects
 
         private void OnDestroy()
         {
+            if (_gameTimer != null)
+                _gameTimer.SecondElapsed -= HandleSecondElapsed;
+
             if (_gameController == null)
                 return;
 
             _gameController.OnItemSpawned -= HandleItemSpawned;
             _gameController.OnItemSorted -= HandleItemSorted;
             _gameController.OnGameWon -= HandleGameWon;
+            _gameController.OnGameLost -= HandleGameLost;
         }
     }
 }

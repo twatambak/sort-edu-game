@@ -1,3 +1,4 @@
+using OndeVai.Gameplay;
 using OndeVai.UI;
 using TMPro;
 using UnityEngine;
@@ -26,11 +27,11 @@ namespace OndeVai.EditorTools
             public Button PauseButton;
         }
 
-        private static BuiltScreens BuildScreens(Kit kit, Transform canvas)
+        private static BuiltScreens BuildScreens(Kit kit, Transform canvas, GameDefinition definition)
         {
             BuiltScreens screens = new();
             screens.Hud = BuildHud(kit, canvas, out screens.PauseButton);
-            screens.Title = BuildTitle(kit, canvas);
+            screens.Title = BuildTitle(kit, canvas, definition);
             screens.Profiles = BuildProfiles(kit, canvas);
             screens.Options = BuildOptions(kit, canvas);
             screens.Progress = BuildProgress(kit, canvas);
@@ -116,7 +117,9 @@ namespace OndeVai.EditorTools
 
             pauseButton = kit.Button("PauseButton", safe, new Vector2(130f, 130f), new Color(1f, 1f, 1f, 0.85f), IconLibrary.Get("icon_pause"), circle: true);
             Kit.Place((RectTransform)pauseButton.transform, new Vector2(1f, 1f), new Vector2(-30f, -30f), new Vector2(130f, 130f));
-            pauseButton.transform.Find("Icon").GetComponent<Image>().color = Kit.Ink;
+            Transform pauseIcon = pauseButton.transform.Find("Icon");
+            if (pauseIcon != null)
+                pauseIcon.GetComponent<Image>().color = Kit.Ink;
 
             hud.gameObject.SetActive(false);
             return hud.gameObject;
@@ -168,10 +171,10 @@ namespace OndeVai.EditorTools
             Kit.Wire(screen, "_titleText", title);
             Kit.Wire(screen, "_bodyText", body);
             Kit.Wire(screen, "_acceptButton", accept);
-            return screen;
+            return SaveScreenPrefab(screen, "DisclaimerScreen");
         }
 
-        private static TitleScreen BuildTitle(Kit kit, Transform canvas)
+        private static TitleScreen BuildTitle(Kit kit, Transform canvas, GameDefinition definition)
         {
             TitleScreen screen = CreateScreen<TitleScreen>("TitleScreen", canvas, Kit.Sky, out RectTransform content);
 
@@ -185,14 +188,25 @@ namespace OndeVai.EditorTools
             Button play = kit.Button("PlayButton", pulse, new Vector2(440f, 440f), Kit.Green, IconLibrary.Get("icon_play"), circle: true);
             Kit.Stretch((RectTransform)play.transform);
 
+            RectTransform scenarios = Kit.Rect("Scenarios", content);
+            Kit.Place(scenarios, new Vector2(0.5f, 0.5f), new Vector2(0f, 355f), new Vector2(980f, 220f));
+            scenarios.pivot = new Vector2(0.5f, 0.5f);
+            Kit.Row(scenarios, 22f);
+            SortingScenarioDefinition animals = FindScenario(definition, "farm-jungle-animals");
+            SortingScenarioDefinition lettersNumbers = FindScenario(definition, "letters-numbers");
+            SortingScenarioDefinition toysTools = FindScenario(definition, "toys-tools");
+            Button animalsScenario = ScenarioButton(kit, scenarios, "AnimalsScenario", "Animais", Kit.Orange, animals, out Image animalsHighlight);
+            Button lettersNumbersScenario = ScenarioButton(kit, scenarios, "LettersNumbersScenario", "Letras e números", Kit.Purple, lettersNumbers, out Image lettersNumbersHighlight);
+            Button toysToolsScenario = ScenarioButton(kit, scenarios, "ToysToolsScenario", "Brinquedos e ferramentas", Kit.Blue, toysTools, out Image toysToolsHighlight);
+
             RectTransform modes = Kit.Rect("Modes", content);
-            Kit.Place(modes, new Vector2(0.5f, 0.5f), new Vector2(0f, -380f), new Vector2(980f, 240f));
+            Kit.Place(modes, new Vector2(0.5f, 0.5f), new Vector2(0f, -380f), new Vector2(980f, 210f));
             modes.pivot = new Vector2(0.5f, 0.5f);
             Kit.Row(modes, 20f);
-            Button dragMode = ModeButton(kit, modes, "DragMode", Kit.Blue, "icon_drag", "Arrastar", out Image dragHighlight);
-            Button questionMode = ModeButton(kit, modes, "QuestionMode", Kit.Purple, "icon_question", "Perguntas", out Image questionHighlight);
-            Button swipeMode = ModeButton(kit, modes, "SwipeMode", Kit.Green, "icon_right", "Cartas", out Image swipeHighlight);
-            Button fourWaySwipeMode = ModeButton(kit, modes, "FourWaySwipeMode", Kit.Orange, "icon_left", "4 direções", out Image fourWaySwipeHighlight);
+            Button dragMode = ModeButton(kit, modes, "DragMode", Kit.Blue, "icon_drag", "Arrastar", 190f, out Image dragHighlight);
+            Button questionMode = ModeButton(kit, modes, "QuestionMode", Kit.Purple, "icon_question", "Perguntas", 190f, out Image questionHighlight);
+            Button swipeMode = ModeButton(kit, modes, "SwipeMode", Kit.Green, "icon_right", "Cartas", 190f, out Image swipeHighlight);
+            Button fourWaySwipeMode = ModeButton(kit, modes, "FourWaySwipeMode", Kit.Orange, "icon_left", "4 direções", 190f, out Image fourWaySwipeHighlight);
 
             Button profile = kit.Button("ProfileButton", content, new Vector2(170f, 170f), Color.white, null, circle: true);
             Kit.Place((RectTransform)profile.transform, new Vector2(0f, 1f), new Vector2(40f, -40f), new Vector2(170f, 170f));
@@ -215,10 +229,16 @@ namespace OndeVai.EditorTools
             Kit.Wire(screen, "_questionModeButton", questionMode);
             Kit.Wire(screen, "_swipeModeButton", swipeMode);
             Kit.Wire(screen, "_fourWaySwipeModeButton", fourWaySwipeMode);
+            Kit.Wire(screen, "_animalsScenarioButton", animalsScenario);
+            Kit.Wire(screen, "_lettersNumbersScenarioButton", lettersNumbersScenario);
+            Kit.Wire(screen, "_toysToolsScenarioButton", toysToolsScenario);
             Kit.Wire(screen, "_dragModeHighlight", dragHighlight);
             Kit.Wire(screen, "_questionModeHighlight", questionHighlight);
             Kit.Wire(screen, "_swipeModeHighlight", swipeHighlight);
             Kit.Wire(screen, "_fourWaySwipeModeHighlight", fourWaySwipeHighlight);
+            Kit.Wire(screen, "_animalsScenarioHighlight", animalsHighlight);
+            Kit.Wire(screen, "_lettersNumbersScenarioHighlight", lettersNumbersHighlight);
+            Kit.Wire(screen, "_toysToolsScenarioHighlight", toysToolsHighlight);
             Kit.Wire(screen, "_profileButton", profile);
             Kit.Wire(screen, "_profileBadge", badge);
             Kit.Wire(screen, "_optionsButton", options);
@@ -227,24 +247,93 @@ namespace OndeVai.EditorTools
             return screen;
         }
 
-        private static Button ModeButton(Kit kit, RectTransform parent, string name, Color color, string icon, string label, out Image highlight)
+        private static SortingScenarioDefinition FindScenario(GameDefinition definition, string scenarioId)
+        {
+            if (definition == null)
+                return null;
+
+            foreach (SortingScenarioDefinition scenario in definition.Scenarios)
+            {
+                if (scenario != null && scenario.Id == scenarioId && scenario.IsPlayable)
+                    return scenario;
+            }
+
+            Debug.LogError($"The title screen cannot display scenario '{scenarioId}' because it is not playable.", definition);
+            return null;
+        }
+
+        private static Button ScenarioButton(
+            Kit kit,
+            RectTransform parent,
+            string name,
+            string label,
+            Color color,
+            SortingScenarioDefinition scenario,
+            out Image highlight)
         {
             RectTransform slot = Kit.Rect(name, parent);
-            Kit.AddLayout(slot.gameObject, new Vector2(220f, 220f));
+            Kit.AddLayout(slot.gameObject, new Vector2(312f, 210f));
+
+            highlight = kit.Image("Highlight", slot, Kit.Yellow, kit.Rounded);
+            Kit.Stretch(highlight.rectTransform, -12f);
+            highlight.raycastTarget = false;
+            highlight.gameObject.SetActive(false);
+
+            Button button = kit.Button("Button", slot, new Vector2(312f, 210f), color, null);
+            Kit.Stretch((RectTransform)button.transform);
+
+            if (scenario != null)
+            {
+                ScenarioIcon(kit, button.transform, scenario.IconA, new Vector2(0.33f, 0.69f));
+                ScenarioIcon(kit, button.transform, scenario.IconB, new Vector2(0.67f, 0.69f));
+            }
+
+            TextMeshProUGUI labelText = kit.Text("Label", button.transform, label, 30f, Color.white);
+            Kit.Place(labelText.rectTransform, new Vector2(0.5f, 0f), new Vector2(0f, 14f), new Vector2(300f, 74f));
+            labelText.enableAutoSizing = true;
+            labelText.fontSizeMin = 20f;
+            labelText.fontSizeMax = 30f;
+            labelText.textWrappingMode = TextWrappingModes.Normal;
+            return button;
+        }
+
+        private static void ScenarioIcon(Kit kit, Transform parent, Sprite sprite, Vector2 anchor)
+        {
+            if (sprite == null)
+                return;
+
+            Image image = kit.Image("CategoryIcon", parent, Color.white, sprite);
+            image.preserveAspect = true;
+            image.raycastTarget = false;
+            Kit.Place(image.rectTransform, anchor, Vector2.zero, new Vector2(82f, 82f));
+        }
+
+        private static Button ModeButton(
+            Kit kit,
+            RectTransform parent,
+            string name,
+            Color color,
+            string icon,
+            string label,
+            float size,
+            out Image highlight)
+        {
+            RectTransform slot = Kit.Rect(name, parent);
+            Kit.AddLayout(slot.gameObject, new Vector2(size, size));
 
             highlight = kit.Image("Highlight", slot, Kit.Yellow, kit.Rounded);
             Kit.Stretch(highlight.rectTransform, -12f);
             highlight.raycastTarget = false;
 
-            Button button = kit.Button("Button", slot, new Vector2(220f, 220f), color, null);
+            Button button = kit.Button("Button", slot, new Vector2(size, size), color, null);
             Kit.Stretch((RectTransform)button.transform);
             Image modeIcon = kit.Image("ModeIcon", button.transform, Color.white, IconLibrary.Get(icon));
             modeIcon.preserveAspect = true;
             modeIcon.raycastTarget = false;
-            Kit.Place(modeIcon.rectTransform, new Vector2(0.5f, 0.68f), Vector2.zero, new Vector2(110f, 110f));
+            Kit.Place(modeIcon.rectTransform, new Vector2(0.5f, 0.68f), Vector2.zero, new Vector2(size * 0.5f, size * 0.5f));
 
             TextMeshProUGUI modeLabel = kit.Text("ModeLabel", button.transform, label, 30f, Color.white);
-            Kit.Place(modeLabel.rectTransform, new Vector2(0.5f, 0f), new Vector2(0f, 10f), new Vector2(204f, 70f));
+            Kit.Place(modeLabel.rectTransform, new Vector2(0.5f, 0f), new Vector2(0f, 10f), new Vector2(size - 16f, 64f));
             modeLabel.enableAutoSizing = true;
             modeLabel.fontSizeMin = 20f;
             modeLabel.fontSizeMax = 30f;
@@ -448,7 +537,7 @@ namespace OndeVai.EditorTools
             Kit.Wire(screen, "_backButton", back);
             Kit.Wire(screen, "_privacyButton", privacy);
             Kit.Wire(screen, "_resetButton", reset);
-            return screen;
+            return SaveScreenPrefab(screen, "OptionsScreen");
         }
 
         /// <summary>White row with a label on the left. Returns the area on the right that holds the control.</summary>

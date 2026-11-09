@@ -13,12 +13,15 @@ namespace OndeVai.Effects
         private static Sprite _circle;
         private static Sprite _ring;
         private static Sprite _star;
+        private static Sprite _tear;
 
         public static Sprite Circle => _circle ??= Create("fx_circle", CircleAlpha);
 
         public static Sprite Ring => _ring ??= Create("fx_ring", RingAlpha);
 
         public static Sprite Star => _star ??= Create("fx_star", StarAlpha);
+
+        public static Sprite Tear => _tear ??= Create("fx_tear", TearAlpha);
 
         private static Sprite Create(string spriteName, System.Func<float, float, float> alpha)
         {
@@ -70,6 +73,14 @@ namespace OndeVai.Effects
             float sector = Mathf.Repeat(angle, 2f * Mathf.PI / points) / (2f * Mathf.PI / points);
             float radius = Mathf.Lerp(1f, 0.45f, Mathf.Abs(sector - 0.5f) * -2f + 1f);
             return 1f - SmoothEdge(radius - 0.08f, radius, distance);
+        }
+
+        private static float TearAlpha(float u, float v)
+        {
+            float distance = Mathf.Sqrt(u * u + v * v);
+            float direction = distance > 0.001f ? v / distance : 0f;
+            float edge = 0.74f - direction * 0.28f;
+            return 1f - SmoothEdge(edge - 0.1f, edge, distance);
         }
 
         /// <summary>GLSL style smoothstep: 0 below edge0, 1 above edge1.</summary>

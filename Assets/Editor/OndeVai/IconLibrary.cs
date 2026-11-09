@@ -1,48 +1,42 @@
 using System.Collections.Generic;
 using UnityEditor;
-using UnityEditor.U2D.Sprites;
 using UnityEngine;
 
 namespace OndeVai.EditorTools
 {
     /// <summary>
-    /// Slices the white game icon sheet into named sprites on a 100px grid and loads them by name.
-    /// Slicing only happens once; later calls reuse the existing sprites.
+    /// Maps the project's pre-sliced white icon sheet to the semantic names used by the UI builder.
     /// </summary>
     public static class IconLibrary
     {
-        public const string SheetPath = "Assets/Sprites/Game Icons/sheet_white2x.png";
+        public const string SheetPath = "Assets/Sprites/sheet_white1x.png";
 
-        private const int CellSize = 100;
-        private const int Padding = 2;
-
-        // Grid positions (row from the top, column from the left) of the icons used by the UI.
-        private static readonly (string Name, int Row, int Column)[] Icons =
+        private static readonly (string Name, string AssetName)[] Icons =
         {
-            ("icon_chart", 0, 1),
-            ("icon_check", 1, 4),
-            ("icon_info", 1, 3),
-            ("icon_music", 1, 2),
-            ("icon_music_off", 2, 2),
-            ("icon_right", 2, 5),
-            ("icon_people", 3, 2),
-            ("icon_home", 3, 3),
-            ("icon_left", 3, 5),
-            ("icon_gear", 4, 3),
-            ("icon_lock", 4, 5),
-            ("icon_drag", 7, 0),
-            ("icon_play", 10, 1),
-            ("icon_trophy", 11, 0),
-            ("icon_replay", 12, 1),
-            ("icon_exit", 12, 3),
-            ("icon_trash", 13, 0),
-            ("icon_question", 13, 1),
-            ("icon_plus", 16, 1),
-            ("icon_star", 17, 0),
-            ("icon_pause", 18, 1),
-            ("icon_person", 19, 0),
-            ("icon_cross", 19, 3),
-            ("icon_sound", 19, 4)
+            ("icon_chart", "sheet_white1x_25"),
+            ("icon_check", "sheet_white1x_9"),
+            ("icon_info", "sheet_white1x_98"),
+            ("icon_music", "sheet_white1x_5"),
+            ("icon_music_off", "sheet_white1x_15"),
+            ("icon_right", "sheet_white1x_96"),
+            ("icon_people", "sheet_white1x_108"),
+            ("icon_home", "sheet_white1x_8"),
+            ("icon_left", "sheet_white1x_1"),
+            ("icon_gear", "sheet_white1x_17"),
+            ("icon_lock", "sheet_white1x_24"),
+            ("icon_drag", "sheet_white1x_2"),
+            ("icon_play", "sheet_white1x_88"),
+            ("icon_trophy", "sheet_white1x_86"),
+            ("icon_replay", "sheet_white1x_14"),
+            ("icon_exit", "sheet_white1x_18"),
+            ("icon_trash", "sheet_white1x_87"),
+            ("icon_question", "sheet_white1x_26"),
+            ("icon_plus", "sheet_white1x_62"),
+            ("icon_star", "sheet_white1x_105"),
+            ("icon_pause", "sheet_white1x_85"),
+            ("icon_person", "sheet_white1x_13"),
+            ("icon_cross", "sheet_white1x_104"),
+            ("icon_sound", "sheet_white1x_70")
         };
 
         private static Dictionary<string, Sprite> _cache;
@@ -69,70 +63,27 @@ namespace OndeVai.EditorTools
         private static void Load()
         {
             _cache = new Dictionary<string, Sprite>();
-            if (!IsSliced())
-                Slice();
-
-            foreach (Object asset in AssetDatabase.LoadAllAssetsAtPath(SheetPath))
-            {
-                if (asset is Sprite sprite)
-                    _cache[sprite.name] = sprite;
-            }
-        }
-
-        private static bool IsSliced()
-        {
-            foreach (Object asset in AssetDatabase.LoadAllAssetsAtPath(SheetPath))
-            {
-                if (asset is Sprite sprite && sprite.name == Icons[0].Name)
-                    return true;
-            }
-
-            return false;
-        }
-
-        private static void Slice()
-        {
-            TextureImporter importer = AssetImporter.GetAtPath(SheetPath) as TextureImporter;
-            Texture2D texture = AssetDatabase.LoadAssetAtPath<Texture2D>(SheetPath);
-            if (importer == null || texture == null)
+            Object[] assets = AssetDatabase.LoadAllAssetsAtPath(SheetPath);
+            if (assets.Length == 0)
             {
                 Debug.LogError($"Icon sheet not found at {SheetPath}.");
                 return;
             }
 
-            importer.textureType = TextureImporterType.Sprite;
-            importer.spriteImportMode = SpriteImportMode.Multiple;
-            importer.mipmapEnabled = false;
-            importer.alphaIsTransparency = true;
-            importer.SaveAndReimport();
-
-            SpriteDataProviderFactories factories = new();
-            factories.Init();
-            ISpriteEditorDataProvider provider = factories.GetSpriteEditorDataProviderFromObject(importer);
-            provider.InitSpriteEditorDataProvider();
-
-            int height = texture.height;
-            List<SpriteRect> rects = new();
-            List<SpriteNameFileIdPair> pairs = new();
-            foreach ((string name, int row, int column) in Icons)
+            Dictionary<string, Sprite> spritesByName = new();
+            foreach (Object asset in assets)
             {
-                SpriteRect spriteRect = new()
-                {
-                    name = name,
-                    rect = new Rect(column * CellSize + Padding, height - (row + 1) * CellSize + Padding, CellSize - Padding * 2, CellSize - Padding * 2),
-                    alignment = SpriteAlignment.Center,
-                    pivot = new Vector2(0.5f, 0.5f),
-                    spriteID = GUID.Generate()
-                };
-                rects.Add(spriteRect);
-                pairs.Add(new SpriteNameFileIdPair(spriteRect.name, spriteRect.spriteID));
+                if (asset is Sprite sprite)
+                    spritesByName[sprite.name] = sprite;
             }
 
-            provider.SetSpriteRects(rects.ToArray());
-            provider.GetDataProvider<ISpriteNameFileIdDataProvider>()?.SetNameFileIdPairs(pairs);
-            provider.Apply();
-            importer.SaveAndReimport();
-            Debug.Log($"Sliced {rects.Count} icons in {SheetPath}.");
+            foreach ((string name, string assetName) in Icons)
+            {
+                if (spritesByName.TryGetValue(assetName, out Sprite sprite))
+                    _cache[name] = sprite;
+                else
+                    Debug.LogError($"Icon sprite '{assetName}' was not found in {SheetPath}.");
+            }
         }
     }
 }

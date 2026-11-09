@@ -25,6 +25,7 @@ namespace OndeVai.EditorTools
         private const string UIRootName = "AppUI";
         private const string SystemsRootName = "OndeVai Systems";
         private const string HomeButtonName = "Home_Button";
+        private const string ScreenPrefabFolder = "Assets/Prefabs/UI";
         private const int CanvasSortingOrder = 1000;
 
         [MenuItem(MenuRoot + "Build App UI", priority = 0)]
@@ -39,6 +40,10 @@ namespace OndeVai.EditorTools
 
             GameObject existingUI = GameObject.Find(UIRootName);
             GameObject existingSystems = GameObject.Find(SystemsRootName);
+            GameObject legacyTitleScreen = GameObject.Find("TitleScreen");
+            if (legacyTitleScreen != null && legacyTitleScreen.transform.parent != null)
+                legacyTitleScreen = null;
+
             if ((existingUI != null || existingSystems != null) &&
                 !EditorUtility.DisplayDialog("Onde Vai", "The app UI already exists. Rebuild it? Manual changes to the generated objects will be lost.", "Rebuild", "Cancel"))
                 return;
@@ -57,10 +62,16 @@ namespace OndeVai.EditorTools
             UIBuilderKit kit = new();
 
             Canvas canvas = CreateCanvas();
-            BuiltScreens screens = BuildScreens(kit, canvas.transform);
+            BuiltScreens screens = BuildScreens(kit, canvas.transform, controller.Definition);
             GameStatusScreen statusScreen = Object.FindFirstObjectByType<GameStatusScreen>(FindObjectsInactive.Include);
             BuildFlow(canvas, screens, statusScreen);
             Undo.RegisterCreatedObjectUndo(canvas.gameObject, "Create App UI");
+
+            if (legacyTitleScreen != null && legacyTitleScreen != screens.Title.gameObject)
+            {
+                Undo.RecordObject(legacyTitleScreen, "Disable legacy title screen");
+                legacyTitleScreen.SetActive(false);
+            }
 
             Transform questionPoint = BuildSystems(controller, out GameObject systemsRoot);
             Undo.RegisterCreatedObjectUndo(systemsRoot, "Create Onde Vai Systems");
@@ -157,6 +168,8 @@ namespace OndeVai.EditorTools
             GameFeedbackEffects effects = effectsObject.AddComponent<GameFeedbackEffects>();
             UIBuilderKit.Wire(effects, "_burstPool", pool);
             UIBuilderKit.Wire(effects, "_camera", Camera.main);
+            GameTimer gameTimer = Object.FindFirstObjectByType<GameTimer>(FindObjectsInactive.Include);
+            UIBuilderKit.Wire(effects, "_gameTimer", gameTimer);
             EnsureCameraFitter(Camera.main);
 
             GameObject tutorialObject = new("Tutorial");
@@ -167,6 +180,34 @@ namespace OndeVai.EditorTools
             questionPoint.transform.SetParent(root.transform, false);
             questionPoint.transform.position = EstimateQuestionPoint(controller);
             return questionPoint.transform;
+        }
+
+        private static T SaveScreenPrefab<T>(T screen, string assetName) where T : UIScreen
+        {
+            if (!AssetDatabase.IsValidFolder(ScreenPrefabFolder))
+                AssetDatabase.CreateFolder("Assets/Prefabs", "UI");
+
+            string path = $"{ScreenPrefabFolder}/{assetName}.prefab";
+            GameObject sceneInstance = screen.gameObject;
+            GameObject prefab = PrefabUtility.SaveAsPrefabAssetAndConnect(
+                sceneInstance,
+                path,
+                InteractionMode.AutomatedAction);
+
+            if (prefab == null)
+            {
+                Debug.LogError($"Could not create the reusable screen prefab at {path}.", sceneInstance);
+                return screen;
+            }
+
+            T sceneScreen = sceneInstance.GetComponent<T>();
+            if (sceneScreen == null)
+            {
+                Debug.LogError($"The prefab at {path} is missing {typeof(T).Name}.", prefab);
+                return screen;
+            }
+
+            return sceneScreen;
         }
 
         /// <summary>Center of the spawn points, which sits above the storages on the shelves.</summary>

@@ -1,3 +1,4 @@
+using System;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,6 +19,10 @@ public class GameTimer : MonoBehaviour
     private GameController _gameController;
     private Color _fillRestColor;
     private Tween _warningTween;
+    private int _lastReportedSecond;
+
+    /// <summary>Raised once for each elapsed whole second, with the remaining seconds.</summary>
+    public event Action<int> SecondElapsed;
 
     private void Start()
     {
@@ -45,6 +50,13 @@ public class GameTimer : MonoBehaviour
         _remainingTime = Mathf.Max(_remainingTime - Time.deltaTime, 0f);
         _sliderTimer.value = _remainingTime;
 
+        int secondsRemaining = Mathf.CeilToInt(_remainingTime);
+        if (secondsRemaining < _lastReportedSecond)
+        {
+            _lastReportedSecond = secondsRemaining;
+            SecondElapsed?.Invoke(secondsRemaining);
+        }
+
         if (_warningTween == null && _remainingTime <= _warningThreshold)
             StartWarning();
 
@@ -59,6 +71,7 @@ public class GameTimer : MonoBehaviour
     {
         StopWarning();
         _remainingTime = config.MatchTime;
+        _lastReportedSecond = Mathf.CeilToInt(_remainingTime);
 
         _sliderTimer.minValue = 0f;
         _sliderTimer.maxValue = _remainingTime;

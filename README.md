@@ -12,6 +12,7 @@ partidas concluídas.
 - [Regras e fluxo da partida](#regras-e-fluxo-da-partida)
 - [Configuração e conteúdo](#configuração-e-conteúdo)
 - [Implementação](#implementação)
+- [Título, cenários e efeitos](#título-cenários-e-efeitos)
 - [Persistência do histórico](#persistência-do-histórico)
 - [Estrutura do projeto](#estrutura-do-projeto)
 - [Tecnologias e dependências](#tecnologias-e-dependências)
@@ -162,6 +163,26 @@ a posição vertical.
   como `Pop`, `Jelly`, `Spring` e `Impact`.
 - `SpriteAnimator` reproduz animações quadro a quadro com sprites configurados
   no Inspector.
+
+## Título, cenários e efeitos
+
+A tela inicial permite escolher entre **Animais**, **Letras e números** e
+**Brinquedos e ferramentas**, além do modo de jogo. Cada escolha salva o ID do
+cenário nas preferências; o botão de jogar inicia a partida com essa seleção.
+Os cartões mostram os primeiros sprites ativos de cada categoria para facilitar
+a identificação visual.
+
+As telas de opções e aviso de privacidade são prefabs com textos TextMesh Pro:
+[`OptionsScreen.prefab`](Assets/Prefabs/UI/OptionsScreen.prefab) e
+[`DisclaimerScreen.prefab`](Assets/Prefabs/UI/DisclaimerScreen.prefab). Use
+**Tools > Onde Vai > Build App UI** para gerar ou reconstruir o fluxo e atualizar
+esses prefabs; salve a cena depois.
+
+Os efeitos reutilizam `GameFeedbackEffects` e `SpriteBurstPool`: brilhos e
+fogos pequenos ao acertar, confete e fogos ao terminar a partida, lágrimas e
+uma sacudida suave ao errar, e partículas discretas a cada segundo do cronômetro.
+As telas, regras de conteúdo e eventos estão detalhados no
+[guia do jogo](Assets/Documentation/SortingGameGuide.md).
 
 ## Persistência do histórico
 
