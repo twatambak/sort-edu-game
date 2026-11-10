@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp-Editor::OndeVai.EditorTools.Mobile.MobileBuildProfile
   ProductName: Onde Vai?
   CompanyName: TLW
-  BundleIdentifier: com.b2b.ondevai
-  Version: 0.1.0
+  BundleIdentifier: com.tlw.ondevai
+  Version: 0.7.4
   BuildNumber: 1
   AppIcon: {fileID: 0}
   PortraitOnly: 1

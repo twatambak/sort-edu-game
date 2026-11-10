@@ -38,8 +38,7 @@ public class GameEndScreen : UIScreen
             return;
         }
 
-        _gameController.OnGameWon += ShowResult;
-        _gameController.OnGameLost += ShowResult;
+        _gameController.OnGameEnded += ShowResult;
         _gameController.OnGameStarted += HandleGameStarted;
     }
 
@@ -61,13 +60,13 @@ public class GameEndScreen : UIScreen
         Hide();
     }
 
-    private void ShowResult()
+    private void ShowResult(GameSessionRecord record)
     {
         Show();
         _scoreTween?.Kill();
         _errorTween?.Kill();
-        _scoreTween = CountUp(_scoreText, _gameController.ScoreCount);
-        _errorTween = CountUp(_errorText, _gameController.ErrorCount);
+        _scoreTween = CountUp(_scoreText, record.Score);
+        _errorTween = CountUp(_errorText, record.Errors);
 
         ShowStars(CalculateStars(_gameController.ScoreCount, _gameController.ErrorCount));
     }
@@ -137,8 +136,7 @@ public class GameEndScreen : UIScreen
         if (_gameController == null)
             return;
 
-        _gameController.OnGameWon -= ShowResult;
-        _gameController.OnGameLost -= ShowResult;
+        _gameController.OnGameEnded -= ShowResult;
         _gameController.OnGameStarted -= HandleGameStarted;
     }
 }
