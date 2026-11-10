@@ -40,7 +40,7 @@ namespace OndeVai.Settings
             ItemsOnScreen = Mathf.Clamp(ItemsOnScreen, MinItemsOnScreen, MaxItemsOnScreen);
             ItemsToWin = Mathf.Max(1, ItemsToWin);
 
-            if (!Enum.IsDefined(typeof(GameMode), Mode))
+            if (Mode != GameMode.DragAndDrop && Mode != GameMode.SwipeTwoDirections)
                 Mode = GameMode.DragAndDrop;
 
             if (string.IsNullOrEmpty(ScenarioId))

@@ -204,9 +204,7 @@ namespace OndeVai.EditorTools
             modes.pivot = new Vector2(0.5f, 0.5f);
             Kit.Row(modes, 20f);
             Button dragMode = ModeButton(kit, modes, "DragMode", Kit.Blue, "icon_drag", "Arrastar", 190f, out Image dragHighlight);
-            Button questionMode = ModeButton(kit, modes, "QuestionMode", Kit.Purple, "icon_question", "Perguntas", 190f, out Image questionHighlight);
-            Button swipeMode = ModeButton(kit, modes, "SwipeMode", Kit.Green, "icon_right", "Cartas", 190f, out Image swipeHighlight);
-            Button fourWaySwipeMode = ModeButton(kit, modes, "FourWaySwipeMode", Kit.Orange, "icon_left", "4 direções", 190f, out Image fourWaySwipeHighlight);
+            Button swipeMode = ModeButton(kit, modes, "SwipeMode", Kit.Green, "icon_right", "Deslizar", 190f, out Image swipeHighlight);
 
             Button profile = kit.Button("ProfileButton", content, new Vector2(170f, 170f), Color.white, null, circle: true);
             Kit.Place((RectTransform)profile.transform, new Vector2(0f, 1f), new Vector2(40f, -40f), new Vector2(170f, 170f));
@@ -226,16 +224,12 @@ namespace OndeVai.EditorTools
             Kit.Wire(screen, "_playButton", play);
             Kit.Wire(screen, "_playPulseTarget", pulse);
             Kit.Wire(screen, "_dragModeButton", dragMode);
-            Kit.Wire(screen, "_questionModeButton", questionMode);
             Kit.Wire(screen, "_swipeModeButton", swipeMode);
-            Kit.Wire(screen, "_fourWaySwipeModeButton", fourWaySwipeMode);
             Kit.Wire(screen, "_animalsScenarioButton", animalsScenario);
             Kit.Wire(screen, "_lettersNumbersScenarioButton", lettersNumbersScenario);
             Kit.Wire(screen, "_toysToolsScenarioButton", toysToolsScenario);
             Kit.Wire(screen, "_dragModeHighlight", dragHighlight);
-            Kit.Wire(screen, "_questionModeHighlight", questionHighlight);
             Kit.Wire(screen, "_swipeModeHighlight", swipeHighlight);
-            Kit.Wire(screen, "_fourWaySwipeModeHighlight", fourWaySwipeHighlight);
             Kit.Wire(screen, "_animalsScenarioHighlight", animalsHighlight);
             Kit.Wire(screen, "_lettersNumbersScenarioHighlight", lettersNumbersHighlight);
             Kit.Wire(screen, "_toysToolsScenarioHighlight", toysToolsHighlight);

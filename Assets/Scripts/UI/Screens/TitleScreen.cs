@@ -55,11 +55,10 @@ namespace OndeVai.UI
         protected override void Awake()
         {
             base.Awake();
+            HideUnsupportedModeButtons();
             Bind(_playButton, () => PlayRequested?.Invoke());
             Bind(_dragModeButton, () => SelectMode(GameMode.DragAndDrop));
-            Bind(_questionModeButton, () => SelectMode(GameMode.Question));
-            Bind(_swipeModeButton, () => SelectMode(GameMode.SwipeCard));
-            Bind(_fourWaySwipeModeButton, () => SelectMode(GameMode.FourWaySwipe));
+            Bind(_swipeModeButton, () => SelectMode(GameMode.SwipeTwoDirections));
             Bind(_animalsScenarioButton, () => SelectScenario(AnimalsScenarioId));
             Bind(_lettersNumbersScenarioButton, () => SelectScenario(LettersNumbersScenarioId));
             Bind(_toysToolsScenarioButton, () => SelectScenario(ToysToolsScenarioId));
@@ -94,13 +93,10 @@ namespace OndeVai.UI
 
             GameSettings settings = _gameController.Settings.Current;
             SetHighlight(_dragModeHighlight, settings.Mode == GameMode.DragAndDrop);
-            SetHighlight(_questionModeHighlight, settings.Mode == GameMode.Question);
-            SetHighlight(_swipeModeHighlight, settings.Mode == GameMode.SwipeCard);
-            SetHighlight(_fourWaySwipeModeHighlight, settings.Mode == GameMode.FourWaySwipe);
-            bool showsTwoGroupScenario = settings.Mode != GameMode.FourWaySwipe;
-            SetHighlight(_animalsScenarioHighlight, showsTwoGroupScenario && settings.ScenarioId == AnimalsScenarioId);
-            SetHighlight(_lettersNumbersScenarioHighlight, showsTwoGroupScenario && settings.ScenarioId == LettersNumbersScenarioId);
-            SetHighlight(_toysToolsScenarioHighlight, showsTwoGroupScenario && settings.ScenarioId == ToysToolsScenarioId);
+            SetHighlight(_swipeModeHighlight, settings.Mode == GameMode.SwipeTwoDirections);
+            SetHighlight(_animalsScenarioHighlight, settings.ScenarioId == AnimalsScenarioId);
+            SetHighlight(_lettersNumbersScenarioHighlight, settings.ScenarioId == LettersNumbersScenarioId);
+            SetHighlight(_toysToolsScenarioHighlight, settings.ScenarioId == ToysToolsScenarioId);
         }
 
         private void SelectMode(GameMode mode)
@@ -108,42 +104,13 @@ namespace OndeVai.UI
             if (_gameController == null)
                 return;
 
-            if (mode == GameMode.FourWaySwipe)
+            if (mode != GameMode.DragAndDrop && mode != GameMode.SwipeTwoDirections)
             {
-                if (_gameController.Definition == null)
-                {
-                    Debug.LogError("TitleScreen cannot select four-way mode because GameDefinition is not assigned.", this);
-                    return;
-                }
-
-                _gameController.Definition.GetPlayableScenarios(_playableScenarios, 4);
-                if (_playableScenarios.Count == 0)
-                {
-                    Debug.LogError("TitleScreen cannot select four-way mode because there is no playable four-category scenario.", this);
-                    return;
-                }
-
-                string scenarioId = _playableScenarios[0].Id;
-                foreach (SortingScenarioDefinition scenario in _playableScenarios)
-                {
-                    if (scenario.Id == _gameController.Settings.Current.ScenarioId)
-                    {
-                        scenarioId = scenario.Id;
-                        break;
-                    }
-                }
-
-                _gameController.Settings.Apply(settings =>
-                {
-                    settings.Mode = mode;
-                    settings.ScenarioId = scenarioId;
-                });
-            }
-            else
-            {
-                _gameController.Settings.Apply(settings => settings.Mode = mode);
+                Debug.LogError($"TitleScreen cannot select unsupported mode {mode}.", this);
+                return;
             }
 
+            _gameController.Settings.Apply(settings => settings.Mode = mode);
             Refresh();
         }
 
@@ -175,10 +142,22 @@ namespace OndeVai.UI
             _gameController.Settings.Apply(settings =>
             {
                 settings.ScenarioId = scenarioId;
-                if (settings.Mode == GameMode.FourWaySwipe)
-                    settings.Mode = GameMode.DragAndDrop;
             });
             Refresh();
+        }
+
+        private void HideUnsupportedModeButtons()
+        {
+            SetActive(_questionModeButton, false);
+            SetActive(_questionModeHighlight, false);
+            SetActive(_fourWaySwipeModeButton, false);
+            SetActive(_fourWaySwipeModeHighlight, false);
+        }
+
+        private static void SetActive(Component component, bool active)
+        {
+            if (component != null && component.gameObject.activeSelf != active)
+                component.gameObject.SetActive(active);
         }
 
         private void StartIdleAnimations()

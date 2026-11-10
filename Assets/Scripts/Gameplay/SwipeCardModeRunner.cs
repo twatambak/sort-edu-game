@@ -4,17 +4,17 @@ using UnityEngine;
 
 namespace OndeVai.Gameplay
 {
-    /// <summary>Runs a one-card swipe match using either two horizontal or four cardinal directions.</summary>
+    /// <summary>Runs a one-card match using left and right swipes.</summary>
     public sealed class SwipeCardModeRunner : IGameModeRunner
     {
         private const float MinimumSwipeDistance = 70f;
         private const float ReturnDuration = 0.32f;
         private const float ExitDuration = 0.28f;
         private const float NextCardDelay = 0.3f;
-        private const float CardScale = 1.5f;
+        private const float CardScale = 2f;
 
         private readonly GameModeContext _context;
-        private readonly List<ItemGroup> _groups = new(4);
+        private readonly List<ItemGroup> _groups = new(2);
         private GameConfiguration _config;
         private Item _current;
         private SwipeDirection _lastDirection;
@@ -34,9 +34,10 @@ namespace OndeVai.Gameplay
         {
             _config = config;
             _groups.Clear();
-            for (int i = 0; i < config.GroupCount; i++)
+            for (int i = 0; i < 2; i++)
                 _groups.Add(config.GetGroup(i));
 
+            _context.QuestionPoint.gameObject.SetActive(true);
             SpawnCard();
         }
 
@@ -52,7 +53,7 @@ namespace OndeVai.Gameplay
             _isAnswering = false;
         }
 
-        public void HandleStorageSelected(Storage storage)
+        public void HandleStorageSelected(SortingSource storage)
         {
         }
 
@@ -104,7 +105,6 @@ namespace OndeVai.Gameplay
                 input = _current.gameObject.AddComponent<SwipeCardInput>();
 
             input.Configure(
-                _config.Mode == GameMode.FourWaySwipe,
                 MinimumSwipeDistance,
                 HandleSwipe,
                 item => _context.NotifyPicked?.Invoke(item),
@@ -168,7 +168,6 @@ namespace OndeVai.Gameplay
                 return;
 
             input.Configure(
-                _config.Mode == GameMode.FourWaySwipe,
                 MinimumSwipeDistance,
                 HandleSwipe,
                 card => _context.NotifyPicked?.Invoke(card),
@@ -187,8 +186,6 @@ namespace OndeVai.Gameplay
             {
                 SwipeDirection.Left => 12f,
                 SwipeDirection.Right => -12f,
-                SwipeDirection.Up => 8f,
-                SwipeDirection.Down => -8f,
                 _ => 0f
             };
         }

@@ -38,12 +38,12 @@ namespace OndeVai.UI
 
         public static string Mode(int mode)
         {
-            return (GameMode)mode switch
+            return mode switch
             {
-                GameMode.DragAndDrop => "Arrastar",
-                GameMode.Question => "Perguntas",
-                GameMode.SwipeCard => "Cartas (2 direções)",
-                GameMode.FourWaySwipe => "Cartas (4 direções)",
+                (int)GameMode.DragAndDrop => "Arrastar",
+                (int)GameMode.SwipeTwoDirections => "Deslizar (2 direções)",
+                1 => "Perguntas (removido)",
+                3 => "Cartas (4 direções, removido)",
                 _ => "?"
             };
         }

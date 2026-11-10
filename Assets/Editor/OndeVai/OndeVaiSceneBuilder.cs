@@ -232,7 +232,7 @@ namespace OndeVai.EditorTools
 
         private static void ConfigureController(GameController controller, Transform questionPoint)
         {
-            List<Storage> storages = new(Object.FindObjectsByType<Storage>(FindObjectsInactive.Exclude, FindObjectsSortMode.None));
+            List<SortingSource> storages = new(Object.FindObjectsByType<SortingSource>(FindObjectsInactive.Exclude, FindObjectsSortMode.None));
             storages.Sort((a, b) => a.transform.position.x.CompareTo(b.transform.position.x));
 
             SerializedObject serialized = new(controller);

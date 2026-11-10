@@ -21,7 +21,7 @@ namespace OndeVai.Gameplay
         void End();
 
         /// <summary>Called when the child taps a storage.</summary>
-        void HandleStorageSelected(Storage storage);
+        void HandleStorageSelected(SortingSource storage);
 
         /// <summary>Called after the controller evaluated an answer and played the storage feedback.</summary>
         void HandleItemResolved(Item item, bool correct);
@@ -32,13 +32,12 @@ namespace OndeVai.Gameplay
     {
         public ItemSpawner Spawner;
         public Transform QuestionPoint;
-        public float QuestionItemScale = 1.6f;
 
         /// <summary>Notifies listeners that an item appeared.</summary>
         public Action<Item> NotifySpawned;
 
         /// <summary>Evaluates an answer. Returns true when correct.</summary>
-        public Func<Item, Storage, bool> Submit;
+        public Func<Item, SortingSource, bool> Submit;
 
         /// <summary>Evaluates a selected category without requiring a physical storage.</summary>
         public Func<Item, ItemGroup, bool> SubmitGroup;

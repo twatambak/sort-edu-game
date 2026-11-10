@@ -5,7 +5,7 @@ namespace OndeVai.Gameplay
 {
     /// <summary>
 /// Content catalog for the game: the single item prefab, the item types (each with its variants)
-/// and the sorting scenarios that pair two types or map four categories to swipe directions.
+/// and the sorting scenarios that pair two types.
 /// </summary>
 [CreateAssetMenu(fileName = "GameDefinition", menuName = "Onde Vai/Game Definition", order = -1)]
 public class GameDefinition : ScriptableObject
@@ -16,7 +16,7 @@ public class GameDefinition : ScriptableObject
     [Tooltip("Every category of item. Each group should appear only once.")]
     [SerializeField] private List<ItemTypeDefinition> _itemTypes = new();
 
-    [Tooltip("Scenarios offered in the options screen. Four-way mode requires all four types to have playable variants.")]
+    [Tooltip("Two-category scenarios offered in the options screen.")]
     [SerializeField] private List<SortingScenarioDefinition> _scenarios = new();
 
     public Item ItemPrefab => _itemPrefab;
@@ -55,16 +55,10 @@ public class GameDefinition : ScriptableObject
     /// </summary>
     public SortingScenarioDefinition GetScenarioOrDefault(string scenarioId)
     {
-        return GetScenarioOrDefault(scenarioId, 2);
-    }
-
-    /// <summary>Finds a playable scenario with the requested number of categories.</summary>
-    public SortingScenarioDefinition GetScenarioOrDefault(string scenarioId, int requiredGroupCount)
-    {
         SortingScenarioDefinition firstPlayable = null;
         foreach (SortingScenarioDefinition scenario in _scenarios)
         {
-            if (scenario == null || !IsPlayableForGroupCount(scenario, requiredGroupCount))
+            if (scenario == null || !scenario.IsPlayable)
                 continue;
 
             if (scenario.Id == scenarioId)
@@ -77,32 +71,21 @@ public class GameDefinition : ScriptableObject
         if (firstPlayable != null)
             return firstPlayable;
 
-        return requiredGroupCount == 2 ? SortingScenarioDefinition.Default : null;
+        return SortingScenarioDefinition.Default;
     }
 
     /// <summary>Fills <paramref name="results"/> with every playable scenario, or the default one when none is set up.</summary>
     public void GetPlayableScenarios(List<SortingScenarioDefinition> results)
     {
-        GetPlayableScenarios(results, 2);
-    }
-
-    /// <summary>Fills <paramref name="results"/> with scenarios suitable for the requested category count.</summary>
-    public void GetPlayableScenarios(List<SortingScenarioDefinition> results, int requiredGroupCount)
-    {
         results.Clear();
         foreach (SortingScenarioDefinition scenario in _scenarios)
         {
-            if (scenario != null && IsPlayableForGroupCount(scenario, requiredGroupCount))
+            if (scenario != null && scenario.IsPlayable)
                 results.Add(scenario);
         }
 
-        if (results.Count == 0 && requiredGroupCount == 2)
+        if (results.Count == 0)
             results.Add(SortingScenarioDefinition.Default);
-    }
-
-    private static bool IsPlayableForGroupCount(SortingScenarioDefinition scenario, int requiredGroupCount)
-    {
-        return requiredGroupCount == 4 ? scenario.IsFourWayPlayable : scenario.IsPlayable;
     }
 
 #if UNITY_EDITOR

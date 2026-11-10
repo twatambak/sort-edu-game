@@ -43,8 +43,6 @@ namespace OndeVai.EditorTools
 
                 string status = scenario.IsPlayable ? "Playable" : "Needs content";
                 string details = $"{Count(scenario.TypeA)} x {Count(scenario.TypeB)} variants";
-                if (scenario.TypeC != null || scenario.TypeD != null)
-                    details += $" / 4-way: {(scenario.IsFourWayPlayable ? "Playable" : "Needs content")}";
 
                 EditorGUILayout.LabelField(scenario.DisplayName, $"{details}   {status}");
             }

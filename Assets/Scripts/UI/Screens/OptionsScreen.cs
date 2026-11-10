@@ -15,6 +15,12 @@ namespace OndeVai.UI
     /// </summary>
     public sealed class OptionsScreen : UIScreen
     {
+        private static readonly GameMode[] AvailableModes =
+        {
+            GameMode.DragAndDrop,
+            GameMode.SwipeTwoDirections
+        };
+
         private static readonly int[] MatchTimes = { 15, 30, 45, 60, 90, 120 };
         private static readonly int[] ErrorLimits = { 1, 2, 3, 5, 10 };
         private static readonly int[] ItemsOnScreen = { 2, 3, 4, 5, 6 };
@@ -119,31 +125,28 @@ namespace OndeVai.UI
             SetNumberOptions(_errorLimitSelector, ErrorLimits, settings.ErrorLimit, value => value.ToString());
             SetNumberOptions(_itemsOnScreenSelector, ItemsOnScreen, settings.ItemsOnScreen, value => value.ToString());
 
-            int requiredGroupCount = settings.Mode == GameMode.FourWaySwipe ? 4 : 2;
             if (definition != null)
-                definition.GetPlayableScenarios(_scenarios, requiredGroupCount);
+                definition.GetPlayableScenarios(_scenarios);
             else
             {
                 _scenarios.Clear();
-                if (requiredGroupCount == 2)
-                    _scenarios.Add(SortingScenarioDefinition.Default);
+                _scenarios.Add(SortingScenarioDefinition.Default);
             }
 
             if (_modeSelector != null)
             {
                 _labels.Clear();
                 _labels.Add("Arrastar e soltar");
-                _labels.Add("Perguntas");
-                _labels.Add("Cartas (2 direções)");
-                _labels.Add("Cartas (4 direções)");
-                _modeSelector.SetOptions(_labels, (int)settings.Mode);
+                _labels.Add("Deslizar (2 direções)");
+                int selectedMode = settings.Mode == GameMode.SwipeTwoDirections ? 1 : 0;
+                _modeSelector.SetOptions(_labels, selectedMode);
             }
 
             if (_scenarioSelector != null)
             {
                 SortingScenarioDefinition current = definition != null
-                    ? definition.GetScenarioOrDefault(settings.ScenarioId, requiredGroupCount)
-                    : requiredGroupCount == 2 ? SortingScenarioDefinition.Default : null;
+                    ? definition.GetScenarioOrDefault(settings.ScenarioId)
+                    : SortingScenarioDefinition.Default;
 
                 _labels.Clear();
                 int selected = 0;
@@ -165,7 +168,13 @@ namespace OndeVai.UI
             if (_isRefreshing || _settings == null)
                 return;
 
-            GameMode mode = (GameMode)index;
+            if (index < 0 || index >= AvailableModes.Length)
+            {
+                Debug.LogError($"OptionsScreen received unsupported mode index {index}.", this);
+                return;
+            }
+
+            GameMode mode = AvailableModes[index];
             _settings.Apply(settings => settings.Mode = mode);
             Refresh(_settings.Current, GameController.Instance != null ? GameController.Instance.Definition : null);
         }

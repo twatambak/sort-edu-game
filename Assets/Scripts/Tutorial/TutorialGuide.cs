@@ -27,7 +27,7 @@ namespace OndeVai.Tutorial
 
         private GameController _gameController;
         private Item _targetItem;
-        private Storage _targetStorage;
+        private SortingSource _targetStorage;
         private float _cycleTime;
         private bool _itemHeld;
 
@@ -83,8 +83,6 @@ namespace OndeVai.Tutorial
             float time = Mathf.Repeat(_cycleTime, CycleDuration);
             if (swipeMode)
                 AnimateSwipe(time);
-            else if (_gameController.Config.Mode == GameMode.Question)
-                AnimateTap(time);
             else
                 AnimateDrag(time);
         }
@@ -144,7 +142,7 @@ namespace OndeVai.Tutorial
                 return;
 
             if (_gameController.TryGetStorageFor(_targetItem.ItemType, out _targetStorage))
-                _targetStorage.SetHighlighted(true);
+                _targetStorage.Presentation.SetHighlighted(true);
             else
                 Debug.LogError($"Tutorial found no storage for group {_targetItem.ItemType}.", this);
         }
@@ -190,14 +188,6 @@ namespace OndeVai.Tutorial
             }
 
             SetVisible(false);
-        }
-
-        private void AnimateTap(float time)
-        {
-            Vector3 target = _targetStorage.DropPoint;
-            float tapPhase = Mathf.PingPong(time * 2f / CycleDuration * 2f, 1f);
-            ShowPointer(target, 1f - 0.2f * tapPhase, 1f);
-            ShowRing(target, Mathf.Repeat(time * 2f / CycleDuration, 1f));
         }
 
         private void AnimateSwipe(float time)
@@ -270,12 +260,12 @@ namespace OndeVai.Tutorial
         private void ClearStorageHighlight()
         {
             if (_targetStorage != null)
-                _targetStorage.SetHighlighted(false);
+                _targetStorage.Presentation.SetHighlighted(false);
         }
 
         private static bool IsSwipeMode(GameMode mode)
         {
-            return mode == GameMode.SwipeCard || mode == GameMode.FourWaySwipe;
+            return mode == GameMode.SwipeTwoDirections;
         }
 
         private void EnsureVisuals()

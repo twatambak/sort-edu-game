@@ -21,24 +21,12 @@ namespace OndeVai.EditorTools
             EditorGUILayout.BeginHorizontal();
             DrawType(scenario.TypeA, "Right");
             DrawType(scenario.TypeB, "Left");
-            if (scenario.TypeC != null || scenario.TypeD != null)
-            {
-                DrawType(scenario.TypeC, "Up");
-                DrawType(scenario.TypeD, "Down");
-            }
             EditorGUILayout.EndHorizontal();
 
             if (!scenario.IsPlayable)
                 EditorGUILayout.HelpBox($"Not playable: {ContentEditorUtility.DescribeScenarioProblem(scenario)}.", MessageType.Warning);
-            else if (scenario.TypeC != null || scenario.TypeD != null)
-            {
-                if (scenario.IsFourWayPlayable)
-                    EditorGUILayout.HelpBox("Playable in two- and four-direction modes.", MessageType.Info);
-                else
-                    EditorGUILayout.HelpBox($"Playable in two-direction modes only: {ContentEditorUtility.DescribeFourWayScenarioProblem(scenario)}.", MessageType.Warning);
-            }
             else
-                EditorGUILayout.HelpBox("Playable in two-direction modes.", MessageType.Info);
+                EditorGUILayout.HelpBox("Playable in drag and two-direction swipe modes.", MessageType.Info);
         }
 
         private static void DrawType(ItemTypeDefinition type, string direction)

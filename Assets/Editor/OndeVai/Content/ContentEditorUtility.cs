@@ -207,14 +207,6 @@ namespace OndeVai.EditorTools
                 if (scenario.TypeB != null && !Contains(definition.ItemTypes, scenario.TypeB))
                     problems.Add($"Scenario '{scenario.DisplayName}' uses {scenario.TypeB.name}, which is not registered in the GameDefinition.");
 
-                if (scenario.TypeC != null && !Contains(definition.ItemTypes, scenario.TypeC))
-                    problems.Add($"Scenario '{scenario.DisplayName}' uses {scenario.TypeC.name}, which is not registered in the GameDefinition.");
-
-                if (scenario.TypeD != null && !Contains(definition.ItemTypes, scenario.TypeD))
-                    problems.Add($"Scenario '{scenario.DisplayName}' uses {scenario.TypeD.name}, which is not registered in the GameDefinition.");
-
-                if ((scenario.TypeC != null || scenario.TypeD != null) && !scenario.IsFourWayPlayable)
-                    problems.Add($"Scenario '{scenario.DisplayName}' is not playable in four-way mode ({DescribeFourWayScenarioProblem(scenario)}).");
             }
 
             if (playable == 0)
@@ -236,31 +228,6 @@ namespace OndeVai.EditorTools
                 return $"{scenario.TypeA.name} has no enabled variant with a sprite";
 
             return scenario.TypeB.HasPlayableVariants ? "unknown" : $"{scenario.TypeB.name} has no enabled variant with a sprite";
-        }
-
-        /// <summary>Short reason why a scenario cannot be played with four categories.</summary>
-        public static string DescribeFourWayScenarioProblem(SortingScenarioDefinition scenario)
-        {
-            if (!scenario.IsPlayable)
-                return DescribeScenarioProblem(scenario);
-
-            if (scenario.TypeC == null || scenario.TypeD == null)
-                return "both optional item types must be assigned";
-
-            ItemTypeDefinition[] types = { scenario.TypeA, scenario.TypeB, scenario.TypeC, scenario.TypeD };
-            for (int i = 0; i < types.Length; i++)
-            {
-                if (!types[i].HasPlayableVariants)
-                    return $"{types[i].name} has no enabled variant with a sprite";
-
-                for (int j = 0; j < i; j++)
-                {
-                    if (types[j].Group == types[i].Group)
-                        return $"{types[i].name} uses the same group as {types[j].name}";
-                }
-            }
-
-            return "unknown";
         }
 
         private static bool Contains(IReadOnlyList<ItemTypeDefinition> list, ItemTypeDefinition type)

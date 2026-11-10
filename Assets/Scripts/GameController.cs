@@ -11,12 +11,12 @@ public readonly struct ItemSortResult
 {
     public readonly Item Item;
     /// <summary>Selected storage, or null when the answer is a swipe-selected category.</summary>
-    public readonly Storage Storage;
+    public readonly SortingSource Storage;
     public readonly bool Correct;
     public readonly bool DuringTutorial;
     public readonly Vector3 Position;
 
-    public ItemSortResult(Item item, Storage storage, bool correct, bool duringTutorial, Vector3 position)
+    public ItemSortResult(Item item, SortingSource storage, bool correct, bool duringTutorial, Vector3 position)
     {
         Item = item;
         Storage = storage;
@@ -44,17 +44,16 @@ public class GameController : SingletonBase<GameController>
 
     [Header("Storages")]
     [Tooltip("Optional. Receives group A of the selected scenario. When empty, storages keep their authored group.")]
-    [SerializeField] private Storage _storageA;
+    [SerializeField] private SortingSource _sortingSourceA;
     [Tooltip("Optional. Receives group B of the selected scenario.")]
-    [SerializeField] private Storage _storageB;
+    [SerializeField] private SortingSource _sortingSourceB;
 
-    [Header("Question Mode")]
+    [Header("Swipe Mode")]
     [SerializeField] private Transform _questionPoint;
-    [SerializeField, Min(0.1f)] private float _questionItemScale = 1.6f;
 
     public Action<GameConfiguration> OnGameStarted { get; set; }
-    public Action OnCorrectStorage { get; set; }
-    public Action OnIncorrectStorage { get; set; }
+    public Action OnCorrectSort { get; set; }
+    public Action OnIncorrectSort { get; set; }
     public Action OnGameWon { get; set; }
     public Action OnGameLost { get; set; }
 
@@ -93,7 +92,6 @@ public class GameController : SingletonBase<GameController>
     public GameSettingsService Settings { get; private set; }
     public GameDataService Data { get; private set; }
     public GameDefinition Definition => _gameDefinition;
-
     public bool IsGameStarted => _gameStarted;
     public bool IsTutorialActive => _gameStarted && !IsGameOver && TutorialItemsRemaining > 0;
     public bool IsTimerRunning => _gameStarted && !IsGameOver && !IsPaused && !IsTutorialActive;
@@ -112,7 +110,7 @@ public class GameController : SingletonBase<GameController>
     private ItemSpawner _spawner;
     private IGameModeRunner _runner;
     private readonly List<ItemAttemptRecord> _attempts = new();
-    private readonly List<Storage> _knownStorages = new();
+    private readonly List<SortingSource> _knownStorages = new();
 
     protected override void Awake()
     {
@@ -137,14 +135,8 @@ public class GameController : SingletonBase<GameController>
     {
         GameSettings settings = Settings.Current;
         SortingScenarioDefinition scenario = _gameDefinition != null
-            ? _gameDefinition.GetScenarioOrDefault(settings.ScenarioId, settings.Mode == GameMode.FourWaySwipe ? 4 : 2)
-            : settings.Mode == GameMode.FourWaySwipe ? null : SortingScenarioDefinition.Default;
-
-        if (scenario == null)
-        {
-            Debug.LogError("No playable four-category sorting scenario is registered in the GameDefinition.", this);
-            return;
-        }
+            ? _gameDefinition.GetScenarioOrDefault(settings.ScenarioId)
+            : SortingScenarioDefinition.Default;
 
         BeginGame(GameConfiguration.FromSettings(settings, scenario));
     }
@@ -154,11 +146,8 @@ public class GameController : SingletonBase<GameController>
         if (selectedConfig == null)
             throw new ArgumentNullException(nameof(selectedConfig));
 
-        if (selectedConfig.Mode == GameMode.FourWaySwipe && !HasPlayableFourWayGroups(selectedConfig))
-        {
-            Debug.LogError("Four-way swipe requires four distinct groups with playable content in the GameDefinition.", this);
-            return;
-        }
+        if (selectedConfig.Mode != GameMode.DragAndDrop && selectedConfig.Mode != GameMode.SwipeTwoDirections)
+            throw new ArgumentOutOfRangeException(nameof(selectedConfig), selectedConfig.Mode, "Unsupported game mode.");
 
         StopCurrentMatch();
 
@@ -174,6 +163,7 @@ public class GameController : SingletonBase<GameController>
         SetPausedInternal(false);
 
         ConfigureStorages();
+
         _runner = CreateRunner(selectedConfig.Mode);
         _runner.Begin(selectedConfig);
 
@@ -204,7 +194,6 @@ public class GameController : SingletonBase<GameController>
             SaveSession(false, GameSessionRecord.ReasonAbandoned);
 
         StopCurrentMatch();
-        SetStoragesVisible(true);
         _gameStarted = false;
         IsGameOver = true;
         SetPausedInternal(false);
@@ -222,25 +211,20 @@ public class GameController : SingletonBase<GameController>
         SetPausedInternal(paused);
     }
 
-    /// <summary>
-    /// Evaluates an item placed in a storage or assigned to a category. Updates the match and feedback.
-    /// </summary>
-    /// <returns>True when the item belongs to the selected category.</returns>
-    public bool SubmitItem(Item item, Storage storage)
+    public bool SubmitItem(Item item, SortingSource storage)
     {
         if (storage == null)
             return false;
 
-        return SubmitItem(item, storage.StorageType, storage);
+        return SubmitItem(item, storage.GroupTarget, storage);
     }
 
-    /// <summary>Evaluates a selected category when the mode has no physical storage targets.</summary>
     public bool SubmitItem(Item item, ItemGroup chosenGroup)
     {
         return SubmitItem(item, chosenGroup, null);
     }
 
-    private bool SubmitItem(Item item, ItemGroup chosenGroup, Storage storage)
+    private bool SubmitItem(Item item, ItemGroup chosenGroup, SortingSource storage)
     {
         if (item == null || !CanAcceptInput || item.IsResolving)
             return false;
@@ -258,17 +242,12 @@ public class GameController : SingletonBase<GameController>
         return correct;
     }
 
-    /// <summary>Forwards a storage tap to the current game mode.</summary>
-    public void SelectStorage(Storage storage)
+    public void SelectSortingSource(SortingSource storage)
     {
         if (CanAcceptInput)
             _runner?.HandleStorageSelected(storage);
     }
 
-    /// <summary>
-    /// Called by the tutorial view when it is ready. Tutorial rules (paused timer, forgiven errors)
-    /// only apply when something is actually showing the tutorial to the child.
-    /// </summary>
     public void RegisterTutorialPresenter()
     {
         _hasTutorialPresenter = true;
@@ -289,23 +268,23 @@ public class GameController : SingletonBase<GameController>
     }
 
     /// <summary>Finds the storage that accepts <paramref name="group"/>.</summary>
-    public bool TryGetStorageFor(ItemGroup group, out Storage storage)
+    public bool TryGetStorageFor(ItemGroup group, out SortingSource storage)
     {
-        if (_storageA != null && _storageA.StorageType == group)
+        if (_sortingSourceA != null && _sortingSourceA.GroupTarget == group)
         {
-            storage = _storageA;
+            storage = _sortingSourceA;
             return true;
         }
 
-        if (_storageB != null && _storageB.StorageType == group)
+        if (_sortingSourceB != null && _sortingSourceB.GroupTarget == group)
         {
-            storage = _storageB;
+            storage = _sortingSourceB;
             return true;
         }
 
-        foreach (Storage candidate in Storage.Active)
+        foreach (SortingSource candidate in SortingSource.Active)
         {
-            if (candidate.StorageType == group)
+            if (candidate.GroupTarget == group)
             {
                 storage = candidate;
                 return true;
@@ -323,7 +302,7 @@ public class GameController : SingletonBase<GameController>
             return;
 
         ScoreCount++;
-        OnCorrectStorage?.Invoke();
+        OnCorrectSort?.Invoke();
         CheckWinCondition();
     }
 
@@ -334,7 +313,7 @@ public class GameController : SingletonBase<GameController>
             return;
 
         ErrorCount++;
-        OnIncorrectStorage?.Invoke();
+        OnIncorrectSort?.Invoke();
         CheckLossCondition();
     }
 
@@ -361,7 +340,7 @@ public class GameController : SingletonBase<GameController>
         return Data.Database.GetCompletedSessionCount();
     }
 
-    private void ResolveCorrect(Item item, Storage storage, bool duringTutorial, Vector3 position)
+    private void ResolveCorrect(Item item, SortingSource storage, bool duringTutorial, Vector3 position)
     {
         _spawner.Remove(item);
         if (storage != null)
@@ -382,7 +361,7 @@ public class GameController : SingletonBase<GameController>
             tutorialFinished = TutorialItemsRemaining == 0;
         }
 
-        OnCorrectStorage?.Invoke();
+        OnCorrectSort?.Invoke();
         OnItemSorted?.Invoke(new ItemSortResult(item, storage, true, duringTutorial, position));
 
         if (tutorialFinished)
@@ -394,14 +373,14 @@ public class GameController : SingletonBase<GameController>
         _runner.HandleItemResolved(item, true);
     }
 
-    private void ResolveIncorrect(Item item, Storage storage, bool duringTutorial, Vector3 position)
+    private void ResolveIncorrect(Item item, SortingSource storage, bool duringTutorial, Vector3 position)
     {
         if (storage != null)
             storage.RejectItem(item, _runner.EjectOnError);
         if (!duringTutorial)
             ErrorCount++;
 
-        OnIncorrectStorage?.Invoke();
+        OnIncorrectSort?.Invoke();
         OnItemSorted?.Invoke(new ItemSortResult(item, storage, false, duringTutorial, position));
 
         if (!duringTutorial && CheckLossCondition())
@@ -492,58 +471,35 @@ public class GameController : SingletonBase<GameController>
 
     private void ConfigureStorages()
     {
-        foreach (Storage storage in Storage.Active)
+        foreach (SortingSource storage in SortingSource.Active)
         {
             if (storage != null && !_knownStorages.Contains(storage))
                 _knownStorages.Add(storage);
         }
 
-        RegisterStorage(_storageA);
-        RegisterStorage(_storageB);
-        bool showStorages = Config.Mode != GameMode.SwipeCard && Config.Mode != GameMode.FourWaySwipe;
-        SetStoragesVisible(showStorages);
+        RegisterStorage(_sortingSourceA);
+        RegisterStorage(_sortingSourceB);
 
-        if (_storageA == null && _storageB == null)
+        if (_sortingSourceA == null && _sortingSourceB == null)
             return;
 
         SortingScenarioDefinition scenario = _gameDefinition != null
             ? _gameDefinition.GetScenarioOrDefault(Config.ScenarioId)
             : SortingScenarioDefinition.Default;
 
-        bool scenarioMatches = scenario.GroupA == Config.ItemGroupA && scenario.GroupB == Config.ItemGroupB;
-        if (_storageA != null)
-            _storageA.Configure(Config.ItemGroupA, scenarioMatches ? scenario.IconA : null, scenarioMatches ? scenario.TypeA.Background : null);
+        bool scenarioMatches = scenario.IsPlayable &&
+            scenario.GroupA == Config.ItemGroupA && scenario.GroupB == Config.ItemGroupB;
+        if (_sortingSourceA != null)
+            _sortingSourceA.Configure(Config, scenario.TypeA);
 
-        if (_storageB != null)
-            _storageB.Configure(Config.ItemGroupB, scenarioMatches ? scenario.IconB : null,  scenarioMatches ? scenario.TypeB.Background : null);
-    }
+        if (_sortingSourceB != null)
+            _sortingSourceB.Configure(Config, scenario.TypeB);
 
-    private void RegisterStorage(Storage storage)
-    {
-        if (storage != null && !_knownStorages.Contains(storage))
-            _knownStorages.Add(storage);
-    }
-
-    private void SetStoragesVisible(bool visible)
-    {
-        foreach (Storage storage in _knownStorages)
+        void RegisterStorage(SortingSource storage)
         {
-            if (storage != null)
-                storage.SetGameModeVisible(visible);
+            if (storage != null && !_knownStorages.Contains(storage))
+                _knownStorages.Add(storage);
         }
-    }
-
-    private bool HasPlayableFourWayGroups(GameConfiguration config)
-    {
-        HashSet<ItemGroup> groups = new();
-        for (int i = 0; i < 4; i++)
-        {
-            ItemGroup group = config.GetGroup(i);
-            if (!groups.Add(group) || _gameDefinition == null || !_gameDefinition.HasContent(group))
-                return false;
-        }
-
-        return true;
     }
 
     private IGameModeRunner CreateRunner(GameMode mode)
@@ -552,7 +508,6 @@ public class GameController : SingletonBase<GameController>
         {
             Spawner = _spawner,
             QuestionPoint = _questionPoint,
-            QuestionItemScale = _questionItemScale,
             NotifySpawned = item => OnItemSpawned?.Invoke(item),
             Submit = (item, storage) => SubmitItem(item, storage),
             SubmitGroup = (item, group) => SubmitItem(item, group),
@@ -563,10 +518,9 @@ public class GameController : SingletonBase<GameController>
 
         return mode switch
         {
-            GameMode.Question => new QuestionModeRunner(context),
-            GameMode.SwipeCard => new SwipeCardModeRunner(context),
-            GameMode.FourWaySwipe => new SwipeCardModeRunner(context),
-            _ => new DragAndDropModeRunner(context)
+            GameMode.DragAndDrop => new DragAndDropModeRunner(context),
+            GameMode.SwipeTwoDirections => new SwipeCardModeRunner(context),
+            _ => throw new ArgumentOutOfRangeException(nameof(mode), mode, "Unsupported game mode.")
         };
     }
 
@@ -575,9 +529,6 @@ public class GameController : SingletonBase<GameController>
         _runner?.End();
         _runner = null;
         _spawner?.Clear();
-
-        foreach (Storage storage in Storage.Active)
-            storage.SetHighlighted(false);
     }
 
     private void SetPausedInternal(bool paused)
@@ -605,7 +556,6 @@ public class GameController : SingletonBase<GameController>
 
     private void OnApplicationPause(bool pauseStatus)
     {
-        // Mobile apps can be killed while in the background without further callbacks.
         if (pauseStatus)
             Settings?.Flush();
 

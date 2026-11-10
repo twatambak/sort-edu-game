@@ -210,28 +210,8 @@ namespace OndeVai.UI
             DateTime finished = new DateTime(session.FinishedAtUtcTicks, DateTimeKind.Utc).ToLocalTime();
             _builder.Append(finished.ToString("dd/MM HH:mm", Culture)).Append("  ");
             _builder.Append(DisplayNames.Mode(session.GameMode)).Append("  ");
-            if ((GameMode)session.GameMode == GameMode.FourWaySwipe)
-            {
-                SortingScenarioDefinition scenario = Definition != null
-                    ? Definition.GetScenarioOrDefault(session.ScenarioId, 4)
-                    : null;
-                if (scenario != null)
-                {
-                    _builder.Append("→ ").Append(DisplayNames.Group(scenario.GroupA, Definition))
-                        .Append("  ← ").Append(DisplayNames.Group(scenario.GroupB, Definition))
-                        .Append("  ↑ ").Append(DisplayNames.Group(scenario.GroupC, Definition))
-                        .Append("  ↓ ").Append(DisplayNames.Group(scenario.GroupD, Definition));
-                }
-                else
-                {
-                    _builder.Append(session.ScenarioId);
-                }
-            }
-            else
-            {
-                _builder.Append(DisplayNames.Group((ItemGroup)session.ItemGroupA, Definition))
-                    .Append(" x ").Append(DisplayNames.Group((ItemGroup)session.ItemGroupB, Definition));
-            }
+            _builder.Append(DisplayNames.Group((ItemGroup)session.ItemGroupA, Definition))
+                .Append(" x ").Append(DisplayNames.Group((ItemGroup)session.ItemGroupB, Definition));
 
             _builder.Append("\n<size=80%>Acertos <b>").Append(session.Score).Append("</b>  Erros <b>").Append(session.Errors).Append("</b>  ");
             _builder.Append(DisplayNames.Duration(session.DurationSeconds)).Append("  ").Append(DisplayNames.FinishReason(session)).Append("</size>");

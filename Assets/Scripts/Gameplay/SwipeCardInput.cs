@@ -14,7 +14,6 @@ namespace OndeVai.Gameplay
         private Vector2 _startPosition;
         private float _minimumDistance;
         private int _pointerId;
-        private bool _allowVertical;
         private bool _isDragging;
 
         private void Awake()
@@ -22,16 +21,14 @@ namespace OndeVai.Gameplay
             TryGetComponent(out _item);
         }
 
-        /// <summary>Configures callbacks and the accepted swipe axes for the current card.</summary>
+        /// <summary>Configures callbacks for a horizontal swipe.</summary>
         public void Configure(
-            bool allowVertical,
             float minimumDistance,
             Action<Item, SwipeDirection> swiped,
             Action<Item> picked,
             Action<Item> released)
         {
             ResetGesture();
-            _allowVertical = allowVertical;
             _minimumDistance = Mathf.Max(1f, minimumDistance);
             _swiped = swiped;
             _picked = picked;
@@ -72,13 +69,10 @@ namespace OndeVai.Gameplay
             if (delta.magnitude < _minimumDistance)
                 return;
 
-            bool horizontal = Mathf.Abs(delta.x) >= Mathf.Abs(delta.y);
-            if (!horizontal && !_allowVertical)
+            if (Mathf.Abs(delta.x) < Mathf.Abs(delta.y))
                 return;
 
-            SwipeDirection direction = horizontal
-                ? (delta.x < 0f ? SwipeDirection.Left : SwipeDirection.Right)
-                : (delta.y < 0f ? SwipeDirection.Down : SwipeDirection.Up);
+            SwipeDirection direction = delta.x < 0f ? SwipeDirection.Left : SwipeDirection.Right;
             _swiped?.Invoke(_item, direction);
         }
 

@@ -36,6 +36,7 @@ namespace OndeVai.Gameplay
         public void Begin(GameConfiguration config)
         {
             _config = config;
+            _context.QuestionPoint.gameObject.SetActive(false);
             SpawnWave();
         }
 
@@ -45,7 +46,7 @@ namespace OndeVai.Gameplay
             _pendingWave = null;
         }
 
-        public void HandleStorageSelected(Storage storage)
+        public void HandleStorageSelected(SortingSource storage)
         {
         }
 

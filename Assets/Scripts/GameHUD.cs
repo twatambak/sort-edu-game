@@ -40,8 +40,8 @@ public class GameHUD : MonoBehaviour
         _sliderTimer.maxValue = _remainingTime;
         _sliderTimer.value = _remainingTime;
 
-        _gameController.OnCorrectStorage += HandleCorrectStorage;
-        _gameController.OnIncorrectStorage += HandleIncorrectStorage;
+        _gameController.OnCorrectSort += HandleCorrectStorage;
+        _gameController.OnIncorrectSort += HandleIncorrectStorage;
     }
 
     public void ResetTimer()

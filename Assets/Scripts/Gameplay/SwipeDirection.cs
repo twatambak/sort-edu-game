@@ -6,9 +6,7 @@ namespace OndeVai.Gameplay
     public enum SwipeDirection
     {
         Left,
-        Right,
-        Up,
-        Down
+        Right
     }
 
     /// <summary>Maps scenario categories to their fixed swipe directions.</summary>
@@ -30,12 +28,6 @@ namespace OndeVai.Gameplay
                 case SwipeDirection.Left:
                     group = config.ItemGroupB;
                     return true;
-                case SwipeDirection.Up when config.Mode == GameMode.FourWaySwipe:
-                    group = config.ItemGroupC;
-                    return true;
-                case SwipeDirection.Down when config.Mode == GameMode.FourWaySwipe:
-                    group = config.ItemGroupD;
-                    return true;
                 default:
                     group = default;
                     return false;
@@ -54,10 +46,6 @@ namespace OndeVai.Gameplay
                 direction = SwipeDirection.Right;
             else if (group == config.ItemGroupB)
                 direction = SwipeDirection.Left;
-            else if (config.Mode == GameMode.FourWaySwipe && group == config.ItemGroupC)
-                direction = SwipeDirection.Up;
-            else if (config.Mode == GameMode.FourWaySwipe && group == config.ItemGroupD)
-                direction = SwipeDirection.Down;
             else
             {
                 direction = default;
@@ -73,8 +61,6 @@ namespace OndeVai.Gameplay
             {
                 SwipeDirection.Left => Vector2.left,
                 SwipeDirection.Right => Vector2.right,
-                SwipeDirection.Up => Vector2.up,
-                SwipeDirection.Down => Vector2.down,
                 _ => Vector2.zero
             };
         }
