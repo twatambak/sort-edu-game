@@ -30,6 +30,9 @@ public class GameController : SingletonBase<GameController>
 
     [Header("Swipe Mode")]
     [SerializeField] private Transform _questionPoint;
+    [Header("Drag and Drop Mode")]
+    [SerializeField] private GameObject _dragAndDropSeparator;
+
 
     public Action<GameConfiguration> OnGameStarted { get; set; }
     public Action OnCorrectSort { get; set; }
@@ -460,6 +463,11 @@ public class GameController : SingletonBase<GameController>
         SortingScenarioDefinition scenario = ResolveScenario(Config.ScenarioId);
         if (scenario.GroupA != Config.ItemGroupA || scenario.GroupB != Config.ItemGroupB)
             Debug.LogError($"Scenario '{scenario.Id}' does not match the groups of the match configuration. Storages may show the wrong category.", this);
+
+        if(Config.Mode == GameMode.DragAndDrop)
+            _dragAndDropSeparator.SetActive(true);
+        else
+            _dragAndDropSeparator.SetActive(false);
 
         if (_sortingSourceA != null)
             _sortingSourceA.Configure(Config, scenario.TypeA);
