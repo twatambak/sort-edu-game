@@ -12,7 +12,7 @@ PlayerSettings:
   targetDevice: 2
   useOnDemandResources: 0
   accelerometerFrequency: 60
-  companyName: Back2Byte
+  companyName: TLW
   productName: Onde Vai?
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
@@ -168,9 +168,9 @@ PlayerSettings:
   androidMaxAspectRatio: 2.4
   androidMinAspectRatio: 1
   applicationIdentifier:
-    Android: com.tlw.ondevai
+    Android: com.b2b.ondevai
     Standalone: com.Unity-Technologies.com.unity.template.urp-blank
-    iPhone: com.tlw.ondevai
+    iPhone: com.b2b.ondevai
   buildNumber:
     Standalone: 0
     VisionOS: 0
@@ -529,6 +529,9 @@ PlayerSettings:
   m_BuildTargetBatching:
   - m_BuildTarget: WebGL
     m_StaticBatching: 0
+    m_DynamicBatching: 0
+  - m_BuildTarget: Android
+    m_StaticBatching: 1
     m_DynamicBatching: 0
   m_BuildTargetShaderSettings: []
   m_BuildTargetGraphicsJobs: []
