@@ -96,3 +96,14 @@ so IL2CPP does not strip them. Add new record or query result types there.
 
 Settings and the privacy disclaimer acceptance are stored in PlayerPrefs, not in
 this database.
+
+## Simulated profile history
+
+When **Simular histórico em novos perfis** is enabled in Options, every newly
+created profile receives six imperfect matches on unique dates spanning the
+previous fourteen days through today. Scores improve over those matches, and
+each includes realistic attempt records and play duration. The profile,
+matches and attempts are committed in a single transaction. The
+`OptionsScreen` inspector option **Show Simulated History Option** controls
+whether this preference appears in the Options screen; hiding it does not
+disable a previously saved preference.

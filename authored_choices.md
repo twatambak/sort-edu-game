@@ -65,6 +65,8 @@ Assumptions and judgement calls made during development. Review and revise as ne
 - Ages offered are 2 to 8+. Names are trimmed, control characters are removed, and names are capped at 24 characters.
 - Settings and the disclaimer acceptance are stored in PlayerPrefs (JSON), not SQLite. They are device preferences, not child data.
 - I have not verified that SQLite data persists across reloads on WebGL (IndexedDB sync). This applied before my changes too.
+- When enabled in Options, creating any new profile adds six simulated matches on distinct random dates from fourteen days ago through today. Results improve over the rounds, with at least one error in every match; item attempts, response times and play durations are saved in the same transaction as the profile.
+- `OptionsScreen` has a serialized visibility boolean, enabled by default, that controls whether the simulated-history preference appears. Hiding the preference preserves its last saved value.
 
 ## Scenarios
 

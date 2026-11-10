@@ -490,6 +490,7 @@ namespace OndeVai.EditorTools
             Slider sfx = kit.Slider("SfxSlider", OptionRow(kit, list, "Efeitos sonoros", new Vector2(500f, 70f)), new Vector2(500f, 70f), Kit.Orange);
             Toggle vibration = kit.Toggle("VibrationToggle", OptionRow(kit, list, "Vibração", new Vector2(100f, 100f)), 100f, Kit.Green);
             Toggle tutorial = kit.Toggle("TutorialToggle", OptionRow(kit, list, "Tutorial no início", new Vector2(100f, 100f)), 100f, Kit.Green);
+            Toggle simulatedProfiles = kit.Toggle("SimulatedProfilesToggle", OptionRow(kit, list, "Simular histórico em novos perfis", new Vector2(100f, 100f)), 100f, Kit.Green);
             OptionSelector tutorialItems = kit.Selector("TutorialItems", OptionRow(kit, list, "Objetos guiados", selectorSize), selectorSize, Kit.Blue);
             OptionSelector mode = kit.Selector("Mode", OptionRow(kit, list, "Modo de jogo", selectorSize), selectorSize, Kit.Blue);
             OptionSelector scenario = kit.Selector("Scenario", OptionRow(kit, list, "Cenário", selectorSize), selectorSize, Kit.Blue);
@@ -521,7 +522,7 @@ namespace OndeVai.EditorTools
                 IconLibrary.Get("icon_trash"),
                 "Segure: excluir perfil");
 
-            foreach (Component control in new Component[] { music, sfx, vibration, tutorial, tutorialItems, mode, scenario, matchTime, errorLimit, itemsOnScreen })
+            foreach (Component control in new Component[] { music, sfx, vibration, tutorial, simulatedProfiles, tutorialItems, mode, scenario, matchTime, errorLimit, itemsOnScreen })
                 Kit.Stretch((RectTransform)control.transform);
 
             RectTransform footer = Footer(content);
@@ -533,6 +534,7 @@ namespace OndeVai.EditorTools
             Kit.Wire(screen, "_sfxSlider", sfx);
             Kit.Wire(screen, "_vibrationToggle", vibration);
             Kit.Wire(screen, "_tutorialToggle", tutorial);
+            Kit.Wire(screen, "_simulatedProfilesToggle", simulatedProfiles);
             Kit.Wire(screen, "_tutorialItemsSelector", tutorialItems);
             Kit.Wire(screen, "_modeSelector", mode);
             Kit.Wire(screen, "_scenarioSelector", scenario);

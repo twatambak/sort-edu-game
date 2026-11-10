@@ -21,6 +21,8 @@ namespace OndeVai.Settings
         public float SfxVolume = 0.8f;
         public bool VibrationEnabled = true;
         public bool TutorialEnabled = true;
+        /// <summary>Generates a simulated match history whenever a new child profile is created.</summary>
+        public bool SimulateNewProfileHistory;
         public int TutorialItemCount = 2;
         public GameMode Mode = GameMode.DragAndDrop;
         public string ScenarioId = SortingScenarioDefinition.DefaultScenarioId;

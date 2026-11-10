@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using DG.Tweening;
 using OndeVai.Data;
+using OndeVai.Gameplay;
+using OndeVai.Settings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -206,13 +208,35 @@ namespace OndeVai.UI
             profile.Age = (_ageSelector != null ? _ageSelector.Index : 2) + MinSelectableAge;
             profile.AvatarIndex = _selectedAvatar;
 
-            if (!data.SaveProfile(profile))
+            bool isNew = _editing == null;
+            GameController controller = GameController.Instance;
+            bool simulateHistory = isNew && controller != null && controller.Settings.Current.SimulateNewProfileHistory;
+            bool saved;
+            if (simulateHistory)
+            {
+                GameSettings settings = controller.Settings.Current;
+                SortingScenarioDefinition scenario = controller.Definition != null
+                    ? controller.Definition.GetScenarioOrDefault(settings.ScenarioId)
+                    : SortingScenarioDefinition.Default;
+                GameConfiguration configuration = GameConfiguration.FromSettings(settings, scenario);
+                List<SimulatedMatchData> matches = ProfileHistorySimulator.Generate(
+                    controller.Definition,
+                    configuration,
+                    DateTime.UtcNow,
+                    new System.Random(Guid.NewGuid().GetHashCode()));
+                saved = data.SaveProfileWithSimulatedHistory(profile, matches);
+            }
+            else
+            {
+                saved = data.SaveProfile(profile);
+            }
+
+            if (!saved)
             {
                 SetError("Não foi possível salvar. Tente novamente.");
                 return;
             }
 
-            bool isNew = _editing == null;
             CloseForm();
             if (isNew)
                 SelectProfile(profile);

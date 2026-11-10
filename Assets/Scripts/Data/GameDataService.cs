@@ -79,6 +79,27 @@ namespace OndeVai.Data
             return true;
         }
 
+        /// <summary>Saves a new profile and its simulated matches and attempts atomically.</summary>
+        public bool SaveProfileWithSimulatedHistory(ChildProfileRecord profile, IReadOnlyList<SimulatedMatchData> matches)
+        {
+            if (!IsAvailable || profile == null || profile.Id != 0 || matches == null || matches.Count == 0)
+                return false;
+
+            profile.Name = SanitizeName(profile.Name);
+            if (string.IsNullOrEmpty(profile.Name))
+                return false;
+
+            profile.Age = Mathf.Clamp(profile.Age, ChildProfileRecord.MinAge, ChildProfileRecord.MaxAge);
+            if (profile.CreatedAtUtcTicks == 0)
+                profile.CreatedAtUtcTicks = DateTime.UtcNow.Ticks;
+
+            if (!TryRun(() => _database.SaveChildProfileWithHistory(profile, matches)))
+                return false;
+
+            ProfilesChanged?.Invoke();
+            return true;
+        }
+
         public bool DeleteProfile(ChildProfileRecord profile)
         {
             if (!IsAvailable || profile == null)

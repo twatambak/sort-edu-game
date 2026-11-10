@@ -10,7 +10,7 @@ using UnityEngine.UI;
 namespace OndeVai.UI
 {
     /// <summary>
-    /// Adult facing options: audio, vibration, tutorial, game mode, scenario and match rules.
+    /// Adult facing options: audio, vibration, tutorial, simulated profile history, game mode and match rules.
     /// Every change is saved immediately.
     /// </summary>
     public sealed class OptionsScreen : UIScreen
@@ -34,6 +34,11 @@ namespace OndeVai.UI
         [Header("Tutorial")]
         [SerializeField] private Toggle _tutorialToggle;
         [SerializeField] private OptionSelector _tutorialItemsSelector;
+
+        [Header("Simulated profile history")]
+        [SerializeField] private Toggle _simulatedProfilesToggle;
+        [Tooltip("Shows the simulated profile history setting in Options.")]
+        [SerializeField] private bool _showSimulatedHistoryOption = true;
 
         [Header("Match")]
         [SerializeField] private OptionSelector _modeSelector;
@@ -82,6 +87,8 @@ namespace OndeVai.UI
             BindSlider(_sfxSlider, value => Apply(s => s.SfxVolume = value, false));
             BindToggle(_vibrationToggle, value => Apply(s => s.VibrationEnabled = value));
             BindToggle(_tutorialToggle, value => Apply(s => s.TutorialEnabled = value));
+            EnsureSimulatedProfilesToggle();
+            BindToggle(_simulatedProfilesToggle, value => Apply(s => s.SimulateNewProfileHistory = value));
             BindSelector(_tutorialItemsSelector, index => Apply(s => s.TutorialItemCount = TutorialItems[index]));
             BindSelector(_modeSelector, HandleModeChanged);
             BindSelector(_scenarioSelector, index => Apply(s => s.ScenarioId = _scenarios[index].Id));
@@ -119,6 +126,16 @@ namespace OndeVai.UI
 
             if (_tutorialToggle != null)
                 _tutorialToggle.SetIsOnWithoutNotify(settings.TutorialEnabled);
+
+            if (_simulatedProfilesToggle != null)
+            {
+                _simulatedProfilesToggle.SetIsOnWithoutNotify(settings.SimulateNewProfileHistory);
+                Transform row = _simulatedProfilesToggle.transform.parent != null
+                    ? _simulatedProfilesToggle.transform.parent.parent
+                    : null;
+                if (row != null)
+                    row.gameObject.SetActive(_showSimulatedHistoryOption);
+            }
 
             SetNumberOptions(_tutorialItemsSelector, TutorialItems, settings.TutorialItemCount, value => value == 1 ? "1 objeto" : $"{value} objetos");
             SetNumberOptions(_matchTimeSelector, MatchTimes, settings.MatchTimeSeconds, value => $"{value} s");
@@ -161,6 +178,39 @@ namespace OndeVai.UI
             }
 
             _isRefreshing = false;
+        }
+
+        private void EnsureSimulatedProfilesToggle()
+        {
+            if (_simulatedProfilesToggle != null)
+                return;
+
+            if (_tutorialToggle == null || _tutorialToggle.transform.parent == null ||
+                _tutorialToggle.transform.parent.parent == null)
+            {
+                Debug.LogError("OptionsScreen could not create the simulated profile history option because the tutorial toggle is missing.", this);
+                return;
+            }
+
+            Transform tutorialRow = _tutorialToggle.transform.parent.parent;
+            GameObject row = Instantiate(tutorialRow.gameObject, tutorialRow.parent);
+            row.name = "SimulatedProfiles";
+            row.transform.SetSiblingIndex(tutorialRow.GetSiblingIndex() + 1);
+
+            TMP_Text label = row.GetComponentInChildren<TMP_Text>(true);
+            if (label != null)
+                label.text = "Simular histórico em novos perfis";
+
+            _simulatedProfilesToggle = row.GetComponentInChildren<Toggle>(true);
+            if (_simulatedProfilesToggle == null)
+            {
+                Debug.LogError("OptionsScreen could not create the simulated profile history option because the tutorial row has no toggle.", this);
+                row.SetActive(false);
+                return;
+            }
+
+            _simulatedProfilesToggle.name = "SimulatedProfilesToggle";
+            row.SetActive(_showSimulatedHistoryOption);
         }
 
         private void HandleModeChanged(int index)

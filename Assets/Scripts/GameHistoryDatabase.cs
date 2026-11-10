@@ -145,6 +145,39 @@ public sealed class GameHistoryDatabase : IDisposable
             _connection.Update(profile);
     }
 
+    /// <summary>Saves a new profile, its matches and their attempts in one transaction.</summary>
+    public void SaveChildProfileWithHistory(ChildProfileRecord profile, IReadOnlyList<SimulatedMatchData> matches)
+    {
+        if (profile == null)
+            throw new ArgumentNullException(nameof(profile));
+        if (profile.Id != 0)
+            throw new ArgumentException("Simulated history can only be saved for a new profile.", nameof(profile));
+        if (matches == null)
+            throw new ArgumentNullException(nameof(matches));
+
+        _connection.RunInTransaction(() =>
+        {
+            _connection.Insert(profile);
+            foreach (SimulatedMatchData match in matches)
+            {
+                if (match == null || match.Session == null || match.Attempts == null)
+                    throw new ArgumentException("Simulated history contains an invalid match.", nameof(matches));
+
+                GameSessionRecord session = match.Session;
+                session.ChildProfileId = profile.Id;
+                session.ChildAge = profile.Age;
+                _connection.Insert(session);
+
+                foreach (ItemAttemptRecord attempt in match.Attempts)
+                {
+                    attempt.SessionId = session.Id;
+                    attempt.ChildProfileId = profile.Id;
+                    _connection.Insert(attempt);
+                }
+            }
+        });
+    }
+
     /// <summary>Removes the profile together with every match and attempt recorded for it.</summary>
     public void DeleteChildProfile(int id)
     {
