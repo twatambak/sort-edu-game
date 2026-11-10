@@ -106,8 +106,12 @@ namespace OndeVai.Data
             return deleted;
         }
 
-        /// <summary>Saves a match for the active child. Returns the stored id, or 0 on failure.</summary>
-        public int SaveSession(GameSessionRecord session, IReadOnlyList<ItemAttemptRecord> attempts)
+        /// <summary>
+        /// Saves a match for the active child. Returns the stored id, or 0 on failure.
+        /// <paramref name="replaceSessionId"/> removes an earlier checkpoint of the same match.
+        /// Checkpoints (<paramref name="isCheckpoint"/>) do not raise <see cref="SessionSaved"/>.
+        /// </summary>
+        public int SaveSession(GameSessionRecord session, IReadOnlyList<ItemAttemptRecord> attempts, int replaceSessionId = 0, bool isCheckpoint = false)
         {
             if (!IsAvailable)
             {
@@ -116,16 +120,28 @@ namespace OndeVai.Data
             }
 
             session.ChildProfileId = ActiveChild?.Id ?? 0;
-            if (!TryRun(() => _database.SaveCompletedGame(session, attempts)))
+            session.ChildAge = ActiveChild?.Age ?? 0;
+            if (!TryRun(() => _database.SaveCompletedGame(session, attempts, replaceSessionId)))
                 return 0;
 
-            SessionSaved?.Invoke(session);
+            if (!isCheckpoint)
+                SessionSaved?.Invoke(session);
             return session.Id;
         }
 
         public List<GameSessionRecord> GetRecentSessions(int childProfileId, int limit)
         {
             return IsAvailable ? _database.GetRecentSessionsForChild(childProfileId, limit) : new List<GameSessionRecord>();
+        }
+
+        /// <summary>Totals of a child for list views. Empty when the database is unavailable or the query fails.</summary>
+        public ChildQuickStats GetQuickStats(int childProfileId)
+        {
+            ChildQuickStats stats = null;
+            if (IsAvailable)
+                TryRun(() => stats = _database.GetQuickStats(childProfileId));
+
+            return stats ?? new ChildQuickStats();
         }
 
         /// <summary>Builds the aggregated progress of a child.</summary>

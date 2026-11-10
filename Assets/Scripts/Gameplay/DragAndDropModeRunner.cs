@@ -36,7 +36,9 @@ namespace OndeVai.Gameplay
         public void Begin(GameConfiguration config)
         {
             _config = config;
-            _context.QuestionPoint.gameObject.SetActive(false);
+            if (_context.QuestionPoint != null)
+                _context.QuestionPoint.gameObject.SetActive(false);
+
             SpawnWave();
         }
 
@@ -61,11 +63,12 @@ namespace OndeVai.Gameplay
                 return;
             }
 
+            // Scaled time, so the delay does not run out while the match is paused.
             _pendingWave = DOVirtual.DelayedCall(_config.DelayBetweenSpawns, () =>
             {
                 _pendingWave = null;
                 SpawnWave();
-            });
+            }, false);
         }
 
         private void SpawnWave()

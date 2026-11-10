@@ -6,30 +6,10 @@ using OndeVai.Platform;
 using OndeVai.Settings;
 using UnityEngine;
 
-/// <summary>Outcome of one sorting attempt, broadcast by <see cref="GameController.OnItemSorted"/>.</summary>
-public readonly struct ItemSortResult
-{
-    public readonly Item Item;
-    /// <summary>Selected storage, or null when the answer is a swipe-selected category.</summary>
-    public readonly SortingSource Storage;
-    public readonly bool Correct;
-    public readonly bool DuringTutorial;
-    public readonly Vector3 Position;
-
-    public ItemSortResult(Item item, SortingSource storage, bool correct, bool duringTutorial, Vector3 position)
-    {
-        Item = item;
-        Storage = storage;
-        Correct = correct;
-        DuringTutorial = duringTutorial;
-        Position = position;
-    }
-
-}
-
 /// <summary>
-/// Owns the match: score, errors, tutorial progress, pause, end conditions and persistence.
-/// Mode-specific rules live in <see cref="IGameModeRunner"/> implementations.
+/// Owns the match: score, errors, tutorial progress, pause and end conditions.
+/// Mode-specific rules live in <see cref="IGameModeRunner"/> implementations and everything that is
+/// stored about a match is collected by <see cref="MatchSessionRecorder"/>.
 /// </summary>
 public class GameController : SingletonBase<GameController>
 {
@@ -63,7 +43,7 @@ public class GameController : SingletonBase<GameController>
     /// <summary>Raised when the child picks up an item.</summary>
     public Action<Item> OnItemPicked { get; set; }
 
-    /// <summary>Raised when the child lets go of a dragged item, before any drop is evaluated.</summary>
+    /// <summary>Raised when the child lets go of an item, before any answer is evaluated.</summary>
     public Action<Item> OnItemReleased { get; set; }
 
     /// <summary>Raised after every sorting attempt.</summary>
@@ -97,20 +77,24 @@ public class GameController : SingletonBase<GameController>
     public bool IsTimerRunning => _gameStarted && !IsGameOver && !IsPaused && !IsTutorialActive;
     public bool CanAcceptInput => _gameStarted && !IsGameOver && !IsPaused;
 
+    /// <summary>Longest run of consecutive correct answers in the current match.</summary>
+    public int BestStreak => _recorder.BestStreak;
+
     /// <summary>The item the tutorial should guide, or null.</summary>
     public Item FocusItem => _runner?.FocusItem;
 
     /// <summary>Items currently in play.</summary>
     public IReadOnlyList<Item> ActiveItems => _spawner != null ? _spawner.ActiveItems : Array.Empty<Item>();
 
+    private readonly MatchSessionRecorder _recorder = new();
     private bool _gameStarted;
     private bool _ownsServices;
     private bool _hasTutorialPresenter;
-    private DateTime _sessionStartedAtUtc;
+    private int _checkpointSessionId;
     private ItemSpawner _spawner;
     private IGameModeRunner _runner;
-    private readonly List<ItemAttemptRecord> _attempts = new();
-    private readonly List<SortingSource> _knownStorages = new();
+
+    private bool IsMatchRunning => _gameStarted && !IsGameOver;
 
     protected override void Awake()
     {
@@ -134,11 +118,7 @@ public class GameController : SingletonBase<GameController>
     public void BeginGameFromSettings()
     {
         GameSettings settings = Settings.Current;
-        SortingScenarioDefinition scenario = _gameDefinition != null
-            ? _gameDefinition.GetScenarioOrDefault(settings.ScenarioId)
-            : SortingScenarioDefinition.Default;
-
-        BeginGame(GameConfiguration.FromSettings(settings, scenario));
+        BeginGame(GameConfiguration.FromSettings(settings, ResolveScenario(settings.ScenarioId)));
     }
 
     public void BeginGame(GameConfiguration selectedConfig)
@@ -146,9 +126,11 @@ public class GameController : SingletonBase<GameController>
         if (selectedConfig == null)
             throw new ArgumentNullException(nameof(selectedConfig));
 
-        if (selectedConfig.Mode != GameMode.DragAndDrop && selectedConfig.Mode != GameMode.SwipeTwoDirections)
+        if (!GameModes.IsSupported(selectedConfig.Mode))
             throw new ArgumentOutOfRangeException(nameof(selectedConfig), selectedConfig.Mode, "Unsupported game mode.");
 
+        // Restarting in the middle of a match must not lose what the child already did.
+        SaveAbandonedMatch();
         StopCurrentMatch();
 
         Config = selectedConfig;
@@ -158,8 +140,8 @@ public class GameController : SingletonBase<GameController>
         ErrorCount = 0;
         ScoreCount = 0;
         TutorialItemsRemaining = _hasTutorialPresenter ? Mathf.Max(0, selectedConfig.TutorialItemCount) : 0;
-        _attempts.Clear();
-        _sessionStartedAtUtc = DateTime.UtcNow;
+        _checkpointSessionId = 0;
+        _recorder.Begin(selectedConfig, DateTime.UtcNow, Time.time);
         SetPausedInternal(false);
 
         ConfigureStorages();
@@ -190,9 +172,7 @@ public class GameController : SingletonBase<GameController>
             return;
 
         bool wasRunning = !IsGameOver;
-        if (wasRunning && _attempts.Count > 0)
-            SaveSession(false, GameSessionRecord.ReasonAbandoned);
-
+        SaveAbandonedMatch();
         StopCurrentMatch();
         _gameStarted = false;
         IsGameOver = true;
@@ -205,41 +185,22 @@ public class GameController : SingletonBase<GameController>
 
     public void SetPaused(bool paused)
     {
-        if (paused && (!_gameStarted || IsGameOver))
+        if (paused && !IsMatchRunning)
             return;
 
         SetPausedInternal(paused);
     }
 
+    /// <summary>Evaluates an item dropped on a storage. Returns true when it belongs there.</summary>
     public bool SubmitItem(Item item, SortingSource storage)
     {
-        if (storage == null)
-            return false;
-
-        return SubmitItem(item, storage.GroupTarget, storage);
+        return storage != null && Submit(item, storage.GroupTarget, storage);
     }
 
+    /// <summary>Evaluates an answer given without a physical drop (swipe). Returns true when correct.</summary>
     public bool SubmitItem(Item item, ItemGroup chosenGroup)
     {
-        return SubmitItem(item, chosenGroup, null);
-    }
-
-    private bool SubmitItem(Item item, ItemGroup chosenGroup, SortingSource storage)
-    {
-        if (item == null || !CanAcceptInput || item.IsResolving)
-            return false;
-
-        bool correct = item.ItemType == chosenGroup;
-        bool duringTutorial = TutorialItemsRemaining > 0;
-        Vector3 position = item.transform.position;
-        RecordAttempt(item, chosenGroup, correct, duringTutorial);
-
-        if (correct)
-            ResolveCorrect(item, storage, duringTutorial, position);
-        else
-            ResolveIncorrect(item, storage, duringTutorial, position);
-
-        return correct;
+        return Submit(item, chosenGroup, null);
     }
 
     public void SelectSortingSource(SortingSource storage)
@@ -253,14 +214,17 @@ public class GameController : SingletonBase<GameController>
         _hasTutorialPresenter = true;
     }
 
-    /// <summary>Called by <see cref="DragAndDrop"/> when an item is picked up.</summary>
+    /// <summary>Called by the input components when an item is picked up.</summary>
     public void NotifyItemPicked(Item item)
     {
-        if (item != null)
-            OnItemPicked?.Invoke(item);
+        if (item == null)
+            return;
+
+        item.RegisterPickup();
+        OnItemPicked?.Invoke(item);
     }
 
-    /// <summary>Called by <see cref="DragAndDrop"/> when a dragged item is released.</summary>
+    /// <summary>Called by the input components when a held item is released.</summary>
     public void NotifyItemReleased(Item item)
     {
         if (item != null)
@@ -295,34 +259,10 @@ public class GameController : SingletonBase<GameController>
         return false;
     }
 
-    /// <summary>Legacy entry point kept for existing callers. Prefer <see cref="SubmitItem"/>.</summary>
-    public void HandleCorrectStorage()
-    {
-        if (!CanAcceptInput)
-            return;
-
-        ScoreCount++;
-        OnCorrectSort?.Invoke();
-        CheckWinCondition();
-    }
-
-    /// <summary>Legacy entry point kept for existing callers. Prefer <see cref="SubmitItem"/>.</summary>
-    public void HandleIncorrectStorage()
-    {
-        if (!CanAcceptInput)
-            return;
-
-        ErrorCount++;
-        OnIncorrectSort?.Invoke();
-        CheckLossCondition();
-    }
-
     public void HandleTimeExpired()
     {
-        if (IsGameOver || !_gameStarted)
-            return;
-
-        EndGame(true, GameSessionRecord.ReasonTimeExpired);
+        if (IsMatchRunning)
+            EndGame(true, GameSessionRecord.ReasonTimeExpired);
     }
 
     public List<GameSessionRecord> GetRecentGameSessions(int limit = 50)
@@ -340,29 +280,54 @@ public class GameController : SingletonBase<GameController>
         return Data.Database.GetCompletedSessionCount();
     }
 
-    private void ResolveCorrect(Item item, SortingSource storage, bool duringTutorial, Vector3 position)
+    private bool Submit(Item item, ItemGroup chosenGroup, SortingSource storage)
     {
+        if (item == null || !CanAcceptInput || item.IsResolving)
+            return false;
+
+        bool correct = item.ItemType == chosenGroup;
+        bool duringTutorial = TutorialItemsRemaining > 0;
+        Vector3 position = item.transform.position;
+        RecordAttempt(item, chosenGroup, correct, duringTutorial);
+
+        // A swipe has no storage to animate, so the panel of the chosen side reacts instead.
+        if (storage == null && TryGetStorageFor(chosenGroup, out SortingSource panel))
+            panel.Presentation.FlashResult(correct);
+
+        ItemSortResult result = new(item, storage, correct, duringTutorial, position, _recorder.CurrentStreak);
+        if (correct)
+            ResolveCorrect(result);
+        else
+            ResolveIncorrect(result);
+
+        return correct;
+    }
+
+    private void ResolveCorrect(in ItemSortResult result)
+    {
+        Item item = result.Item;
         _spawner.Remove(item);
-        if (storage != null)
+        if (result.Storage != null)
         {
-            storage.AcceptItem(item);
+            result.Storage.AcceptItem(item);
         }
         else
         {
             item.BeginResolve();
             item.SetKinematic(true);
         }
+
         ScoreCount++;
 
         bool tutorialFinished = false;
-        if (duringTutorial)
+        if (result.DuringTutorial)
         {
             TutorialItemsRemaining--;
             tutorialFinished = TutorialItemsRemaining == 0;
         }
 
         OnCorrectSort?.Invoke();
-        OnItemSorted?.Invoke(new ItemSortResult(item, storage, true, duringTutorial, position));
+        OnItemSorted?.Invoke(result);
 
         if (tutorialFinished)
             OnTutorialCompleted?.Invoke();
@@ -373,20 +338,21 @@ public class GameController : SingletonBase<GameController>
         _runner.HandleItemResolved(item, true);
     }
 
-    private void ResolveIncorrect(Item item, SortingSource storage, bool duringTutorial, Vector3 position)
+    private void ResolveIncorrect(in ItemSortResult result)
     {
-        if (storage != null)
-            storage.RejectItem(item, _runner.EjectOnError);
-        if (!duringTutorial)
+        if (result.Storage != null)
+            result.Storage.RejectItem(result.Item, _runner.EjectOnError);
+
+        if (!result.DuringTutorial)
             ErrorCount++;
 
         OnIncorrectSort?.Invoke();
-        OnItemSorted?.Invoke(new ItemSortResult(item, storage, false, duringTutorial, position));
+        OnItemSorted?.Invoke(result);
 
-        if (!duringTutorial && CheckLossCondition())
+        if (!result.DuringTutorial && CheckLossCondition())
             return;
 
-        _runner.HandleItemResolved(item, false);
+        _runner.HandleItemResolved(result.Item, false);
     }
 
     private bool CheckWinCondition()
@@ -416,7 +382,7 @@ public class GameController : SingletonBase<GameController>
         LastGameWon = won;
         MobilePlatformRuntime.SetKeepAwake(false);
         _runner?.End();
-        GameSessionRecord record = SaveSession(won, finishReason);
+        GameSessionRecord record = SaveSession(won, finishReason, false);
 
         if (won)
             OnGameWon?.Invoke();
@@ -426,80 +392,80 @@ public class GameController : SingletonBase<GameController>
         OnGameEnded?.Invoke(record);
     }
 
-    private GameSessionRecord SaveSession(bool won, string finishReason)
-    {
-        DateTime finishedAtUtc = DateTime.UtcNow;
-        GameSessionRecord record = new()
-        {
-            StartedAtUtcTicks = _sessionStartedAtUtc.Ticks,
-            FinishedAtUtcTicks = finishedAtUtc.Ticks,
-            DurationSeconds = Math.Max(0, (finishedAtUtc - _sessionStartedAtUtc).TotalSeconds),
-            MatchTimeSeconds = Config.MatchTime,
-            ErrorLimit = Config.ErrorLimit,
-            MaxItemsOnScreen = Config.MaxItemsOnScreen,
-            ItemsToWin = Config.ItemsToWin,
-            DelayBetweenSpawnsSeconds = Config.DelayBetweenSpawns,
-            ItemGroupA = (int)Config.ItemGroupA,
-            ItemGroupB = (int)Config.ItemGroupB,
-            Score = ScoreCount,
-            Errors = ErrorCount,
-            Won = won,
-            FinishReason = finishReason,
-            GameMode = (int)Config.Mode,
-            ScenarioId = Config.ScenarioId,
-            TutorialItemCount = Config.TutorialItemCount
-        };
-
-        return Data.SaveSession(record, _attempts) > 0 ? record : null;
-    }
-
     private void RecordAttempt(Item item, ItemGroup chosenGroup, bool correct, bool duringTutorial)
     {
-        _attempts.Add(new ItemAttemptRecord
+        SortAttempt attempt = new()
         {
-            ItemGroup = (int)item.ItemType,
-            ChosenGroup = (int)chosenGroup,
+            ItemGroup = item.ItemType,
+            ChosenGroup = chosenGroup,
             ItemName = item.name,
             Correct = correct,
-            ResponseSeconds = Mathf.Max(0f, Time.time - item.AvailableSince),
-            DuringTutorial = duringTutorial
-        });
+            DuringTutorial = duringTutorial,
+            ResponseSeconds = Time.time - item.AvailableSince,
+            RetryIndex = item.AttemptCount,
+            PickupCount = item.PickupCount
+        };
 
+        _recorder.RecordAttempt(attempt, DateTime.UtcNow, Time.time);
+        item.RegisterAttempt();
         if (!correct)
             item.RestartResponseTimer();
     }
 
+    /// <summary>
+    /// Stores the match in its current state. A checkpoint is replaced by the next save of the same
+    /// match, so the history never holds the same match twice.
+    /// </summary>
+    private GameSessionRecord SaveSession(bool won, string finishReason, bool isCheckpoint)
+    {
+        GameSessionRecord record = _recorder.BuildRecord(
+            won, finishReason, ScoreCount, ErrorCount, DateTime.UtcNow, Time.time, Application.version);
+
+        int savedId = Data.SaveSession(record, _recorder.Attempts, _checkpointSessionId, isCheckpoint);
+        if (savedId <= 0)
+            return null;
+
+        _checkpointSessionId = isCheckpoint ? savedId : 0;
+        return record;
+    }
+
+    private void SaveAbandonedMatch()
+    {
+        if (IsMatchRunning && _recorder.HasAttempts)
+            SaveSession(false, GameSessionRecord.ReasonAbandoned, false);
+    }
+
+    /// <summary>
+    /// Mobile systems may kill a backgrounded app without notice, so the running match is stored as
+    /// abandoned when the app goes to the background. It is replaced if the match continues.
+    /// </summary>
+    private void SaveCheckpoint()
+    {
+        if (IsMatchRunning && _recorder.HasAttempts)
+            SaveSession(false, GameSessionRecord.ReasonAbandoned, true);
+    }
+
+    private SortingScenarioDefinition ResolveScenario(string scenarioId)
+    {
+        return _gameDefinition != null
+            ? _gameDefinition.GetScenarioOrDefault(scenarioId)
+            : SortingScenarioDefinition.Default;
+    }
+
     private void ConfigureStorages()
     {
-        foreach (SortingSource storage in SortingSource.Active)
-        {
-            if (storage != null && !_knownStorages.Contains(storage))
-                _knownStorages.Add(storage);
-        }
-
-        RegisterStorage(_sortingSourceA);
-        RegisterStorage(_sortingSourceB);
-
         if (_sortingSourceA == null && _sortingSourceB == null)
             return;
 
-        SortingScenarioDefinition scenario = _gameDefinition != null
-            ? _gameDefinition.GetScenarioOrDefault(Config.ScenarioId)
-            : SortingScenarioDefinition.Default;
+        SortingScenarioDefinition scenario = ResolveScenario(Config.ScenarioId);
+        if (scenario.GroupA != Config.ItemGroupA || scenario.GroupB != Config.ItemGroupB)
+            Debug.LogError($"Scenario '{scenario.Id}' does not match the groups of the match configuration. Storages may show the wrong category.", this);
 
-        bool scenarioMatches = scenario.IsPlayable &&
-            scenario.GroupA == Config.ItemGroupA && scenario.GroupB == Config.ItemGroupB;
         if (_sortingSourceA != null)
             _sortingSourceA.Configure(Config, scenario.TypeA);
 
         if (_sortingSourceB != null)
             _sortingSourceB.Configure(Config, scenario.TypeB);
-
-        void RegisterStorage(SortingSource storage)
-        {
-            if (storage != null && !_knownStorages.Contains(storage))
-                _knownStorages.Add(storage);
-        }
     }
 
     private IGameModeRunner CreateRunner(GameMode mode)
@@ -509,11 +475,12 @@ public class GameController : SingletonBase<GameController>
             Spawner = _spawner,
             QuestionPoint = _questionPoint,
             NotifySpawned = item => OnItemSpawned?.Invoke(item),
-            Submit = (item, storage) => SubmitItem(item, storage),
-            SubmitGroup = (item, group) => SubmitItem(item, group),
+            Submit = SubmitItem,
+            SubmitGroup = SubmitItem,
             NotifyPicked = NotifyItemPicked,
             NotifyReleased = NotifyItemReleased,
-            CanAcceptInput = () => CanAcceptInput
+            CanAcceptInput = () => CanAcceptInput,
+            FindStorage = group => TryGetStorageFor(group, out SortingSource storage) ? storage : null
         };
 
         return mode switch
@@ -538,6 +505,9 @@ public class GameController : SingletonBase<GameController>
             return;
 
         IsPaused = paused;
+        if (paused)
+            _recorder.NotifyPaused();
+
         OnPauseChanged?.Invoke(paused);
     }
 
@@ -556,10 +526,12 @@ public class GameController : SingletonBase<GameController>
 
     private void OnApplicationPause(bool pauseStatus)
     {
-        if (pauseStatus)
-            Settings?.Flush();
+        if (!pauseStatus)
+            return;
 
-        if (pauseStatus && _autoPauseOnFocusLoss)
+        Settings?.Flush();
+        SaveCheckpoint();
+        if (_autoPauseOnFocusLoss)
             SetPaused(true);
     }
 
@@ -567,6 +539,14 @@ public class GameController : SingletonBase<GameController>
     {
         if (!hasFocus && _autoPauseOnFocusLoss)
             SetPaused(true);
+    }
+
+    protected override void OnApplicationQuit()
+    {
+        if (_ownsServices)
+            SaveAbandonedMatch();
+
+        base.OnApplicationQuit();
     }
 
     protected override void OnDestroy()

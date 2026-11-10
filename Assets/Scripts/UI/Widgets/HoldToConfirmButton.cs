@@ -1,3 +1,4 @@
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -54,6 +55,10 @@ namespace OndeVai.UI
 
         public void OnPointerUp(PointerEventData eventData)
         {
+            // A quick tap does nothing on purpose; the wobble tells the adult the button reacted and wants a hold.
+            if (_isHolding)
+                PlayTapHint();
+
             Release();
         }
 
@@ -66,6 +71,12 @@ namespace OndeVai.UI
         {
             _isHolding = false;
             SetProgress(0f);
+        }
+
+        private void PlayTapHint()
+        {
+            transform.DOKill(true);
+            transform.DOPunchScale(Vector3.one * -0.08f, 0.25f, 8, 0.5f).SetUpdate(true).SetLink(gameObject);
         }
 
         private void SetProgress(float progress)

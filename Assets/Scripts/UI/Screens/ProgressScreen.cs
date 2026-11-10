@@ -2,22 +2,41 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using DG.Tweening;
 using OndeVai.Data;
+using OndeVai.Gameplay;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using OndeVai.Gameplay;
 
 namespace OndeVai.UI
 {
     /// <summary>
-    /// Progress report for parents and teachers: overall numbers, accuracy per category and the
-    /// most recent matches of the selected child.
+    /// Progress report for parents and teachers: headline numbers, accuracy per category and
+    /// scenario, the items the child misses most, a chart of the latest matches and their details.
+    /// The headline tiles and the scenario and item sections are built at runtime next to the
+    /// authored sections.
     /// </summary>
     public sealed class ProgressScreen : UIScreen
     {
         private const int RecentSessionCount = 12;
         private const int ChartSessionCount = 10;
+        private const int HardestItemCount = 5;
+        private const float TileSpacing = 16f;
+        private const float BarSpacing = 14f;
+        private const float SectionTitleHeight = 90f;
+        private const float RowStagger = 0.04f;
+        private const float ChartMinBarHeight = 8f;
+
+        private static readonly Color TileBlue = new(0.33f, 0.63f, 1f, 1f);
+        private static readonly Color TileGreen = new(0.3f, 0.78f, 0.45f, 1f);
+        private static readonly Color TileOrange = new(1f, 0.62f, 0.26f, 1f);
+        private static readonly Color TilePurple = new(0.62f, 0.48f, 0.92f, 1f);
+        private static readonly Color TileRed = new(0.95f, 0.4f, 0.4f, 1f);
+        private static readonly Color TileTeal = new(0.2f, 0.72f, 0.72f, 1f);
+        private static readonly Color LowColor = new(0.95f, 0.45f, 0.4f, 1f);
+        private static readonly Color MidColor = new(1f, 0.8f, 0.3f, 1f);
+        private static readonly Color HighColor = new(0.4f, 0.8f, 0.45f, 1f);
 
         [SerializeField] private OptionSelector _childSelector;
         [SerializeField] private AvatarBadge _childBadge;
@@ -44,10 +63,26 @@ namespace OndeVai.UI
         private readonly List<ChildProfileRecord> _children = new();
         private readonly List<string> _childLabels = new();
         private readonly List<StatBarRow> _groupBars = new();
+        private readonly List<StatBarRow> _scenarioBars = new();
+        private readonly List<StatBarRow> _itemBars = new();
         private readonly List<Image> _chartBars = new();
         private readonly List<TMP_Text> _sessionRows = new();
+        private readonly List<ItemTally> _hardestItems = new();
         private readonly StringBuilder _builder = new();
         private static readonly CultureInfo Culture = CreateCulture();
+
+        private bool _runtimeSectionsBuilt;
+        private GameObject _tilesRoot;
+        private StatTile _gamesTile;
+        private StatTile _accuracyTile;
+        private StatTile _starsTile;
+        private StatTile _playTimeTile;
+        private StatTile _responseTile;
+        private StatTile _streakTile;
+        private RectTransform _scenarioBarsParent;
+        private GameObject _scenarioTitle;
+        private RectTransform _itemBarsParent;
+        private GameObject _itemTitle;
 
         public event Action Closed;
 
@@ -74,6 +109,8 @@ namespace OndeVai.UI
 
         protected override void OnShown()
         {
+            BuildRuntimeSections();
+
             GameDataService data = Data;
             _children.Clear();
             _childLabels.Clear();
@@ -116,13 +153,118 @@ namespace OndeVai.UI
             if (_noDataMessage != null)
                 _noDataMessage.SetActive(!hasData);
 
-            ShowSummary(summary, data != null && data.IsAvailable);
+            bool databaseAvailable = data != null && data.IsAvailable;
+            ShowTiles(summary, databaseAvailable);
+            ShowSummary(summary, databaseAvailable);
             ShowGroupBars(summary);
+            ShowScenarioBars(summary);
+            ShowHardestItems(summary);
             ShowChart(sessions);
             ShowSessionList(sessions);
 
             if (_deleteHistoryButton != null)
                 _deleteHistoryButton.gameObject.SetActive(child != null && hasData);
+        }
+
+        /// <summary>
+        /// Creates the headline tiles above the summary text and the scenario and item sections
+        /// after the category bars. Runs once, the first time the screen opens.
+        /// </summary>
+        private void BuildRuntimeSections()
+        {
+            if (_runtimeSectionsBuilt)
+                return;
+
+            _runtimeSectionsBuilt = true;
+            if (_summaryText != null)
+                BuildTiles();
+
+            if (_groupBarsParent == null || _groupBarTemplate == null)
+                return;
+
+            // Inserted in reverse so the final order is: categories, scenarios, hardest items.
+            int insertIndex = _groupBarsParent.GetSiblingIndex() + 1;
+            _itemBarsParent = CreateBarSection("Itens mais difíceis", insertIndex, out _itemTitle);
+            _scenarioBarsParent = CreateBarSection("Acertos por cenário", insertIndex, out _scenarioTitle);
+        }
+
+        private void BuildTiles()
+        {
+            Transform content = _summaryText.transform.parent;
+            RectTransform root = RuntimeUI.Rect("StatTiles", content);
+            root.SetSiblingIndex(_summaryText.transform.GetSiblingIndex());
+            RuntimeUI.Column(root, TileSpacing);
+            _tilesRoot = root.gameObject;
+
+            RectTransform firstRow = CreateTileRow(root);
+            _gamesTile = new StatTile(firstRow, _summaryText, "Partidas", TileBlue);
+            _accuracyTile = new StatTile(firstRow, _summaryText, "Acertos", TileGreen);
+            _starsTile = new StatTile(firstRow, _summaryText, "Estrelas", TileOrange);
+
+            RectTransform secondRow = CreateTileRow(root);
+            _playTimeTile = new StatTile(secondRow, _summaryText, "Tempo de jogo", TilePurple);
+            _responseTile = new StatTile(secondRow, _summaryText, "Resposta média", TileRed);
+            _streakTile = new StatTile(secondRow, _summaryText, "Melhor sequência", TileTeal);
+        }
+
+        private static RectTransform CreateTileRow(Transform parent)
+        {
+            RectTransform row = RuntimeUI.Rect("Row", parent);
+            RuntimeUI.Row(row, TileSpacing, true);
+            return row;
+        }
+
+        /// <summary>Adds a titled list of bars that looks like the authored category section.</summary>
+        private RectTransform CreateBarSection(string title, int siblingIndex, out GameObject titleObject)
+        {
+            Transform content = _groupBarsParent.parent;
+            RectTransform bars = RuntimeUI.Rect(title + " Bars", content);
+            bars.SetSiblingIndex(siblingIndex);
+            RuntimeUI.Column(bars, BarSpacing);
+
+            titleObject = CreateSectionTitle(title, content);
+            titleObject.transform.SetSiblingIndex(siblingIndex);
+            return bars;
+        }
+
+        /// <summary>Copies the title above the category bars so new sections share its style.</summary>
+        private GameObject CreateSectionTitle(string title, Transform content)
+        {
+            int authoredTitleIndex = _groupBarsParent.GetSiblingIndex() - 1;
+            TMP_Text authoredTitle = authoredTitleIndex >= 0
+                ? content.GetChild(authoredTitleIndex).GetComponent<TMP_Text>()
+                : null;
+
+            if (authoredTitle != null)
+            {
+                TMP_Text copy = Instantiate(authoredTitle, content);
+                copy.name = title;
+                copy.text = title;
+                return copy.gameObject;
+            }
+
+            TextMeshProUGUI created = RuntimeUI.Text(title, content, _summaryText, title, 52f, TileOrange, TextAlignmentOptions.BottomLeft);
+            RuntimeUI.Layout(created.gameObject, -1f, SectionTitleHeight);
+            return created.gameObject;
+        }
+
+        private void ShowTiles(ChildProgressSummary summary, bool databaseAvailable)
+        {
+            if (_tilesRoot == null)
+                return;
+
+            _tilesRoot.SetActive(databaseAvailable);
+            if (!databaseAvailable)
+                return;
+
+            _gamesTile.Show(summary.GamesPlayed.ToString(), 0f);
+            _accuracyTile.Show(DisplayNames.Percent(summary.Accuracy), RowStagger);
+            _starsTile.Show(summary.TotalStars.ToString(), RowStagger * 2f);
+            _playTimeTile.Show(DisplayNames.Duration(summary.TotalPlaySeconds), RowStagger * 3f);
+            _responseTile.Show(
+                summary.AverageResponseSeconds > 0f ? summary.AverageResponseSeconds.ToString("0.0", Culture) + " s" : "-",
+                RowStagger * 4f);
+            _streakTile.Show(summary.BestStreak > 0 ? summary.BestStreak.ToString() : "-", RowStagger * 5f);
         }
 
         private void ShowSummary(ChildProgressSummary summary, bool databaseAvailable)
@@ -137,18 +279,20 @@ namespace OndeVai.UI
             }
 
             _builder.Clear();
-            _builder.Append("Partidas: <b>").Append(summary.GamesPlayed).Append("</b>");
-            _builder.Append("    Vitórias: <b>").Append(summary.Wins).Append("</b>\n");
-            _builder.Append("Acertos: <b>").Append(summary.TotalCorrect).Append("</b>");
-            _builder.Append("    Erros: <b>").Append(summary.TotalErrors).Append("</b>\n");
-            _builder.Append("Precisão: <b>").Append(DisplayNames.Percent(summary.Accuracy)).Append("</b>");
+            _builder.Append("Vitórias: <b>").Append(summary.Wins).Append("</b> de <b>").Append(summary.GamesPlayed).Append("</b>");
             _builder.Append("    Melhor pontuação: <b>").Append(summary.BestScore).Append("</b>\n");
-            _builder.Append("Tempo de jogo: <b>").Append(DisplayNames.Duration(summary.TotalPlaySeconds)).Append("</b>");
-            if (summary.AverageResponseSeconds > 0f)
-                _builder.Append("    Resposta média: <b>").Append(summary.AverageResponseSeconds.ToString("0.0", Culture)).Append(" s</b>");
-
+            _builder.Append("Dias jogados: <b>").Append(summary.DaysPlayed).Append("</b>");
             if (summary.LastPlayedUtc.HasValue)
-                _builder.Append("\nÚltima partida: <b>").Append(summary.LastPlayedUtc.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm", Culture)).Append("</b>");
+                _builder.Append("    Última partida: <b>").Append(summary.LastPlayedUtc.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm", Culture)).Append("</b>");
+
+            // Without the tiles (no summary parent to host them) the text carries every number, as before.
+            if (_tilesRoot == null)
+            {
+                _builder.Append("\nAcertos: <b>").Append(summary.TotalCorrect).Append("</b>");
+                _builder.Append("    Erros: <b>").Append(summary.TotalErrors).Append("</b>");
+                _builder.Append("    Precisão: <b>").Append(DisplayNames.Percent(summary.Accuracy)).Append("</b>");
+                _builder.Append("\nTempo de jogo: <b>").Append(DisplayNames.Duration(summary.TotalPlaySeconds)).Append("</b>");
+            }
 
             _summaryText.text = _builder.ToString();
         }
@@ -158,15 +302,65 @@ namespace OndeVai.UI
             int index = 0;
             foreach (KeyValuePair<ItemGroup, AccuracyTally> entry in summary.AccuracyByGroup)
             {
-                StatBarRow row = GetOrCreate(_groupBars, _groupBarTemplate, _groupBarsParent, index++);
+                StatBarRow row = GetOrCreate(_groupBars, _groupBarTemplate, _groupBarsParent, index);
                 if (row == null)
                     return;
 
                 AccuracyTally tally = entry.Value;
-                row.Show(DisplayNames.Group(entry.Key, Definition), tally.Ratio, $"{tally.Correct}/{tally.Total}");
+                row.Show(DisplayNames.Group(entry.Key, Definition), tally.Ratio, $"{tally.Correct}/{tally.Total}", null, index * RowStagger);
+                index++;
             }
 
             HideFrom(_groupBars, index);
+        }
+
+        private void ShowScenarioBars(ChildProgressSummary summary)
+        {
+            if (_scenarioBarsParent == null)
+                return;
+
+            int index = 0;
+            foreach (KeyValuePair<string, AccuracyTally> entry in summary.AccuracyByScenario)
+            {
+                StatBarRow row = GetOrCreate(_scenarioBars, _groupBarTemplate, _scenarioBarsParent, index);
+                if (row == null)
+                    return;
+
+                AccuracyTally tally = entry.Value;
+                row.Show(ScenarioName(entry.Key), tally.Ratio, $"{tally.Correct}/{tally.Total}", null, index * RowStagger);
+                index++;
+            }
+
+            HideFrom(_scenarioBars, index);
+            _scenarioTitle.SetActive(index > 0);
+        }
+
+        /// <summary>The items the child gets wrong most often, shown with their picture.</summary>
+        private void ShowHardestItems(ChildProgressSummary summary)
+        {
+            if (_itemBarsParent == null)
+                return;
+
+            GameDefinition definition = Definition;
+            summary.GetHardestItems(_hardestItems, HardestItemCount);
+            for (int i = 0; i < _hardestItems.Count; i++)
+            {
+                StatBarRow row = GetOrCreate(_itemBars, _groupBarTemplate, _itemBarsParent, i);
+                if (row == null)
+                    return;
+
+                ItemTally item = _hardestItems[i];
+                Sprite icon = definition != null ? definition.FindVariantSprite(item.Group, item.ItemName) : null;
+                row.Show(
+                    DisplayNames.Group(item.Group, definition),
+                    item.Accuracy.Ratio,
+                    $"{item.Accuracy.Correct}/{item.Accuracy.Total}",
+                    icon,
+                    i * RowStagger);
+            }
+
+            HideFrom(_itemBars, _hardestItems.Count);
+            _itemTitle.SetActive(_hardestItems.Count > 0);
         }
 
         private void ShowChart(List<GameSessionRecord> sessions)
@@ -180,11 +374,19 @@ namespace OndeVai.UI
                 if (bar == null)
                     return;
 
-                int attempts = session.Score + session.Errors;
-                float ratio = attempts > 0 ? (float)session.Score / attempts : 0f;
+                float ratio = AccuracyOf(session);
                 RectTransform barRect = bar.rectTransform;
-                barRect.sizeDelta = new Vector2(barRect.sizeDelta.x, Mathf.Max(8f, ratio * _chartMaxBarHeight));
-                bar.color = Color.Lerp(new Color(0.95f, 0.45f, 0.4f), new Color(0.4f, 0.8f, 0.45f), ratio);
+                float width = barRect.sizeDelta.x;
+                float height = Mathf.Max(ChartMinBarHeight, ratio * _chartMaxBarHeight);
+                bar.color = AccuracyColor(ratio);
+
+                barRect.DOKill();
+                barRect.sizeDelta = new Vector2(width, ChartMinBarHeight);
+                barRect.DOSizeDelta(new Vector2(width, height), 0.4f)
+                    .SetDelay(i * RowStagger)
+                    .SetEase(Ease.OutBack)
+                    .SetUpdate(true)
+                    .SetLink(bar.gameObject);
             }
 
             HideFrom(_chartBars, count);
@@ -208,14 +410,57 @@ namespace OndeVai.UI
         {
             _builder.Clear();
             DateTime finished = new DateTime(session.FinishedAtUtcTicks, DateTimeKind.Utc).ToLocalTime();
-            _builder.Append(finished.ToString("dd/MM HH:mm", Culture)).Append("  ");
-            _builder.Append(DisplayNames.Mode(session.GameMode)).Append("  ");
-            _builder.Append(DisplayNames.Group((ItemGroup)session.ItemGroupA, Definition))
-                .Append(" x ").Append(DisplayNames.Group((ItemGroup)session.ItemGroupB, Definition));
+            float ratio = AccuracyOf(session);
+            int stars = ProgressCalculator.StarsOf(session);
 
-            _builder.Append("\n<size=80%>Acertos <b>").Append(session.Score).Append("</b>  Erros <b>").Append(session.Errors).Append("</b>  ");
-            _builder.Append(DisplayNames.Duration(session.DurationSeconds)).Append("  ").Append(DisplayNames.FinishReason(session)).Append("</size>");
+            _builder.Append("<b>").Append(finished.ToString("dd/MM HH:mm", Culture)).Append("</b>  ");
+            _builder.Append(SessionScenarioName(session));
+
+            _builder.Append("\n<size=80%>");
+            _builder.Append(DisplayNames.Mode(session.GameMode)).Append("  •  ");
+            _builder.Append(DisplayNames.Duration(ProgressCalculator.PlaySecondsOf(session))).Append("  •  ");
+            _builder.Append(DisplayNames.FinishReason(session));
+
+            _builder.Append("\n<color=#").Append(ColorUtility.ToHtmlStringRGB(AccuracyColor(ratio))).Append("><b>");
+            _builder.Append(DisplayNames.Percent(session.Score + session.Errors > 0 ? ratio : -1f)).Append("</b></color>  •  ");
+            _builder.Append("Acertos <b>").Append(session.Score).Append("</b>  •  Erros <b>").Append(session.Errors).Append("</b>  •  ");
+            _builder.Append(stars).Append(stars == 1 ? " estrela" : " estrelas");
+            if (session.BestStreak > 1)
+                _builder.Append("  •  Sequência <b>").Append(session.BestStreak).Append("</b>");
+
+            _builder.Append("</size>");
             return _builder.ToString();
+        }
+
+        private string SessionScenarioName(GameSessionRecord session)
+        {
+            GameDefinition definition = Definition;
+            SortingScenarioDefinition scenario = definition != null ? definition.FindScenario(session.ScenarioId) : null;
+            if (scenario != null)
+                return scenario.DisplayName;
+
+            return DisplayNames.Group((ItemGroup)session.ItemGroupA, definition) + " x " + DisplayNames.Group((ItemGroup)session.ItemGroupB, definition);
+        }
+
+        private string ScenarioName(string scenarioId)
+        {
+            GameDefinition definition = Definition;
+            SortingScenarioDefinition scenario = definition != null ? definition.FindScenario(scenarioId) : null;
+            return scenario != null ? scenario.DisplayName : "Cenário removido";
+        }
+
+        private static float AccuracyOf(GameSessionRecord session)
+        {
+            int attempts = session.Score + session.Errors;
+            return attempts > 0 ? (float)session.Score / attempts : 0f;
+        }
+
+        /// <summary>Red for low accuracy, yellow around half and green for high.</summary>
+        private static Color AccuracyColor(float ratio)
+        {
+            return ratio < 0.5f
+                ? Color.Lerp(LowColor, MidColor, ratio * 2f)
+                : Color.Lerp(MidColor, HighColor, (ratio - 0.5f) * 2f);
         }
 
         private void DeleteSelectedHistory()

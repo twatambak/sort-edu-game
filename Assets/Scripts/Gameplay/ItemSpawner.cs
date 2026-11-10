@@ -11,7 +11,8 @@ namespace OndeVai.Gameplay
     /// </summary>
     public sealed class ItemSpawner
     {
-        private const float SpawnPopDuration = 0.35f;
+        private const float WaveStagger = 0.07f;
+        private const float PlayAreaMargin = 1f;
 
         private readonly GameDefinition _definition;
         private readonly Transform[] _spawnPoints;
@@ -70,9 +71,9 @@ namespace OndeVai.Gameplay
             RefillSpawnPoints();
             BuildWaveGroups(count, groupA, groupB);
 
-            foreach (ItemGroup group in _waveGroups)
+            for (int i = 0; i < _waveGroups.Count; i++)
             {
-                Item item = Spawn(group, TakeSpawnPoint());
+                Item item = Spawn(_waveGroups[i], TakeSpawnPoint(), i * WaveStagger);
                 if (item != null)
                     onSpawned?.Invoke(item);
             }
@@ -82,7 +83,7 @@ namespace OndeVai.Gameplay
         public Item SpawnSingle(Vector3 position, ItemGroup groupA, ItemGroup groupB)
         {
             ItemGroup group = Random.value < 0.5f ? groupA : groupB;
-            return Spawn(group, position);
+            return Spawn(group, position, 0f);
         }
 
         /// <summary>Spawns one item from the supplied category set at <paramref name="position"/>.</summary>
@@ -94,7 +95,7 @@ namespace OndeVai.Gameplay
                 return null;
             }
 
-            return Spawn(groups[Random.Range(0, groups.Count)], position);
+            return Spawn(groups[Random.Range(0, groups.Count)], position, 0f);
         }
 
         /// <summary>Stops tracking an item. Does not despawn it.</summary>
@@ -103,8 +104,7 @@ namespace OndeVai.Gameplay
             if (item == null || !_activeItems.Remove(item))
                 return;
 
-            foreach (Collider2D itemCollider in item.GetComponentsInChildren<Collider2D>())
-                _activeColliders.Remove(itemCollider);
+            _activeColliders.Remove(item.Collider);
         }
 
         /// <summary>Returns every tracked item to the pool.</summary>
@@ -121,7 +121,7 @@ namespace OndeVai.Gameplay
             _activeColliders.Clear();
         }
 
-        private Item Spawn(ItemGroup group, Vector3 position)
+        private Item Spawn(ItemGroup group, Vector3 position, float popDelay)
         {
             if (_definition == null || _definition.ItemPrefab == null)
                 return null;
@@ -140,12 +140,27 @@ namespace OndeVai.Gameplay
             if (item.TryGetComponent(out SwipeCardInput swipeInput))
                 swipeInput.enabled = false;
             item.Initialize(type, variant);
+            ApplyPlayArea(item, position);
             item.gameObject.SetActive(true);
 
             IgnoreCollisionsWithActiveItems(item);
             _activeItems.Add(item);
-            PlaySpawnPop(item);
+            item.PlaySpawnPop(popDelay);
             return item;
+        }
+
+        /// <summary>Keeps the item inside the camera view plus a margin, see <see cref="Item.SetPlayArea"/>.</summary>
+        private static void ApplyPlayArea(Item item, Vector3 spawnPosition)
+        {
+            Camera viewCamera = Camera.main;
+            if (viewCamera == null || !viewCamera.orthographic)
+                return;
+
+            float halfHeight = viewCamera.orthographicSize + PlayAreaMargin;
+            float halfWidth = viewCamera.orthographicSize * viewCamera.aspect + PlayAreaMargin;
+            Vector3 center = viewCamera.transform.position;
+            Rect area = new(center.x - halfWidth, center.y - halfHeight, halfWidth * 2f, halfHeight * 2f);
+            item.SetPlayArea(area, spawnPosition);
         }
 
         private Item Rent()
@@ -175,7 +190,10 @@ namespace OndeVai.Gameplay
 
         private void IgnoreCollisionsWithActiveItems(Item item)
         {
-            Collider2D[] newColliders = item.GetComponentsInChildren<Collider2D>();
+            Collider2D newCollider = item.Collider;
+            if (newCollider == null)
+                return;
+
             for (int i = _activeColliders.Count - 1; i >= 0; i--)
             {
                 Collider2D activeCollider = _activeColliders[i];
@@ -185,20 +203,10 @@ namespace OndeVai.Gameplay
                     continue;
                 }
 
-                foreach (Collider2D newCollider in newColliders)
-                    Physics2D.IgnoreCollision(activeCollider, newCollider);
+                Physics2D.IgnoreCollision(activeCollider, newCollider);
             }
 
-            _activeColliders.AddRange(newColliders);
-        }
-
-        private static void PlaySpawnPop(Item item)
-        {
-            item.PresentationScale = 0.2f;
-            DOTween.To(() => item.PresentationScale, value => item.PresentationScale = value, 1f, SpawnPopDuration)
-                .SetEase(Ease.OutBack)
-                .SetTarget(item)
-                .SetLink(item.gameObject);
+            _activeColliders.Add(newCollider);
         }
 
         private void BuildWaveGroups(int count, ItemGroup groupA, ItemGroup groupB)

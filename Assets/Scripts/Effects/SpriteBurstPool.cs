@@ -17,6 +17,9 @@ namespace OndeVai.Effects
         public float StartSize;
         public float Spin;
 
+        /// <summary>Size at the end of the lifetime as a multiple of <see cref="StartSize"/>. Zero uses the default shrink.</summary>
+        public float EndScale;
+
         /// <summary>Direction range in degrees. 0..360 is a full circle.</summary>
         public Vector2 AngleRange;
     }
@@ -27,6 +30,8 @@ namespace OndeVai.Effects
     /// </summary>
     public sealed class SpriteBurstPool : MonoBehaviour
     {
+        private const float DefaultEndScale = 0.4f;
+
         [SerializeField, Min(1)] private int _prewarmCount = 48;
         [SerializeField] private string _sortingLayerName = "Default";
         [SerializeField] private int _sortingOrder = 500;
@@ -69,6 +74,7 @@ namespace OndeVai.Effects
             float lifetime = Mathf.Max(0.05f, settings.Lifetime * Random.Range(0.8f, 1.2f));
             float spin = Random.Range(-settings.Spin, settings.Spin);
             float startSize = settings.StartSize;
+            float endScale = settings.EndScale > 0f ? settings.EndScale : DefaultEndScale;
 
             DOTween.To(() => 0f, t =>
                 {
@@ -76,7 +82,7 @@ namespace OndeVai.Effects
                     Vector3 offset = new(velocity.x * time, velocity.y * time - 0.5f * gravity * time * time, 0f);
                     particleTransform.position = origin + offset;
                     particleTransform.Rotate(0f, 0f, spin * Time.deltaTime);
-                    particleTransform.localScale = Vector3.one * (startSize * (1f - t * 0.6f));
+                    particleTransform.localScale = Vector3.one * (startSize * Mathf.LerpUnclamped(1f, endScale, t));
                     Color faded = color;
                     faded.a = color.a * (1f - t * t);
                     particle.color = faded;

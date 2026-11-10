@@ -27,6 +27,7 @@ namespace OndeVai.Audio
 
         private GameController _gameController;
         private GameSettingsService _settings;
+        private AudioClip _tick;
         private float _sfxVolume = 1f;
         private int _correctStreak;
 
@@ -45,6 +46,7 @@ namespace OndeVai.Audio
             _wrong = _wrong != null ? _wrong : ProceduralAudio.CreateWrong();
             _win = _win != null ? _win : ProceduralAudio.CreateWin();
             _lose = _lose != null ? _lose : ProceduralAudio.CreateLose();
+            _tick = ProceduralAudio.CreateTick();
         }
 
         private void Start()
@@ -76,6 +78,12 @@ namespace OndeVai.Audio
         public void PlayClick()
         {
             PlaySfx(_click, 0f);
+        }
+
+        /// <summary>Plays the short tick used for the last seconds of the timer.</summary>
+        public void PlayTick()
+        {
+            PlaySfx(_tick, 0f);
         }
 
         /// <summary>Plays any clip through the effects channel using the effects volume.</summary>

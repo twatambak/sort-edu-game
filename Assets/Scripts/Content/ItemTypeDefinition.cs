@@ -132,6 +132,18 @@ namespace OndeVai.Gameplay
             }
         }
 
+        /// <summary>Finds a variant by its stable id. Returns null when the type has none with that id.</summary>
+        public ItemVariant FindVariant(string id)
+        {
+            foreach (ItemVariant variant in _variants)
+            {
+                if (variant != null && variant.Id == id)
+                    return variant;
+            }
+
+            return null;
+        }
+
         /// <summary>Resolves the collider shape of a variant.</summary>
         public ItemColliderShape GetColliderShape(ItemVariant variant)
         {

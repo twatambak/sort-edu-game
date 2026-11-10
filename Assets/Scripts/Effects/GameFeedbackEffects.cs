@@ -1,15 +1,22 @@
 using DG.Tweening;
-using UnityEngine;
+using OndeVai.Audio;
 using OndeVai.Gameplay;
+using UnityEngine;
 
 namespace OndeVai.Effects
 {
     /// <summary>
-    /// Visual and haptic reactions to gameplay events: sparkles on spawn, stars on correct answers,
-    /// a soft shake and tears on mistakes, timer ticks, and a confetti celebration when the match ends.
+    /// Visual and haptic reactions to gameplay events: sparkles on spawn, a trail while an item is
+    /// held, stars on correct answers, a soft shake and tears on mistakes, streak fireworks, timer
+    /// ticks, a nudge when the child is idle and a confetti celebration when the match ends.
+    /// The particle recipes live in <see cref="FeedbackBursts"/>.
     /// </summary>
     public sealed class GameFeedbackEffects : MonoBehaviour
     {
+        private const int UrgentSeconds = 5;
+        private const int FirstStreakMilestone = 3;
+        private const int StreakMilestoneStep = 5;
+
         [SerializeField] private SpriteBurstPool _burstPool;
         [SerializeField] private Camera _camera;
         [SerializeField] private GameTimer _gameTimer;
@@ -37,7 +44,15 @@ namespace OndeVai.Effects
             new(0.8f, 0.5f, 0.95f, 1f)
         };
 
+        [Header("Idle")]
+        [Tooltip("Seconds without any interaction before an item hops to call the child's attention. 0 disables it.")]
+        [SerializeField, Min(0f)] private float _idleNudgeSeconds = 6f;
+
+        private readonly Color[] _categoryColors = { Color.white, Color.white };
+        private readonly Color[] _glowColors = { new(1f, 1f, 0.8f, 0.55f) };
         private GameController _gameController;
+        private HeldItemTrail _trail;
+        private IdleNudge _idleNudge;
         private Vector3 _cameraRestPosition;
         private Quaternion _cameraRestRotation;
         private Color[] _wrongColors;
@@ -49,6 +64,7 @@ namespace OndeVai.Effects
                 _camera = Camera.main;
 
             _wrongColors = new[] { _wrongColor };
+            _tearColors = new[] { _tearColor };
             if (_camera != null)
             {
                 _cameraRestPosition = _camera.transform.position;
@@ -57,6 +73,9 @@ namespace OndeVai.Effects
 
             if (_burstPool == null)
                 Debug.LogError("GameFeedbackEffects has no SpriteBurstPool assigned. Particle effects are disabled.", this);
+
+            _trail = new HeldItemTrail(HandleTrailStep);
+            _idleNudge = new IdleNudge(_idleNudgeSeconds, NudgeIdleItem);
 
             if (_gameTimer != null)
                 _gameTimer.SecondElapsed += HandleSecondElapsed;
@@ -68,10 +87,20 @@ namespace OndeVai.Effects
                 return;
             }
 
+            _gameController.OnGameStarted += HandleGameStarted;
             _gameController.OnItemSpawned += HandleItemSpawned;
+            _gameController.OnItemPicked += HandleItemPicked;
+            _gameController.OnItemReleased += HandleItemReleased;
             _gameController.OnItemSorted += HandleItemSorted;
             _gameController.OnGameWon += HandleGameWon;
             _gameController.OnGameLost += HandleGameLost;
+            _gameController.OnGameAborted += StopMatchEffects;
+        }
+
+        private void HandleGameStarted(GameConfiguration config)
+        {
+            _trail.End();
+            _idleNudge.Arm();
         }
 
         private void HandleItemSpawned(Item item)
@@ -79,21 +108,35 @@ namespace OndeVai.Effects
             if (item == null)
                 return;
 
-            Emit(item.transform.position, new BurstSettings
-            {
-                Sprite = ProceduralSprites.Circle,
-                Colors = _correctColors,
-                Count = 6,
-                MinSpeed = 1.2f,
-                MaxSpeed = 2f,
-                Lifetime = 0.35f,
-                StartSize = 0.18f,
-                AngleRange = new Vector2(0f, 360f)
-            });
+            Emit(item.transform.position, FeedbackBursts.SpawnSparkles(CategoryColors(item)));
+            _idleNudge.Arm();
+        }
+
+        private void HandleItemPicked(Item item)
+        {
+            if (item == null)
+                return;
+
+            Emit(item.transform.position, FeedbackBursts.PickupRing(CategoryColors(item)));
+            _trail.Begin(item);
+            _idleNudge.Cancel();
+        }
+
+        private void HandleItemReleased(Item item)
+        {
+            _trail.End();
+            _idleNudge.Arm();
+        }
+
+        private void HandleTrailStep(Item item, Vector3 position)
+        {
+            Emit(position, FeedbackBursts.DragTrail(CategoryColors(item)));
         }
 
         private void HandleItemSorted(ItemSortResult result)
         {
+            _trail.End();
+            _idleNudge.Arm();
             if (result.Correct)
                 PlayCorrect(result);
             else
@@ -103,51 +146,39 @@ namespace OndeVai.Effects
         private void PlayCorrect(ItemSortResult result)
         {
             Vector3 position = result.Storage != null ? result.Storage.DropPoint : result.Position;
-            Emit(position, new BurstSettings
-            {
-                Sprite = ProceduralSprites.Star,
-                Colors = _correctColors,
-                Count = 14,
-                MinSpeed = 2.5f,
-                MaxSpeed = 5f,
-                Lifetime = 0.7f,
-                Gravity = 6f,
-                StartSize = 0.45f,
-                Spin = 360f,
-                AngleRange = new Vector2(20f, 160f)
-            });
+            Emit(position, FeedbackBursts.Glow(_glowColors));
+            Emit(position, FeedbackBursts.CorrectStars(_correctColors));
+            Emit(position, FeedbackBursts.Ring(_correctColors, 0.9f));
+            Emit(position + new Vector3(-0.55f, 0.45f, 0f), FeedbackBursts.Firework(_confettiColors));
+            Emit(position + new Vector3(0.55f, 0.65f, 0f), FeedbackBursts.Firework(_confettiColors));
 
-            Emit(position, new BurstSettings
-            {
-                Sprite = ProceduralSprites.Ring,
-                Colors = _correctColors,
-                Count = 1,
-                Lifetime = 0.35f,
-                StartSize = 1.6f,
-                AngleRange = Vector2.zero
-            });
+            if (IsStreakMilestone(result.Streak))
+                PlayStreak(position);
+        }
 
-            EmitFirework(position + new Vector3(-0.55f, 0.45f, 0f));
-            EmitFirework(position + new Vector3(0.55f, 0.65f, 0f));
+        private static bool IsStreakMilestone(int streak)
+        {
+            return streak == FirstStreakMilestone || (streak > 0 && streak % StreakMilestoneStep == 0);
+        }
+
+        /// <summary>Extra fireworks that reward several right answers in a row.</summary>
+        private void PlayStreak(Vector3 position)
+        {
+            Emit(position, FeedbackBursts.Ring(_confettiColors, 1.6f));
+            for (int i = 0; i < 3; i++)
+            {
+                float angle = (90f + (i - 1) * 55f) * Mathf.Deg2Rad;
+                Vector3 offset = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0f) * 1.3f;
+                Emit(position + offset, FeedbackBursts.Firework(_confettiColors));
+            }
         }
 
         private void PlayWrong(ItemSortResult result)
         {
-            Emit(result.Position, new BurstSettings
-            {
-                Sprite = ProceduralSprites.Circle,
-                Colors = _wrongColors,
-                Count = 8,
-                MinSpeed = 1f,
-                MaxSpeed = 2.2f,
-                Lifetime = 0.45f,
-                Gravity = -1f,
-                StartSize = 0.3f,
-                AngleRange = new Vector2(0f, 360f)
-            });
+            Emit(result.Position, FeedbackBursts.WrongPuff(_wrongColors));
 
             if (!result.DuringTutorial)
-                EmitTears(result.Position, 3);
+                Emit(result.Position, FeedbackBursts.Tears(_tearColors, 3));
 
             ShakeCamera();
             Vibrate();
@@ -155,70 +186,55 @@ namespace OndeVai.Effects
 
         private void HandleGameWon()
         {
+            StopMatchEffects();
             Celebrate();
         }
 
         private void HandleGameLost()
         {
+            StopMatchEffects();
             if (_camera != null)
-                EmitTears(_camera.transform.position + Vector3.up * 0.6f, 14);
+                Emit(_camera.transform.position + Vector3.up * 0.6f, FeedbackBursts.Tears(_tearColors, 14));
 
             Celebrate();
         }
 
+        private void StopMatchEffects()
+        {
+            _trail.End();
+            _idleNudge.Cancel();
+        }
+
         private void HandleSecondElapsed(int secondsRemaining)
         {
+            bool urgent = secondsRemaining <= UrgentSeconds;
+            if (urgent && secondsRemaining > 0)
+                GameAudio.Instance?.PlayTick();
+
             if (_camera == null || !_camera.orthographic)
                 return;
 
             Vector3 position = _camera.transform.position + Vector3.up * (_camera.orthographicSize - 0.35f);
-            Color[] colors = secondsRemaining <= 5 ? _confettiColors : _correctColors;
-            Emit(position, new BurstSettings
-            {
-                Sprite = secondsRemaining <= 5 ? ProceduralSprites.Star : ProceduralSprites.Circle,
-                Colors = colors,
-                Count = secondsRemaining <= 5 ? 5 : 2,
-                MinSpeed = 0.3f,
-                MaxSpeed = 0.9f,
-                Lifetime = 0.45f,
-                StartSize = 0.16f,
-                AngleRange = new Vector2(235f, 305f)
-            });
+            Emit(position, FeedbackBursts.TimerTick(urgent ? _confettiColors : _correctColors, urgent));
         }
 
-        private void EmitFirework(Vector3 position)
+        /// <summary>Makes one waiting item hop when the child has not touched anything for a while.</summary>
+        private void NudgeIdleItem()
         {
-            Emit(position, new BurstSettings
-            {
-                Sprite = ProceduralSprites.Star,
-                Colors = _confettiColors,
-                Count = 10,
-                MinSpeed = 1.8f,
-                MaxSpeed = 3.4f,
-                Lifetime = 0.9f,
-                Gravity = 1.2f,
-                StartSize = 0.24f,
-                Spin = 540f,
-                AngleRange = new Vector2(0f, 360f)
-            });
-        }
+            _idleNudge.Arm();
+            if (_gameController == null || !_gameController.CanAcceptInput || _gameController.IsTutorialActive)
+                return;
 
-        private void EmitTears(Vector3 position, int count)
-        {
-            _tearColors ??= new[] { _tearColor };
-            Emit(position, new BurstSettings
-            {
-                Sprite = ProceduralSprites.Tear,
-                Colors = _tearColors,
-                Count = count,
-                MinSpeed = 0.7f,
-                MaxSpeed = 1.5f,
-                Lifetime = 0.8f,
-                Gravity = 2.8f,
-                StartSize = 0.28f,
-                Spin = 18f,
-                AngleRange = new Vector2(230f, 310f)
-            });
+            System.Collections.Generic.IReadOnlyList<Item> items = _gameController.ActiveItems;
+            if (items.Count == 0)
+                return;
+
+            Item item = items[Random.Range(0, items.Count)];
+            if (item == null || item.IsLifted || item.IsResolving)
+                return;
+
+            item.Punch(1.2f, 0.5f);
+            Emit(item.transform.position, FeedbackBursts.SpawnSparkles(CategoryColors(item)));
         }
 
         private void Celebrate()
@@ -226,26 +242,14 @@ namespace OndeVai.Effects
             if (_camera == null || !_camera.orthographic)
                 return;
 
+            const int columns = 6;
             float halfWidth = _camera.orthographicSize * _camera.aspect;
             Vector3 top = _camera.transform.position + Vector3.up * (_camera.orthographicSize + 0.5f);
-            top.z = 0f;
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < columns; i++)
             {
-                Vector3 position = top + Vector3.right * Mathf.Lerp(-halfWidth, halfWidth, (i + 0.5f) / 6f);
-                EmitFirework(position);
-                Emit(position, new BurstSettings
-                {
-                    Sprite = i % 2 == 0 ? ProceduralSprites.Star : ProceduralSprites.Circle,
-                    Colors = _confettiColors,
-                    Count = 12,
-                    MinSpeed = 0.5f,
-                    MaxSpeed = 2.5f,
-                    Lifetime = 2.2f,
-                    Gravity = 3.5f,
-                    StartSize = 0.3f,
-                    Spin = 540f,
-                    AngleRange = new Vector2(200f, 340f)
-                });
+                Vector3 position = top + Vector3.right * Mathf.Lerp(-halfWidth, halfWidth, (i + 0.5f) / columns);
+                Emit(position, FeedbackBursts.Firework(_confettiColors));
+                Emit(position, FeedbackBursts.Confetti(_confettiColors, i % 2 == 0));
             }
         }
 
@@ -283,6 +287,13 @@ namespace OndeVai.Effects
 #endif
         }
 
+        /// <summary>The item's category color plus white, in a shared array to avoid allocations.</summary>
+        private Color[] CategoryColors(Item item)
+        {
+            _categoryColors[0] = item != null && item.Type != null ? item.Type.Color : Color.white;
+            return _categoryColors;
+        }
+
         private void Emit(Vector3 position, BurstSettings settings)
         {
             position.z = 0f;
@@ -292,16 +303,23 @@ namespace OndeVai.Effects
 
         private void OnDestroy()
         {
+            _trail?.End();
+            _idleNudge?.Cancel();
+
             if (_gameTimer != null)
                 _gameTimer.SecondElapsed -= HandleSecondElapsed;
 
             if (_gameController == null)
                 return;
 
+            _gameController.OnGameStarted -= HandleGameStarted;
             _gameController.OnItemSpawned -= HandleItemSpawned;
+            _gameController.OnItemPicked -= HandleItemPicked;
+            _gameController.OnItemReleased -= HandleItemReleased;
             _gameController.OnItemSorted -= HandleItemSorted;
             _gameController.OnGameWon -= HandleGameWon;
             _gameController.OnGameLost -= HandleGameLost;
+            _gameController.OnGameAborted -= StopMatchEffects;
         }
     }
 }

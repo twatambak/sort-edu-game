@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using DG.Tweening;
-using OndeVai.Data;
 using OndeVai.Gameplay;
 using OndeVai.Settings;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace OndeVai.UI
@@ -20,6 +20,8 @@ namespace OndeVai.UI
         private const string ToysToolsScenarioId = "toys-tools";
         private const string FoodScenarioId = "foods";
 
+        private const float IntroDuration = 0.3f;
+        private const float IntroStagger = 0.05f;
 
         [SerializeField] private Button _playButton;
         [SerializeField] private Button _dragModeButton;
@@ -27,7 +29,8 @@ namespace OndeVai.UI
         [SerializeField] private Button _animalsScenarioButton;
         [SerializeField] private Button _lettersNumbersScenarioButton;
         [SerializeField] private Button _toysToolsScenarioButton;
-        [SerializeField] private Button _FoodScenarioButton;
+        [FormerlySerializedAs("_FoodScenarioButton")]
+        [SerializeField] private Button _foodScenarioButton;
         [SerializeField] private Image _dragModeHighlight;
         [SerializeField] private Image _swipeModeHighlight;
         [SerializeField] private Image _animalsScenarioHighlight;
@@ -42,10 +45,30 @@ namespace OndeVai.UI
         [Tooltip("Parent of the play button that receives the idle pulse, so it does not fight the press animation.")]
         [SerializeField] private RectTransform _playPulseTarget;
 
+        /// <summary>A selectable card: the button, its selection frame and the value it stands for.</summary>
+        private readonly struct Choice<T>
+        {
+            public readonly T Value;
+            public readonly Button Button;
+            public readonly Image Highlight;
+
+            public Choice(T value, Button button, Image highlight)
+            {
+                Value = value;
+                Button = button;
+                Highlight = highlight;
+            }
+
+            /// <summary>The layout slot that holds the button and its highlight.</summary>
+            public Transform Slot => Button != null ? Button.transform.parent : null;
+        }
+
+        private readonly List<SortingScenarioDefinition> _playableScenarios = new();
+        private Choice<string>[] _scenarioChoices;
+        private Choice<GameMode>[] _modeChoices;
         private GameController _gameController;
         private Tween _playPulse;
         private Tween _logoFloat;
-        private readonly List<SortingScenarioDefinition> _playableScenarios = new();
 
         public event Action PlayRequested;
         public event Action ProfilesRequested;
@@ -55,13 +78,33 @@ namespace OndeVai.UI
         protected override void Awake()
         {
             base.Awake();
+            _scenarioChoices = new[]
+            {
+                new Choice<string>(AnimalsScenarioId, _animalsScenarioButton, _animalsScenarioHighlight),
+                new Choice<string>(LettersNumbersScenarioId, _lettersNumbersScenarioButton, _lettersNumbersScenarioHighlight),
+                new Choice<string>(ToysToolsScenarioId, _toysToolsScenarioButton, _toysToolsScenarioHighlight),
+                new Choice<string>(FoodScenarioId, _foodScenarioButton, _foodScenarioHighlight)
+            };
+
+            _modeChoices = new[]
+            {
+                new Choice<GameMode>(GameMode.DragAndDrop, _dragModeButton, _dragModeHighlight),
+                new Choice<GameMode>(GameMode.SwipeTwoDirections, _swipeModeButton, _swipeModeHighlight)
+            };
+
+            foreach (Choice<string> choice in _scenarioChoices)
+            {
+                Choice<string> captured = choice;
+                Bind(choice.Button, () => SelectScenario(captured));
+            }
+
+            foreach (Choice<GameMode> choice in _modeChoices)
+            {
+                Choice<GameMode> captured = choice;
+                Bind(choice.Button, () => SelectMode(captured));
+            }
+
             Bind(_playButton, () => PlayRequested?.Invoke());
-            Bind(_dragModeButton, () => SelectMode(GameMode.DragAndDrop));
-            Bind(_swipeModeButton, () => SelectMode(GameMode.SwipeTwoDirections));
-            Bind(_animalsScenarioButton, () => SelectScenario(AnimalsScenarioId));
-            Bind(_lettersNumbersScenarioButton, () => SelectScenario(LettersNumbersScenarioId));
-            Bind(_toysToolsScenarioButton, () => SelectScenario(ToysToolsScenarioId));
-            Bind(_FoodScenarioButton, () => SelectScenario(FoodScenarioId));
             Bind(_profileButton, () => ProfilesRequested?.Invoke());
             Bind(_optionsButton, () => OptionsRequested?.Invoke());
             Bind(_progressButton, () => ProgressRequested?.Invoke());
@@ -72,14 +115,13 @@ namespace OndeVai.UI
             _gameController = GameController.Instance;
             Refresh();
             StartIdleAnimations();
+            PlayIntro();
         }
 
         protected override void OnHidden()
         {
-            _playPulse?.Rewind();
-            _playPulse?.Kill();
-            _logoFloat?.Rewind();
-            _logoFloat?.Kill();
+            StopTween(ref _playPulse);
+            StopTween(ref _logoFloat);
         }
 
         private void Refresh()
@@ -87,36 +129,68 @@ namespace OndeVai.UI
             if (_gameController == null)
                 return;
 
-            ChildProfileRecord child = _gameController.Data.ActiveChild;
             if (_profileBadge != null)
-                _profileBadge.Show(child);
+                _profileBadge.Show(_gameController.Data.ActiveChild);
 
             GameSettings settings = _gameController.Settings.Current;
-            SetHighlight(_dragModeHighlight, settings.Mode == GameMode.DragAndDrop);
-            SetHighlight(_swipeModeHighlight, settings.Mode == GameMode.SwipeTwoDirections);
-            SetHighlight(_animalsScenarioHighlight, settings.ScenarioId == AnimalsScenarioId);
-            SetHighlight(_lettersNumbersScenarioHighlight, settings.ScenarioId == LettersNumbersScenarioId);
-            SetHighlight(_toysToolsScenarioHighlight, settings.ScenarioId == ToysToolsScenarioId);
-            SetHighlight(_foodScenarioHighlight, settings.ScenarioId == FoodScenarioId);
+            foreach (Choice<GameMode> choice in _modeChoices)
+                SetHighlight(choice.Highlight, settings.Mode == choice.Value);
 
+            RefreshScenarios(settings);
         }
 
-        private void SelectMode(GameMode mode)
+        /// <summary>
+        /// Highlights the scenario the next match will really use and disables the cards whose
+        /// scenario has no playable content.
+        /// </summary>
+        private void RefreshScenarios(GameSettings settings)
+        {
+            GameDefinition definition = _gameController.Definition;
+            string activeId = settings.ScenarioId;
+            _playableScenarios.Clear();
+            if (definition != null)
+            {
+                definition.GetPlayableScenarios(_playableScenarios);
+                activeId = definition.GetScenarioOrDefault(settings.ScenarioId).Id;
+            }
+
+            foreach (Choice<string> choice in _scenarioChoices)
+            {
+                SetHighlight(choice.Highlight, choice.Value == activeId);
+                if (choice.Button != null)
+                    choice.Button.interactable = IsPlayable(choice.Value);
+            }
+        }
+
+        private bool IsPlayable(string scenarioId)
+        {
+            foreach (SortingScenarioDefinition scenario in _playableScenarios)
+            {
+                if (scenario.Id == scenarioId)
+                    return true;
+            }
+
+            return false;
+        }
+
+        private void SelectMode(Choice<GameMode> choice)
         {
             if (_gameController == null)
                 return;
 
-            if (mode != GameMode.DragAndDrop && mode != GameMode.SwipeTwoDirections)
+            if (!GameModes.IsSupported(choice.Value))
             {
-                Debug.LogError($"TitleScreen cannot select unsupported mode {mode}.", this);
+                Debug.LogError($"TitleScreen cannot select unsupported mode {choice.Value}.", this);
                 return;
             }
 
+            GameMode mode = choice.Value;
             _gameController.Settings.Apply(settings => settings.Mode = mode);
             Refresh();
+            Punch(choice.Slot);
         }
 
-        private void SelectScenario(string scenarioId)
+        private void SelectScenario(Choice<string> choice)
         {
             if (_gameController == null || _gameController.Definition == null)
             {
@@ -124,34 +198,22 @@ namespace OndeVai.UI
                 return;
             }
 
-            bool isPlayable = false;
+            string scenarioId = choice.Value;
             _gameController.Definition.GetPlayableScenarios(_playableScenarios);
-            foreach (SortingScenarioDefinition scenario in _playableScenarios)
-            {
-                if (scenario.Id != scenarioId)
-                    continue;
-
-                isPlayable = true;
-                break;
-            }
-
-            if (!isPlayable)
+            if (!IsPlayable(scenarioId))
             {
                 Debug.LogError($"TitleScreen scenario '{scenarioId}' is missing or has no playable content.", this);
                 return;
             }
 
-            _gameController.Settings.Apply(settings =>
-            {
-                settings.ScenarioId = scenarioId;
-            });
+            _gameController.Settings.Apply(settings => settings.ScenarioId = scenarioId);
             Refresh();
+            Punch(choice.Slot);
         }
 
         private void StartIdleAnimations()
         {
-            _playPulse?.Rewind();
-            _playPulse?.Kill();
+            StopTween(ref _playPulse);
             if (_playPulseTarget != null)
             {
                 _playPulse = _playPulseTarget.DOScale(1.08f, 0.6f)
@@ -161,8 +223,7 @@ namespace OndeVai.UI
                     .SetLink(_playPulseTarget.gameObject);
             }
 
-            _logoFloat?.Rewind();
-            _logoFloat?.Kill();
+            StopTween(ref _logoFloat);
             if (_logo != null)
             {
                 _logoFloat = _logo.DOAnchorPosY(_logo.anchoredPosition.y + 20f, 1.4f)
@@ -171,6 +232,51 @@ namespace OndeVai.UI
                     .SetUpdate(true)
                     .SetLink(_logo.gameObject);
             }
+        }
+
+        /// <summary>Pops the scenario and mode cards in one after the other when the screen opens.</summary>
+        private void PlayIntro()
+        {
+            int index = 0;
+            foreach (Choice<string> choice in _scenarioChoices)
+                PopIn(choice.Slot, index++);
+
+            foreach (Choice<GameMode> choice in _modeChoices)
+                PopIn(choice.Slot, index++);
+        }
+
+        private static void PopIn(Transform slot, int index)
+        {
+            if (slot == null)
+                return;
+
+            slot.DOKill();
+            slot.localScale = Vector3.one * 0.6f;
+            slot.DOScale(1f, IntroDuration)
+                .SetDelay(index * IntroStagger)
+                .SetEase(Ease.OutBack)
+                .SetUpdate(true)
+                .SetLink(slot.gameObject);
+        }
+
+        private static void Punch(Transform slot)
+        {
+            if (slot == null)
+                return;
+
+            slot.DOKill();
+            slot.localScale = Vector3.one;
+            slot.DOPunchScale(Vector3.one * 0.12f, 0.3f, 6, 0.6f).SetUpdate(true).SetLink(slot.gameObject);
+        }
+
+        private static void StopTween(ref Tween tween)
+        {
+            if (tween == null)
+                return;
+
+            tween.Rewind();
+            tween.Kill();
+            tween = null;
         }
 
         private static void SetHighlight(Image highlight, bool selected)

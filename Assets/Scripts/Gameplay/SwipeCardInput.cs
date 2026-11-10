@@ -1,16 +1,24 @@
-using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace OndeVai.Gameplay
 {
-    /// <summary>Converts a pointer drag on an item into a cardinal swipe gesture.</summary>
+    /// <summary>Receives the swipe gesture of a card. Deltas are in screen pixels from the press position.</summary>
+    public interface ISwipeCardListener
+    {
+        void OnSwipeStarted(Item item);
+
+        void OnSwipeMoved(Item item, Vector2 screenDelta);
+
+        /// <summary><paramref name="direction"/> is null when the gesture was too short or mostly vertical.</summary>
+        void OnSwipeEnded(Item item, SwipeDirection? direction);
+    }
+
+    /// <summary>Converts a pointer drag on an item into a horizontal swipe gesture.</summary>
     public sealed class SwipeCardInput : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
     {
         private Item _item;
-        private Action<Item, SwipeDirection> _swiped;
-        private Action<Item> _picked;
-        private Action<Item> _released;
+        private ISwipeCardListener _listener;
         private Vector2 _startPosition;
         private float _minimumDistance;
         private int _pointerId;
@@ -21,18 +29,12 @@ namespace OndeVai.Gameplay
             TryGetComponent(out _item);
         }
 
-        /// <summary>Configures callbacks for a horizontal swipe.</summary>
-        public void Configure(
-            float minimumDistance,
-            Action<Item, SwipeDirection> swiped,
-            Action<Item> picked,
-            Action<Item> released)
+        /// <summary>Enables the input. A swipe counts once it travels <paramref name="minimumDistance"/> pixels sideways.</summary>
+        public void Configure(float minimumDistance, ISwipeCardListener listener)
         {
-            ResetGesture();
+            CancelGesture();
             _minimumDistance = Mathf.Max(1f, minimumDistance);
-            _swiped = swiped;
-            _picked = picked;
-            _released = released;
+            _listener = listener;
             enabled = true;
         }
 
@@ -44,47 +46,45 @@ namespace OndeVai.Gameplay
             _startPosition = eventData.pressPosition;
             _pointerId = eventData.pointerId;
             _isDragging = true;
-            _picked?.Invoke(_item);
+            _listener?.OnSwipeStarted(_item);
         }
 
         public void OnDrag(PointerEventData eventData)
         {
+            if (_isDragging && eventData.pointerId == _pointerId)
+                _listener?.OnSwipeMoved(_item, eventData.position - _startPosition);
         }
 
         public void OnEndDrag(PointerEventData eventData)
         {
-            if (!_isDragging)
+            if (!_isDragging || eventData.pointerId != _pointerId)
                 return;
 
-            if (eventData.pointerId != _pointerId)
-            {
-                ResetGesture();
-                return;
-            }
-
-            ResetGesture();
-            _released?.Invoke(_item);
+            _isDragging = false;
+            _pointerId = int.MinValue;
 
             Vector2 delta = eventData.position - _startPosition;
-            if (delta.magnitude < _minimumDistance)
-                return;
+            bool isSwipe = Mathf.Abs(delta.x) >= _minimumDistance && Mathf.Abs(delta.x) >= Mathf.Abs(delta.y);
+            SwipeDirection? direction = null;
+            if (isSwipe)
+                direction = delta.x < 0f ? SwipeDirection.Left : SwipeDirection.Right;
 
-            if (Mathf.Abs(delta.x) < Mathf.Abs(delta.y))
-                return;
-
-            SwipeDirection direction = delta.x < 0f ? SwipeDirection.Left : SwipeDirection.Right;
-            _swiped?.Invoke(_item, direction);
+            _listener?.OnSwipeEnded(_item, direction);
         }
 
         private void OnDisable()
         {
-            ResetGesture();
+            CancelGesture();
         }
 
-        private void ResetGesture()
+        /// <summary>Ends a gesture in progress without an answer, so the card can settle back.</summary>
+        private void CancelGesture()
         {
+            bool wasDragging = _isDragging;
             _isDragging = false;
             _pointerId = int.MinValue;
+            if (wasDragging)
+                _listener?.OnSwipeEnded(_item, null);
         }
     }
 }

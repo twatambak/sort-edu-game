@@ -50,5 +50,8 @@ namespace OndeVai.Gameplay
 
         /// <summary>True while input is allowed (not paused, not game over).</summary>
         public Func<bool> CanAcceptInput;
+
+        /// <summary>Returns the storage that represents a category, or null.</summary>
+        public Func<ItemGroup, SortingSource> FindStorage;
     }
 }

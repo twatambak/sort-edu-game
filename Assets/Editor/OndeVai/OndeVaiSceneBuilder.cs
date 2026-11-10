@@ -27,6 +27,10 @@ namespace OndeVai.EditorTools
         private const string HomeButtonName = "Home_Button";
         private const string ScreenPrefabFolder = "Assets/Prefabs/UI";
         private const int CanvasSortingOrder = 1000;
+        private const string RebuildWarning =
+            "The app UI already exists. Rebuild it?\n\n" +
+            "The scene may be using a hand-edited AppUI. Rebuilding replaces it with the generated layout, " +
+            "and every manual change to AppUI, its HUD and its results screen will be lost.";
 
         [MenuItem(MenuRoot + "Build App UI", priority = 0)]
         public static void BuildAppUI()
@@ -45,7 +49,7 @@ namespace OndeVai.EditorTools
                 legacyTitleScreen = null;
 
             if ((existingUI != null || existingSystems != null) &&
-                !EditorUtility.DisplayDialog("Onde Vai", "The app UI already exists. Rebuild it? Manual changes to the generated objects will be lost.", "Rebuild", "Cancel"))
+                !EditorUtility.DisplayDialog("Onde Vai", RebuildWarning, "Rebuild", "Cancel"))
                 return;
 
             Undo.IncrementCurrentGroup();
@@ -63,7 +67,7 @@ namespace OndeVai.EditorTools
 
             Canvas canvas = CreateCanvas();
             BuiltScreens screens = BuildScreens(kit, canvas.transform, controller.Definition);
-            GameStatusScreen statusScreen = Object.FindFirstObjectByType<GameStatusScreen>(FindObjectsInactive.Include);
+            GameEndScreen statusScreen = Object.FindFirstObjectByType<GameEndScreen>(FindObjectsInactive.Include);
             BuildFlow(canvas, screens, statusScreen);
             Undo.RegisterCreatedObjectUndo(canvas.gameObject, "Create App UI");
 
@@ -130,7 +134,7 @@ namespace OndeVai.EditorTools
             return canvas;
         }
 
-        private static void BuildFlow(Canvas canvas, BuiltScreens screens, GameStatusScreen statusScreen)
+        private static void BuildFlow(Canvas canvas, BuiltScreens screens, GameEndScreen statusScreen)
         {
             GameFlowController flow = canvas.gameObject.AddComponent<GameFlowController>();
             UIBuilderKit.Wire(flow, "_disclaimerScreen", screens.Disclaimer);
@@ -241,19 +245,20 @@ namespace OndeVai.EditorTools
             serialized.FindProperty("_questionPoint").objectReferenceValue = questionPoint;
             if (storages.Count >= 2)
             {
-                serialized.FindProperty("_storageA").objectReferenceValue = storages[0];
-                serialized.FindProperty("_storageB").objectReferenceValue = storages[storages.Count - 1];
+                // Group A is swiped right, so its storage is the one on the right side of the screen.
+                serialized.FindProperty("_sortingSourceA").objectReferenceValue = storages[storages.Count - 1];
+                serialized.FindProperty("_sortingSourceB").objectReferenceValue = storages[0];
             }
             else
             {
-                Debug.LogWarning("Expected two storages in the scene. Scenario switching is disabled until _storageA and _storageB are assigned on the GameController.", controller);
+                Debug.LogWarning("Expected two storages in the scene. Scenario switching is disabled until _sortingSourceA and _sortingSourceB are assigned on the GameController.", controller);
             }
 
             serialized.ApplyModifiedProperties();
         }
 
         /// <summary>Duplicates the play again button of the results screen into a home button.</summary>
-        private static void AddHomeButton(GameStatusScreen statusScreen)
+        private static void AddHomeButton(GameEndScreen statusScreen)
         {
             Button playAgain = null;
             foreach (Button button in statusScreen.GetComponentsInChildren<Button>(true))
@@ -263,7 +268,7 @@ namespace OndeVai.EditorTools
 
                 for (int i = 0; i < button.onClick.GetPersistentEventCount(); i++)
                 {
-                    if (button.onClick.GetPersistentMethodName(i) == nameof(GameStatusScreen.PlayAgain))
+                    if (button.onClick.GetPersistentMethodName(i) == nameof(GameEndScreen.PlayAgain))
                         playAgain = button;
                 }
             }

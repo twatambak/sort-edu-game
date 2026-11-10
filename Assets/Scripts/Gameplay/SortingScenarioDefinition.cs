@@ -1,4 +1,3 @@
-using DG.Tweening;
 using UnityEngine;
 
 namespace OndeVai.Gameplay
@@ -23,12 +22,6 @@ namespace OndeVai.Gameplay
         [Tooltip("Second category. Left swipe in two-direction swipe mode.")]
         [SerializeField] private ItemTypeDefinition _typeB;
 
-        private Collider2D _collider;
-        private Vector3 _restScale;
-        private Color _restColor = Color.white;
-        private Color _initialRestColor = Color.white;
-        private Tween _highlightTween;
-        
         private static SortingScenarioDefinition _default;
 
         public string Id => string.IsNullOrEmpty(_id) ? name : _id;

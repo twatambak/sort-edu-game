@@ -52,14 +52,19 @@ public sealed class GameHistoryDatabase : IDisposable
 
     /// <summary>
     /// Saves a match and its attempts atomically. Attempts receive the new session id.
+    /// When <paramref name="replaceSessionId"/> is set, that earlier save of the same match
+    /// (a checkpoint) is removed in the same transaction.
     /// </summary>
-    public int SaveCompletedGame(GameSessionRecord session, IReadOnlyList<ItemAttemptRecord> attempts)
+    public int SaveCompletedGame(GameSessionRecord session, IReadOnlyList<ItemAttemptRecord> attempts, int replaceSessionId = 0)
     {
         if (session == null)
             throw new ArgumentNullException(nameof(session));
 
         _connection.RunInTransaction(() =>
         {
+            if (replaceSessionId > 0)
+                DeleteSessionInternal(replaceSessionId);
+
             _connection.Insert(session);
             if (attempts == null)
                 return;
@@ -154,6 +159,26 @@ public sealed class GameHistoryDatabase : IDisposable
     public void DeleteChildHistory(int id)
     {
         _connection.RunInTransaction(() => DeleteChildHistoryInternal(id));
+    }
+
+    /// <summary>Match count, totals and last play date of one child, computed by the database.</summary>
+    public ChildQuickStats GetQuickStats(int childProfileId)
+    {
+        List<ChildQuickStats> rows = _connection.Query<ChildQuickStats>(
+            $"SELECT COUNT(*) AS {nameof(ChildQuickStats.GamesPlayed)}, " +
+            $"COALESCE(SUM({nameof(GameSessionRecord.Score)}), 0) AS {nameof(ChildQuickStats.TotalCorrect)}, " +
+            $"COALESCE(SUM({nameof(GameSessionRecord.Errors)}), 0) AS {nameof(ChildQuickStats.TotalErrors)}, " +
+            $"COALESCE(MAX({nameof(GameSessionRecord.FinishedAtUtcTicks)}), 0) AS {nameof(ChildQuickStats.LastPlayedUtcTicks)} " +
+            $"FROM {nameof(GameSessionRecord)} WHERE {nameof(GameSessionRecord.ChildProfileId)} = ?",
+            childProfileId);
+
+        return rows.Count > 0 ? rows[0] : new ChildQuickStats();
+    }
+
+    private void DeleteSessionInternal(int sessionId)
+    {
+        _connection.Execute($"DELETE FROM {nameof(ItemAttemptRecord)} WHERE {nameof(ItemAttemptRecord.SessionId)} = ?", sessionId);
+        _connection.Delete<GameSessionRecord>(sessionId);
     }
 
     private void DeleteChildHistoryInternal(int id)

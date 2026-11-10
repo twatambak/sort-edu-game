@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using DG.Tweening;
 using OndeVai.Data;
 using TMPro;
 using UnityEngine;
@@ -14,6 +15,8 @@ namespace OndeVai.UI
     {
         private const int MinSelectableAge = 2;
         private const int MaxSelectableAge = 8;
+        private const float RowEntranceDuration = 0.25f;
+        private const float RowEntranceStagger = 0.05f;
 
         [Header("List")]
         [SerializeField] private RectTransform _listContent;
@@ -92,12 +95,27 @@ namespace OndeVai.UI
             {
                 bool used = i < profiles.Count;
                 _rows[i].gameObject.SetActive(used);
-                if (used)
-                    _rows[i].Bind(profiles[i], profiles[i].Id == activeId, SelectProfile, OpenForm);
+                if (!used)
+                    continue;
+
+                ChildProfileRecord profile = profiles[i];
+                _rows[i].Bind(profile, data.GetQuickStats(profile.Id), profile.Id == activeId, SelectProfile, OpenForm);
+                PlayRowEntrance(_rows[i].transform, i);
             }
 
             if (_emptyListMessage != null)
                 _emptyListMessage.SetActive(profiles.Count == 0);
+        }
+
+        private static void PlayRowEntrance(Transform row, int index)
+        {
+            row.DOKill();
+            row.localScale = new Vector3(1f, 0f, 1f);
+            row.DOScaleY(1f, RowEntranceDuration)
+                .SetDelay(index * RowEntranceStagger)
+                .SetEase(Ease.OutBack)
+                .SetUpdate(true)
+                .SetLink(row.gameObject);
         }
 
         private void EnsureRowCount(int count)

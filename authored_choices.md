@@ -129,7 +129,7 @@ Assumptions and judgement calls made during development. Review and revise as ne
 ## Swipe Two Directions
 
 - Swipe mode uses the scenario's Type A for Right and Type B for Left. The Type A panel is on the right and Type B is on the left.
-- Swipe gestures use a 70-pixel minimum, require a dominant horizontal direction, and ignore vertical gestures.
+- Swipe gestures require a dominant horizontal direction and ignore vertical gestures. The minimum distance was 70 pixels and is now 8% of the screen width (see "Polish pass").
 - Group imagery is constrained to a consistent maximum world size so large backgrounds or sprites cannot cover the card.
 - Every spawned card clears the previous answer lock; without that transition, later cards appear but reject input. Swipe input resets its pointer gesture on configuration or disable, and clears stale gestures on mismatched drag-end events.
 - Accepted cards fly out in the selected direction; incorrect cards recoil and return for another try. Existing score, error, audio, haptic and particle feedback remains shared.
@@ -141,3 +141,57 @@ Assumptions and judgement calls made during development. Review and revise as ne
 - Clearing progress removes that child's sessions and item attempts but retains the profile. Deleting the profile removes both the profile and its history and returns the active selection to guest mode.
 - The profile editor and progress screen keep their existing deletion controls; their failure paths display an error rather than implying success.
 - The generated `OptionsScreen.prefab` is refreshed from `OndeVaiSceneBuilder.Screens.cs` when rebuilding App UI.
+
+## Polish pass (2026-11-10)
+
+Unity was open and I could not enter Play mode, so nothing here was seen running. Both script assemblies were compiled outside Unity against the Unity 6000.3.16f1 assemblies with 0 errors. Scene and prefab files were not edited: every new visual is created from code, so the hand-edited `AppUI` prefab and the scene wiring stay as they are.
+
+### Visuals and feel
+
+- New visuals are generated at runtime (outline, arrows, shadow, tiles, stars) instead of being added to the scene or prefabs. If you prefer authored art, the generated objects are the places to replace: `HighlightFrame` under each sorting source, `SwipeHints`, `Shadow` under items.
+- The target outline uses `ItemTypeDefinition.Color` for the hover and swipe lean states. A category color close to its background image (e.g. green on the forest) will read weakly; adjust the color on the item type asset.
+- The outline draws at sorting order -1: above the category images (-3/-4) and below the swipe card slot (0) and the items (5).
+- Held items scale to 1.15 (unchanged) and now also get a drop shadow at 28% opacity, offset (0.1, -0.16) world units.
+- Swipe: the answer distance changed from a fixed 70 pixels to 8% of the screen width (86 px on a 1080 wide screen), so it feels the same on every resolution. The card follows up to 1.8 units sideways, 20% of the vertical movement, and tilts up to 14 degrees.
+- Swipe hint arrows sit 1.85 units to each side of the card and hide while the card is held.
+- The tutorial now also pulses the correct side panel in swipe mode. Before, only drag mode highlighted the target (and that highlight animated an inactive renderer, so it was never visible).
+- Streak fireworks play at 3 in a row and at every multiple of 5.
+- Idle nudge: one random waiting item hops after 6 seconds without interaction (`GameFeedbackEffects._idleNudgeSeconds`, 0 disables). Off during the tutorial, which has its own pointer.
+- Timer fill goes from its rest color to yellow at half time and to the warning color at zero. A tick sound plays in the last 5 seconds.
+- Wave items pop in 0.07 s apart.
+- Results screen: three stars are generated under the title because `_stars` is not wired in the prefab. Size 170, placed right after the title in its layout group. Score and errors count up over 0.6 s.
+- Title: cards pop in on open and punch when selected. Cards of unplayable scenarios are disabled.
+- Hold buttons wobble on a short tap so adults see that a hold is needed.
+
+### Behavior changes
+
+- Wrong drops no longer use an impulse proportional to the distance from the target center. That could launch an item fast enough to pass through the level walls and leave a wave impossible to finish. Items are now thrown at 9 units/s, always with a downward component.
+- Safety net: an item outside the camera view plus 1 unit returns to its spawn position (logged as a warning).
+- When several drop targets overlap the item, the one closest to its center wins. Before, the first one returned by physics won.
+- Delays between cards and waves now use game time. With unscaled time, a pause right after a correct swipe consumed the delay and the next card never appeared.
+- Restarting from the pause screen now saves the interrupted match as abandoned (it was discarded). Quitting the app does the same.
+- Going to the background saves a checkpoint of the running match, replaced by the next save of that match.
+- `ItemVariant.Tint` is now applied to the sprite. It was ignored; every variant asset currently has a white tint, so nothing changes visually.
+- The title highlights the scenario the next match will really use. Before, a saved scenario without content showed no highlight while the match silently used another one.
+
+### Data
+
+- New `GameSessionRecord` columns: `Stars`, `BestStreak`, `ActiveSeconds`, `PauseCount`, `TutorialErrors`, `AverageResponseSeconds`, `ChildAge`, `AppVersion`.
+- New `ItemAttemptRecord` columns: `AttemptIndex`, `RetryIndex`, `PickupCount`, `SecondsIntoMatch`, `OccurredAtUtcTicks`.
+- For rows saved before these columns existed, the progress screen computes stars from score and errors and uses `DurationSeconds` as play time. Best streak shows "-".
+- "Itens mais difíceis" lists up to 5 items with at least 2 attempts and 1 error, lowest accuracy first. Items are shown by picture because variant ids such as `toys-and-tools_0` are not readable.
+- The profile list shows age, match count and accuracy per child, from one aggregate query per row.
+
+### Code cleanup
+
+- Deleted `GameHUD.cs`. No scene or prefab referenced it; `GameTimer` and `ErrorCounter` replaced it. Removed its only callers' targets, `GameController.HandleCorrectStorage` and `HandleIncorrectStorage`, which bypassed attempt recording.
+- Removed unused members: `SortingSource.SetGameModeVisible`, leftover tween fields in `SortingScenarioDefinition`, `_knownStorages` in `GameController`.
+- Renamed `TitleScreen._FoodScenarioButton` to `_foodScenarioButton` with `FormerlySerializedAs`, so the prefab reference is kept.
+- `Tools > Onde Vai > Build App UI` wrote to `_storageA`/`_storageB`, which no longer exist, and threw. It now writes `_sortingSourceA` (rightmost) and `_sortingSourceB` (leftmost), matching the scene. The generator still does not produce the food card, the HUD timer or the current results screen; its confirmation dialog now says so.
+- `SortingGameGuide.md` described Question and Four-way modes that were removed; it now describes the current game.
+
+### Not done
+
+- No scene, prefab or art changes. No new audio assets.
+- The idle nudge and the swipe arrows have no setting to turn them off for a specific child.
+- No export of the history (CSV or similar). The data is stored for it.

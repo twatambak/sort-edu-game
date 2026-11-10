@@ -16,7 +16,7 @@ namespace OndeVai.UI
         [SerializeField] private OptionsScreen _optionsScreen;
         [SerializeField] private ProgressScreen _progressScreen;
         [SerializeField] private PauseScreen _pauseScreen;
-        [SerializeField] private GameStatusScreen _statusScreen;
+        [SerializeField] private GameEndScreen _statusScreen;
 
         [Tooltip("In-game HUD elements owned by the flow (e.g. the pause button). Shown only during matches.")]
         [SerializeField] private GameObject _gameplayHud;
@@ -197,6 +197,7 @@ namespace OndeVai.UI
         private void HandleGameEnded(GameSessionRecord record)
         {
             SetHudVisible(false);
+            _statusScreen.Show();
         }
 
         private void HandlePauseChanged(bool paused)

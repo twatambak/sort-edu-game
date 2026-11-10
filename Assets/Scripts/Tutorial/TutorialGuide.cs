@@ -6,7 +6,7 @@ namespace OndeVai.Tutorial
 {
     /// <summary>
     /// Shows a pointer that demonstrates the expected action for the first items of a match:
-    /// dragging the item to its storage in drag mode, or tapping the right storage in question mode.
+    /// dragging the item to its storage in drag mode, or swiping the card to the right side in swipe mode.
     /// Only enabled while the tutorial is active, so its Update costs nothing during normal play.
     /// </summary>
     public sealed class TutorialGuide : MonoBehaviour
@@ -138,12 +138,10 @@ namespace OndeVai.Tutorial
             if (_targetItem == null)
                 return;
 
-            if (IsSwipeMode(_gameController.Config.Mode))
-                return;
-
+            // The right target pulses in both modes: the storage in drag mode, the side panel in swipe mode.
             if (_gameController.TryGetStorageFor(_targetItem.ItemType, out _targetStorage))
                 _targetStorage.Presentation.SetHighlighted(true);
-            else
+            else if (!IsSwipeMode(_gameController.Config.Mode))
                 Debug.LogError($"Tutorial found no storage for group {_targetItem.ItemType}.", this);
         }
 

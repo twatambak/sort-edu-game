@@ -8,6 +8,7 @@
     <type fullname="GameSessionRecord" preserve="all" />
     <type fullname="OndeVai.Data.ChildProfileRecord" preserve="all" />
     <type fullname="OndeVai.Data.ItemAttemptRecord" preserve="all" />
+    <type fullname="OndeVai.Data.ChildQuickStats" preserve="all" />
   </assembly>
   <assembly fullname="Gilzoide.SqliteNet" preserve="all" />
 </linker>

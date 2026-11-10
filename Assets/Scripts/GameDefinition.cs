@@ -50,6 +50,26 @@ public class GameDefinition : ScriptableObject
         return type != null && type.TryPickVariant(avoid, out variant);
     }
 
+    /// <summary>Finds a scenario by id whether it is playable or not, e.g. to name old history rows. Returns null when unknown.</summary>
+    public SortingScenarioDefinition FindScenario(string scenarioId)
+    {
+        foreach (SortingScenarioDefinition scenario in _scenarios)
+        {
+            if (scenario != null && scenario.Id == scenarioId)
+                return scenario;
+        }
+
+        return null;
+    }
+
+    /// <summary>Sprite of an item variant, looked up by the id stored in the history database. Returns null when unknown.</summary>
+    public Sprite FindVariantSprite(ItemGroup group, string variantId)
+    {
+        ItemTypeDefinition type = GetItemType(group);
+        ItemVariant variant = type != null ? type.FindVariant(variantId) : null;
+        return variant?.Sprite;
+    }
+
     /// <summary>
     /// Finds a playable scenario by id. Falls back to the first playable scenario, then to the built-in default.
     /// </summary>
