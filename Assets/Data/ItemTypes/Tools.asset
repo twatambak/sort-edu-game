@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _group: 1
   _displayName: Ferramentas
+  _background: {fileID: 21300000, guid: 4c629d885ef14924e8a9065b4f009af0, type: 3}
   _icon: {fileID: 0}
   _color: {r: 0.33, g: 0.63, b: 1, a: 1}
   _scale: 0.3

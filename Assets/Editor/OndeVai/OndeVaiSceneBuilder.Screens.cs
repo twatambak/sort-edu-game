@@ -101,19 +101,6 @@ namespace OndeVai.EditorTools
             RectTransform safe = Kit.Stretch(Kit.Rect("SafeArea", hud));
             safe.gameObject.AddComponent<SafeAreaFitter>();
 
-            SwipeDirectionHints hints = hud.gameObject.AddComponent<SwipeDirectionHints>();
-            BuildSwipeHint(kit, safe, "LeftHint", "←", new Vector2(0f, 0.5f), new Vector2(125f, 0f), out TextMeshProUGUI leftHint);
-            BuildSwipeHint(kit, safe, "RightHint", "→", new Vector2(1f, 0.5f), new Vector2(-125f, 0f), out TextMeshProUGUI rightHint);
-            BuildSwipeHint(kit, safe, "UpHint", "↑", new Vector2(0.5f, 1f), new Vector2(0f, -260f), out TextMeshProUGUI upHint);
-            BuildSwipeHint(kit, safe, "DownHint", "↓", new Vector2(0.5f, 0f), new Vector2(0f, 220f), out TextMeshProUGUI downHint);
-            Kit.Wire(hints, "_leftRoot", leftHint.transform.parent.gameObject);
-            Kit.Wire(hints, "_rightRoot", rightHint.transform.parent.gameObject);
-            Kit.Wire(hints, "_upRoot", upHint.transform.parent.gameObject);
-            Kit.Wire(hints, "_downRoot", downHint.transform.parent.gameObject);
-            Kit.Wire(hints, "_leftLabel", leftHint);
-            Kit.Wire(hints, "_rightLabel", rightHint);
-            Kit.Wire(hints, "_upLabel", upHint);
-            Kit.Wire(hints, "_downLabel", downHint);
 
             pauseButton = kit.Button("PauseButton", safe, new Vector2(130f, 130f), new Color(1f, 1f, 1f, 0.85f), IconLibrary.Get("icon_pause"), circle: true);
             Kit.Place((RectTransform)pauseButton.transform, new Vector2(1f, 1f), new Vector2(-30f, -30f), new Vector2(130f, 130f));

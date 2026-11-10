@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _group: 5
   _displayName: "Comidas n\xE3o saud\xE1veis"
-  _background: {fileID: 0}
+  _background: {fileID: 21300000, guid: 85d3d52f7a490404fa06065144cbb671, type: 3}
   _icon: {fileID: 0}
   _color: {r: 0.95, g: 0.5, b: 0.35, a: 1}
   _scale: 0.3

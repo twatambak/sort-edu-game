@@ -18,22 +18,22 @@ namespace OndeVai.UI
         private const string AnimalsScenarioId = "farm-jungle-animals";
         private const string LettersNumbersScenarioId = "letters-numbers";
         private const string ToysToolsScenarioId = "toys-tools";
+        private const string FoodScenarioId = "foods";
+
 
         [SerializeField] private Button _playButton;
         [SerializeField] private Button _dragModeButton;
-        [SerializeField] private Button _questionModeButton;
         [SerializeField] private Button _swipeModeButton;
-        [SerializeField] private Button _fourWaySwipeModeButton;
         [SerializeField] private Button _animalsScenarioButton;
         [SerializeField] private Button _lettersNumbersScenarioButton;
         [SerializeField] private Button _toysToolsScenarioButton;
+        [SerializeField] private Button _FoodScenarioButton;
         [SerializeField] private Image _dragModeHighlight;
-        [SerializeField] private Image _questionModeHighlight;
         [SerializeField] private Image _swipeModeHighlight;
-        [SerializeField] private Image _fourWaySwipeModeHighlight;
         [SerializeField] private Image _animalsScenarioHighlight;
         [SerializeField] private Image _lettersNumbersScenarioHighlight;
         [SerializeField] private Image _toysToolsScenarioHighlight;
+        [SerializeField] private Image _foodScenarioHighlight;
         [SerializeField] private Button _profileButton;
         [SerializeField] private AvatarBadge _profileBadge;
         [SerializeField] private HoldToConfirmButton _optionsButton;
@@ -55,13 +55,13 @@ namespace OndeVai.UI
         protected override void Awake()
         {
             base.Awake();
-            HideUnsupportedModeButtons();
             Bind(_playButton, () => PlayRequested?.Invoke());
             Bind(_dragModeButton, () => SelectMode(GameMode.DragAndDrop));
             Bind(_swipeModeButton, () => SelectMode(GameMode.SwipeTwoDirections));
             Bind(_animalsScenarioButton, () => SelectScenario(AnimalsScenarioId));
             Bind(_lettersNumbersScenarioButton, () => SelectScenario(LettersNumbersScenarioId));
             Bind(_toysToolsScenarioButton, () => SelectScenario(ToysToolsScenarioId));
+            Bind(_FoodScenarioButton, () => SelectScenario(FoodScenarioId));
             Bind(_profileButton, () => ProfilesRequested?.Invoke());
             Bind(_optionsButton, () => OptionsRequested?.Invoke());
             Bind(_progressButton, () => ProgressRequested?.Invoke());
@@ -97,6 +97,8 @@ namespace OndeVai.UI
             SetHighlight(_animalsScenarioHighlight, settings.ScenarioId == AnimalsScenarioId);
             SetHighlight(_lettersNumbersScenarioHighlight, settings.ScenarioId == LettersNumbersScenarioId);
             SetHighlight(_toysToolsScenarioHighlight, settings.ScenarioId == ToysToolsScenarioId);
+            SetHighlight(_foodScenarioHighlight, settings.ScenarioId == FoodScenarioId);
+
         }
 
         private void SelectMode(GameMode mode)
@@ -144,20 +146,6 @@ namespace OndeVai.UI
                 settings.ScenarioId = scenarioId;
             });
             Refresh();
-        }
-
-        private void HideUnsupportedModeButtons()
-        {
-            SetActive(_questionModeButton, false);
-            SetActive(_questionModeHighlight, false);
-            SetActive(_fourWaySwipeModeButton, false);
-            SetActive(_fourWaySwipeModeHighlight, false);
-        }
-
-        private static void SetActive(Component component, bool active)
-        {
-            if (component != null && component.gameObject.activeSelf != active)
-                component.gameObject.SetActive(active);
         }
 
         private void StartIdleAnimations()
