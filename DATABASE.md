@@ -100,10 +100,13 @@ this database.
 ## Simulated profile history
 
 When **Simular histórico em novos perfis** is enabled in Options, every newly
-created profile receives six imperfect matches on unique dates spanning the
-previous fourteen days through today. Scores improve over those matches, and
-each includes realistic attempt records and play duration. The profile,
-matches and attempts are committed in a single transaction. The
-`OptionsScreen` inspector option **Show Simulated History Option** controls
-whether this preference appears in the Options screen; hiding it does not
-disable a previously saved preference.
+created profile receives a random number of one to ten imperfect matches on
+unique dates spanning the previous fourteen days through today. Gameplay is
+scheduled between 9:00 and 20:00 local time, with the entire match kept inside
+that window. Results improve over the rounds. Scenarios are drawn from
+definitions in the content catalog and game modes vary between drag and swipe
+when there is more than one match. Each match includes
+realistic attempt records and play duration. The profile, matches and attempts
+are committed in a single transaction. The `OptionsScreen` inspector option
+**Show Simulated History Option** controls whether this preference appears in
+Options; hiding it does not disable a previously saved preference.

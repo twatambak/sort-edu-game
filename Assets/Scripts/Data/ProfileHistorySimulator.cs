@@ -19,20 +19,16 @@ namespace OndeVai.Data
         }
     }
 
-    /// <summary>Builds a short, improving but imperfect play history for a new profile.</summary>
+    /// <summary>Builds an improving, imperfect play history for a new profile.</summary>
     public static class ProfileHistorySimulator
     {
-        private static readonly RoundResult[] Results =
+        private static readonly GameMode[] Modes =
         {
-            new(3, 4, 4, 6, GameSessionRecord.ReasonErrorLimit),
-            new(4, 3, 3, 7, GameSessionRecord.ReasonErrorLimit),
-            new(5, 3, 4, 8, GameSessionRecord.ReasonTimeExpired),
-            new(7, 2, 3, 7, GameSessionRecord.ReasonItemsCollected),
-            new(8, 2, 3, 8, GameSessionRecord.ReasonItemsCollected),
-            new(9, 1, 2, 9, GameSessionRecord.ReasonItemsCollected)
+            GameMode.DragAndDrop,
+            GameMode.SwipeTwoDirections
         };
 
-        /// <summary>Creates six matches with unique play dates spanning the last fourteen days.</summary>
+        /// <summary>Creates one to ten matches using configured scenarios and supported game modes.</summary>
         public static List<SimulatedMatchData> Generate(
             GameDefinition definition,
             GameConfiguration configuration,
@@ -47,48 +43,158 @@ namespace OndeVai.Data
             DateTime utcNow = nowUtc.Kind == DateTimeKind.Local
                 ? nowUtc.ToUniversalTime()
                 : DateTime.SpecifyKind(nowUtc, DateTimeKind.Utc);
-            List<int> daysAgo = CreatePlayDates(random);
-            List<SimulatedMatchData> matches = new(Results.Length);
+            DateTime localNow = utcNow.ToLocalTime();
+            int gameCount = random.Next(1, 11);
+            List<RoundResult> results = CreateResults(gameCount, configuration, random);
             int matchTime = Math.Max(15, configuration.MatchTime);
-
-            for (int i = 0; i < Results.Length; i++)
+            bool includeToday = localNow >= localNow.Date.AddHours(9).AddSeconds(matchTime + 20);
+            List<int> daysAgo = CreatePlayDates(gameCount, includeToday, random);
+            List<SortingScenarioDefinition> availableScenarios = new();
+            if (definition != null)
             {
-                DateTime finishedAt = CreateFinishTime(utcNow, daysAgo[i], random);
-                matches.Add(CreateMatch(definition, configuration, Results[i], finishedAt, matchTime, random));
+                foreach (SortingScenarioDefinition scenario in definition.Scenarios)
+                {
+                    if (scenario != null)
+                        availableScenarios.Add(scenario);
+                }
+            }
+
+            if (availableScenarios.Count == 0)
+                availableScenarios.Add(SortingScenarioDefinition.Default);
+
+            List<SortingScenarioDefinition> scenarioSequence = CreateSequence(availableScenarios, gameCount, random);
+            List<GameMode> modeSequence = CreateSequence(Modes, gameCount, random);
+            List<SimulatedMatchData> matches = new(gameCount);
+
+            for (int i = 0; i < gameCount; i++)
+            {
+                SortingScenarioDefinition scenario = scenarioSequence[i];
+                GameConfiguration matchConfiguration = CreateMatchConfiguration(configuration, scenario, modeSequence[i]);
+                DateTime localDay = localNow.Date.AddDays(-daysAgo[i]);
+                matches.Add(CreateMatch(definition, matchConfiguration, results[i], localDay, localNow, matchTime, random));
             }
 
             return matches;
         }
 
-        private static List<int> CreatePlayDates(Random random)
+        private static List<RoundResult> CreateResults(int gameCount, GameConfiguration configuration, Random random)
         {
-            List<int> dates = new() { 14, 0 };
-            while (dates.Count < Results.Length)
+            List<RoundResult> results = new(gameCount);
+            int singleGameScore = random.Next(2, 5);
+            int singleGameErrors = random.Next(3, 6);
+
+            for (int i = 0; i < gameCount; i++)
             {
-                int candidate = random.Next(1, 14);
-                if (!dates.Contains(candidate))
-                    dates.Add(candidate);
+                double progress = gameCount > 1 ? (double)i / (gameCount - 1) : 0;
+                int score = gameCount > 1 ? 2 + i : singleGameScore;
+                int errors = gameCount > 1
+                    ? Math.Max(1, 5 - (int)Math.Round(progress * 4))
+                    : singleGameErrors;
+                bool won = gameCount >= 3 && i >= gameCount - 2;
+                bool reachedErrorLimit = i == 0 && !won;
+                string finishReason = won
+                    ? GameSessionRecord.ReasonItemsCollected
+                    : reachedErrorLimit
+                        ? GameSessionRecord.ReasonErrorLimit
+                        : GameSessionRecord.ReasonTimeExpired;
+                int errorLimit = reachedErrorLimit
+                    ? errors
+                    : Math.Max(errors + 1, configuration.ErrorLimit);
+                int itemsToWin = won ? score : Math.Max(score + 1, configuration.ItemsToWin);
+
+                results.Add(new RoundResult(score, errors, errorLimit, itemsToWin, finishReason));
             }
 
+            return results;
+        }
+
+        private static GameConfiguration CreateMatchConfiguration(
+            GameConfiguration source,
+            SortingScenarioDefinition scenario,
+            GameMode mode)
+        {
+            return new GameConfiguration(
+                source.MatchTime,
+                source.ErrorLimit,
+                source.MaxItemsOnScreen,
+                source.ItemsToWin,
+                source.DelayBetweenSpawns,
+                scenario.GroupA,
+                scenario.GroupB)
+            {
+                Mode = mode,
+                ScenarioId = scenario.Id,
+                TutorialItemCount = source.TutorialItemCount
+            };
+        }
+
+        private static List<int> CreatePlayDates(int count, bool includeToday, Random random)
+        {
+            List<int> availableDates = new(includeToday ? 15 : 14);
+            for (int daysAgo = 1; daysAgo <= 14; daysAgo++)
+                availableDates.Add(daysAgo);
+            if (includeToday)
+                availableDates.Add(0);
+
+            Shuffle(availableDates, random);
+            List<int> dates = availableDates.GetRange(0, count);
             dates.Sort((left, right) => right.CompareTo(left));
             return dates;
         }
 
-        private static DateTime CreateFinishTime(DateTime utcNow, int daysAgo, Random random)
+        private static List<T> CreateSequence<T>(IReadOnlyList<T> options, int count, Random random)
         {
-            DateTime day = utcNow.Date.AddDays(-daysAgo);
-            int latestSecond = daysAgo == 0
-                ? (int)(utcNow - day).TotalSeconds
-                : 86399;
-            int seconds = random.Next(0, Math.Max(0, latestSecond) + 1);
-            return day.AddSeconds(seconds);
+            if (options == null || options.Count == 0)
+                throw new ArgumentException("At least one option is required.", nameof(options));
+
+            List<T> sequence = new(count);
+            while (sequence.Count < count)
+            {
+                List<T> cycle = new(options);
+                Shuffle(cycle, random);
+
+                if (sequence.Count > 0 && cycle.Count > 1 &&
+                    EqualityComparer<T>.Default.Equals(cycle[0], sequence[sequence.Count - 1]))
+                {
+                    for (int i = 1; i < cycle.Count; i++)
+                    {
+                        if (EqualityComparer<T>.Default.Equals(cycle[i], sequence[sequence.Count - 1]))
+                            continue;
+
+                        (cycle[0], cycle[i]) = (cycle[i], cycle[0]);
+                        break;
+                    }
+                }
+
+                int remaining = count - sequence.Count;
+                int cycleCount = Math.Min(remaining, cycle.Count);
+                for (int i = 0; i < cycleCount; i++)
+                    sequence.Add(cycle[i]);
+            }
+
+            return sequence;
+        }
+
+        private static DateTime CreateFinishTime(DateTime localDay, DateTime localNow, double durationSeconds, Random random)
+        {
+            DateTime earliestFinish = localDay.AddHours(9).AddSeconds(durationSeconds);
+            DateTime latestFinish = localDay.AddHours(20);
+            if (localDay.Date == localNow.Date && localNow < latestFinish)
+                latestFinish = localNow;
+
+            int availableSeconds = (int)(latestFinish - earliestFinish).TotalSeconds;
+            if (availableSeconds < 0)
+                throw new InvalidOperationException("The simulated gameplay does not fit within the allowed daily time window.");
+
+            return earliestFinish.AddSeconds(random.Next(availableSeconds + 1));
         }
 
         private static SimulatedMatchData CreateMatch(
             GameDefinition definition,
             GameConfiguration configuration,
             RoundResult result,
-            DateTime finishedAt,
+            DateTime localDay,
+            DateTime localNow,
             int matchTime,
             Random random)
         {
@@ -100,6 +206,8 @@ namespace OndeVai.Data
                 ? matchTime
                 : Math.Max(5, Math.Round(matchTime * RandomRange(random, 0.4f, 0.8f)));
             double durationSeconds = activeSeconds + pauseSeconds;
+            DateTime finishedAtLocal = CreateFinishTime(localDay, localNow, durationSeconds, random);
+            DateTime finishedAt = finishedAtLocal.ToUniversalTime();
             DateTime startedAt = finishedAt.AddSeconds(-durationSeconds);
 
             List<ItemAttemptRecord> attempts = BuildAttempts(plans, startedAt, activeSeconds, out int bestStreak, out float averageResponse);
