@@ -197,7 +197,13 @@ namespace OndeVai.UI
         private void HandleGameEnded(GameSessionRecord record)
         {
             SetHudVisible(false);
-            _statusScreen.Show();
+            if (_statusScreen == null)
+            {
+                Debug.LogError("GameFlowController could not show the results because no GameEndScreen is assigned.", this);
+                return;
+            }
+
+            _statusScreen.ShowResult(record, _gameController.ScoreCount, _gameController.ErrorCount);
         }
 
         private void HandlePauseChanged(bool paused)

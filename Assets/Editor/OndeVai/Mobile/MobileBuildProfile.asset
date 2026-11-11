@@ -15,7 +15,7 @@ MonoBehaviour:
   ProductName: Onde Vai?
   CompanyName: TLW
   BundleIdentifier: com.tlw.ondevai
-  Version: 0.7.5
+  Version: 0.7.6
   BuildNumber: 1
   AppIcon: {fileID: 0}
   PortraitOnly: 1

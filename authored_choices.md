@@ -21,6 +21,7 @@ Assumptions and judgement calls made during development. Review and revise as ne
 - The existing pre-sliced icon sheet `Assets/Sprites/sheet_white1x.png` is mapped to semantic names in `IconLibrary.cs`. The unavailable `sheet_white2x.png` path is not imported or modified.
 - Drag mode uses the diagonal arrow icon. Replace it when final art exists.
 - The results screen gets a home button by duplicating `PlayAgain_Button`, hiding its label and adding a home icon. If the duplicate overlaps something, move it by hand.
+- The results screen remains inactive until a match ends, so `GameFlowController` passes the end-of-match result to it directly instead of relying on the screen's `Start` subscription, which would miss the first end event. Live score/error totals are shown if saving the history record fails.
 - The new canvas uses sorting order 1000, above the existing results canvas (999). The pause button sits in the top-right corner and may overlap the existing HUD; I could not see the HUD layout.
 - Title logo text "Onde Vai?" uses LondrinaSolid. I dropped the TMP outline because changing it in edit mode would also change the shared font material.
 - `SafeAreaFitter` keeps screen content clear of notches.

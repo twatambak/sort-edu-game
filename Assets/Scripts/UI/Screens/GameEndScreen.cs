@@ -22,25 +22,11 @@ public class GameEndScreen : UIScreen
     [Tooltip("Optional star images, filled from left to right according to accuracy. A row of stars is generated under the title when empty.")]
     [SerializeField] private Image[] _stars;
 
-    private GameController _gameController;
     private Tween _scoreTween;
     private Tween _errorTween;
 
     /// <summary>Raised when the player asks to go back to the title screen.</summary>
     public event Action HomeRequested;
-
-    private void Start()
-    {
-        _gameController = GameController.Instance;
-        if (_gameController == null)
-        {
-            Debug.LogError("GameStatusScreen could not find the GameController.", this);
-            return;
-        }
-
-        _gameController.OnGameEnded += ShowResult;
-        _gameController.OnGameStarted += HandleGameStarted;
-    }
 
     public void PlayAgain()
     {
@@ -55,20 +41,21 @@ public class GameEndScreen : UIScreen
         HomeRequested?.Invoke();
     }
 
-    private void HandleGameStarted(GameConfiguration config)
+    /// <summary>Displays the finished match, using live totals if its history record could not be saved.</summary>
+    public void ShowResult(GameSessionRecord record, int score, int errors)
     {
-        Hide();
-    }
+        if (record == null)
+            Debug.LogError("GameEndScreen is showing live results because the match history record could not be saved.", this);
 
-    private void ShowResult(GameSessionRecord record)
-    {
         Show();
         _scoreTween?.Kill();
         _errorTween?.Kill();
-        _scoreTween = CountUp(_scoreText, record.Score);
-        _errorTween = CountUp(_errorText, record.Errors);
+        int displayedScore = record != null ? record.Score : score;
+        int displayedErrors = record != null ? record.Errors : errors;
+        _scoreTween = CountUp(_scoreText, displayedScore);
+        _errorTween = CountUp(_errorText, displayedErrors);
 
-        ShowStars(CalculateStars(_gameController.ScoreCount, _gameController.ErrorCount));
+        ShowStars(CalculateStars(displayedScore, displayedErrors));
     }
 
     /// <summary>Three stars for no mistakes, fewer as the error ratio grows. At least one star when anything was sorted.</summary>
@@ -129,14 +116,5 @@ public class GameEndScreen : UIScreen
                 .SetUpdate(true)
                 .SetLink(star.gameObject);
         }
-    }
-
-    private void OnDestroy()
-    {
-        if (_gameController == null)
-            return;
-
-        _gameController.OnGameEnded -= ShowResult;
-        _gameController.OnGameStarted -= HandleGameStarted;
     }
 }
