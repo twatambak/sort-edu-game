@@ -12248,6 +12248,7 @@ MonoBehaviour:
   _formTitle: {fileID: 6725312263693624278}
   _nameInput: {fileID: 2762069872208589480}
   _ageSelector: {fileID: 785944455460504955}
+  _hideNameToggle: {fileID: 0}
   _avatarOptionsParent: {fileID: 6468767145712362692}
   _avatarOptionTemplate: {fileID: 8372317225968494799}
   _formPreview: {fileID: 1164731505597350976}
@@ -20892,6 +20893,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 349610536394556272, guid: 978908132bb456a4e827777d127c3332, type: 3}
       propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 390414193970154653, guid: 978908132bb456a4e827777d127c3332, type: 3}
+      propertyPath: _showSimulatedHistoryOption
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 396684533606027327, guid: 978908132bb456a4e827777d127c3332, type: 3}

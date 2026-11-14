@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using OndeVai.Gameplay;
 using OndeVai.Settings;
 using OndeVai.Data;
+using OndeVai.Platform;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -56,6 +59,9 @@ namespace OndeVai.UI
         [SerializeField] private TMP_Text _profileDataStatus;
         [SerializeField] private HoldToConfirmButton _clearProgressButton;
         [SerializeField] private HoldToConfirmButton _deleteProfileButton;
+        [SerializeField] private HoldToConfirmButton _deleteAllProfilesButton;
+        [SerializeField] private Button _exportCsvButton;
+        [SerializeField] private TMP_Text _csvExportStatus;
 
         private readonly List<SortingScenarioDefinition> _scenarios = new();
         private readonly List<string> _labels = new();
@@ -82,6 +88,14 @@ namespace OndeVai.UI
 
             if (_deleteProfileButton != null)
                 _deleteProfileButton.OnConfirmed.AddListener(DeleteActiveProfile);
+
+            EnsureDeleteAllProfilesButton();
+            if (_deleteAllProfilesButton != null)
+                _deleteAllProfilesButton.OnConfirmed.AddListener(DeleteAllProfiles);
+
+            EnsureExportCsvButton();
+            if (_exportCsvButton != null)
+                _exportCsvButton.onClick.AddListener(ExportSavedDataCsv);
 
             BindSlider(_musicSlider, value => Apply(s => s.MusicVolume = value, false));
             BindSlider(_sfxSlider, value => Apply(s => s.SfxVolume = value, false));
@@ -292,21 +306,162 @@ namespace OndeVai.UI
             SetProfileDataStatus("Perfil excluído. A próxima partida será sem cadastro.");
         }
 
+        private void DeleteAllProfiles()
+        {
+            GameDataService data = GameController.Instance != null ? GameController.Instance.Data : null;
+            if (data == null || !data.IsAvailable)
+            {
+                SetProfileDataStatus("Os dados deste aparelho não estão disponíveis.");
+                return;
+            }
+
+            if (!data.DeleteAllProfiles())
+            {
+                SetProfileDataStatus("Não foi possível excluir os perfis. Tente novamente.");
+                return;
+            }
+
+            RefreshProfileActions(data);
+            SetProfileDataStatus("Todos os perfis salvos e seus históricos foram excluídos.");
+        }
+
+        private void ExportSavedDataCsv()
+        {
+            GameDataService data = GameController.Instance != null ? GameController.Instance.Data : null;
+            if (data == null || !data.IsAvailable)
+            {
+                SetCsvExportStatus("Os dados deste aparelho não estão disponíveis.");
+                return;
+            }
+
+            string path = Path.Combine(Application.persistentDataPath, "ondevai-dados.csv");
+            try
+            {
+                Directory.CreateDirectory(Application.persistentDataPath);
+                using (StreamWriter writer = new(path, false, new UTF8Encoding(true)))
+                    data.WriteAllDataCsv(writer);
+
+                CsvExportShare.Share(path);
+                SetCsvExportStatus("CSV pronto para compartilhar. Nomes em sigilo foram mascarados.");
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception, this);
+                SetCsvExportStatus("Não foi possível exportar os dados. Tente novamente.");
+            }
+        }
+
+        private void EnsureExportCsvButton()
+        {
+            if (_exportCsvButton != null)
+                return;
+
+            if (_profileDataStatus == null || _profileDataStatus.transform.parent == null)
+            {
+                Debug.LogError("OptionsScreen could not create the CSV export action because the profile data area is missing.", this);
+                return;
+            }
+
+            Transform parent = _profileDataStatus.transform.parent;
+            int siblingIndex = Mathf.Max(0, _profileDataStatus.transform.GetSiblingIndex() - 1);
+            GameObject titleObject = new("ExportCsvTitle", typeof(RectTransform), typeof(CanvasRenderer), typeof(TextMeshProUGUI), typeof(LayoutElement));
+            titleObject.transform.SetParent(parent, false);
+            titleObject.transform.SetSiblingIndex(siblingIndex++);
+            TMP_Text title = titleObject.GetComponent<TMP_Text>();
+            title.font = _profileDataStatus.font;
+            title.fontSize = 46f;
+            title.color = _profileDataStatus.color;
+            title.text = "Exportar dados";
+            title.alignment = TextAlignmentOptions.MidlineLeft;
+            titleObject.GetComponent<LayoutElement>().preferredHeight = 75f;
+
+            GameObject buttonObject = new("ExportCsvButton", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button), typeof(LayoutElement));
+            buttonObject.transform.SetParent(parent, false);
+            buttonObject.transform.SetSiblingIndex(siblingIndex);
+            LayoutElement buttonLayout = buttonObject.GetComponent<LayoutElement>();
+            buttonLayout.preferredHeight = 120f;
+            buttonLayout.flexibleWidth = 1f;
+            Image background = buttonObject.GetComponent<Image>();
+            background.color = new Color(0.25f, 0.43f, 0.55f, 1f);
+            _exportCsvButton = buttonObject.GetComponent<Button>();
+            _exportCsvButton.targetGraphic = background;
+
+            GameObject labelObject = new("Label", typeof(RectTransform), typeof(CanvasRenderer), typeof(TextMeshProUGUI));
+            labelObject.transform.SetParent(buttonObject.transform, false);
+            RectTransform labelRect = (RectTransform)labelObject.transform;
+            labelRect.anchorMin = Vector2.zero;
+            labelRect.anchorMax = Vector2.one;
+            labelRect.offsetMin = new Vector2(28f, 8f);
+            labelRect.offsetMax = new Vector2(-28f, -8f);
+            TMP_Text label = labelObject.GetComponent<TMP_Text>();
+            label.font = _profileDataStatus.font;
+            label.fontSize = 34f;
+            label.color = Color.white;
+            label.text = "Exportar todos os dados (CSV)";
+            label.alignment = TextAlignmentOptions.Center;
+            label.enableAutoSizing = true;
+            label.fontSizeMin = 24f;
+            label.fontSizeMax = 34f;
+            label.raycastTarget = false;
+        }
+
+        private void SetCsvExportStatus(string message)
+        {
+            if (_csvExportStatus != null)
+                _csvExportStatus.text = message;
+            else
+                SetProfileDataStatus(message);
+        }
+
+        private void EnsureDeleteAllProfilesButton()
+        {
+            if (_deleteAllProfilesButton != null)
+                return;
+
+            if (_deleteProfileButton == null || _deleteProfileButton.transform.parent == null)
+            {
+                Debug.LogError("OptionsScreen could not create the delete-all-profiles action because the delete-profile button is missing.", this);
+                return;
+            }
+
+            _deleteAllProfilesButton = Instantiate(
+                _deleteProfileButton,
+                _deleteProfileButton.transform.parent,
+                false);
+            _deleteAllProfilesButton.name = "DeleteAllProfilesButton";
+            _deleteAllProfilesButton.transform.SetSiblingIndex(_deleteProfileButton.transform.GetSiblingIndex() + 1);
+
+            TMP_Text label = _deleteAllProfilesButton.GetComponentInChildren<TMP_Text>(true);
+            if (label == null)
+            {
+                Debug.LogError("OptionsScreen could not create the delete-all-profiles action because the button label is missing.", this);
+                _deleteAllProfilesButton.gameObject.SetActive(false);
+                _deleteAllProfilesButton = null;
+                return;
+            }
+
+            label.text = "Segure: apagar todos os perfis e históricos";
+        }
+
         private void RefreshProfileActions(GameDataService data)
         {
             bool canManageProfile = data != null && data.IsAvailable && data.ActiveChild != null;
+            bool hasSavedProfiles = data != null && data.IsAvailable && data.GetProfiles().Count > 0;
             if (_clearProgressButton != null)
                 _clearProgressButton.gameObject.SetActive(canManageProfile);
 
             if (_deleteProfileButton != null)
                 _deleteProfileButton.gameObject.SetActive(canManageProfile);
 
+            if (_deleteAllProfilesButton != null)
+                _deleteAllProfilesButton.gameObject.SetActive(hasSavedProfiles);
+
             if (data == null || !data.IsAvailable)
                 SetProfileDataStatus("Os dados deste aparelho não estão disponíveis.");
             else if (!canManageProfile)
-                SetProfileDataStatus("Selecione uma criança para gerenciar os dados do perfil.");
+                SetProfileDataStatus("Selecione uma criança para gerenciar o perfil. O botão final apaga todos os perfis.");
             else
-                SetProfileDataStatus("As ações abaixo afetam apenas o perfil ativo.");
+                SetProfileDataStatus("As ações de progresso afetam o perfil ativo; o botão final apaga todos os perfis.");
         }
 
         private void SetProfileDataStatus(string message)

@@ -51,7 +51,7 @@ namespace OndeVai.UI
                 _badge.Show(profile);
 
             if (_nameText != null)
-                _nameText.text = profile.Name;
+                _nameText.text = profile.DisplayName;
 
             if (_detailText != null)
                 _detailText.text = FormatDetail(profile, stats);
@@ -63,11 +63,12 @@ namespace OndeVai.UI
         private static string FormatDetail(ChildProfileRecord profile, ChildQuickStats stats)
         {
             string age = profile.Age == 1 ? "1 ano" : $"{profile.Age} anos";
+            string code = string.IsNullOrWhiteSpace(profile.UserCode) ? "Código indisponível" : $"Código: {profile.UserCode}";
             if (stats == null || stats.GamesPlayed == 0)
-                return $"{age} • ainda não jogou";
+                return $"{code} • {age} • ainda não jogou";
 
             string games = stats.GamesPlayed == 1 ? "1 partida" : $"{stats.GamesPlayed} partidas";
-            return $"{age} • {games} • {DisplayNames.Percent(stats.Accuracy)}";
+            return $"{code} • {age} • {games} • {DisplayNames.Percent(stats.Accuracy)}";
         }
     }
 }

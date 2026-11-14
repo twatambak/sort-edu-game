@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Globalization;
 using OndeVai.Data;
 using SQLite;
 using UnityEngine;
@@ -33,6 +34,7 @@ public sealed class GameHistoryDatabase : IDisposable
             // Rows saved before child profiles existed have NULL in the migrated column.
             connection.Execute($"UPDATE {nameof(GameSessionRecord)} SET {nameof(GameSessionRecord.ChildProfileId)} = 0 WHERE {nameof(GameSessionRecord.ChildProfileId)} IS NULL");
             _connection = connection;
+            EnsureProfileUserCodes();
         }
         catch
         {
@@ -91,6 +93,23 @@ public sealed class GameHistoryDatabase : IDisposable
             .ToList();
     }
 
+    /// <summary>Returns every saved match, oldest first, for a complete data export.</summary>
+    public List<GameSessionRecord> GetAllSessionsForExport()
+    {
+        return _connection.Table<GameSessionRecord>()
+            .OrderBy(session => session.StartedAtUtcTicks)
+            .ThenBy(session => session.Id)
+            .ToList();
+    }
+
+    /// <summary>Returns every saved attempt, in database order, for a complete data export.</summary>
+    public List<ItemAttemptRecord> GetAllAttemptsForExport()
+    {
+        return _connection.Table<ItemAttemptRecord>()
+            .OrderBy(attempt => attempt.Id)
+            .ToList();
+    }
+
     /// <summary>Newest matches of one child first.</summary>
     public List<GameSessionRecord> GetRecentSessionsForChild(int childProfileId, int limit = 50)
     {
@@ -139,6 +158,7 @@ public sealed class GameHistoryDatabase : IDisposable
         if (profile == null)
             throw new ArgumentNullException(nameof(profile));
 
+        EnsureUserCode(profile);
         if (profile.Id == 0)
             _connection.Insert(profile);
         else
@@ -157,6 +177,7 @@ public sealed class GameHistoryDatabase : IDisposable
 
         _connection.RunInTransaction(() =>
         {
+            EnsureUserCode(profile);
             _connection.Insert(profile);
             foreach (SimulatedMatchData match in matches)
             {
@@ -188,6 +209,21 @@ public sealed class GameHistoryDatabase : IDisposable
         });
     }
 
+    /// <summary>Deletes every saved child profile and its history, preserving guest match history.</summary>
+    public void DeleteAllChildProfiles()
+    {
+        _connection.RunInTransaction(() =>
+        {
+            _connection.Execute(
+                $"DELETE FROM {nameof(ItemAttemptRecord)} WHERE {nameof(ItemAttemptRecord.ChildProfileId)} IN " +
+                $"(SELECT {nameof(ChildProfileRecord.Id)} FROM {nameof(ChildProfileRecord)})");
+            _connection.Execute(
+                $"DELETE FROM {nameof(GameSessionRecord)} WHERE {nameof(GameSessionRecord.ChildProfileId)} IN " +
+                $"(SELECT {nameof(ChildProfileRecord.Id)} FROM {nameof(ChildProfileRecord)})");
+            _connection.DeleteAll<ChildProfileRecord>();
+        });
+    }
+
     /// <summary>Removes every match and attempt of the child but keeps the profile.</summary>
     public void DeleteChildHistory(int id)
     {
@@ -212,6 +248,63 @@ public sealed class GameHistoryDatabase : IDisposable
     {
         _connection.Execute($"DELETE FROM {nameof(ItemAttemptRecord)} WHERE {nameof(ItemAttemptRecord.SessionId)} = ?", sessionId);
         _connection.Delete<GameSessionRecord>(sessionId);
+    }
+
+    private void EnsureProfileUserCodes()
+    {
+        _connection.RunInTransaction(() =>
+        {
+            List<ChildProfileRecord> profiles = _connection.Table<ChildProfileRecord>()
+                .OrderBy(profile => profile.Id)
+                .ToList();
+            HashSet<string> usedCodes = new(StringComparer.OrdinalIgnoreCase);
+            System.Random random = new(unchecked((int)DateTime.UtcNow.Ticks));
+
+            foreach (ChildProfileRecord profile in profiles)
+            {
+                if (string.IsNullOrWhiteSpace(profile.UserCode) || !usedCodes.Add(profile.UserCode))
+                {
+                    profile.UserCode = GenerateUniqueUserCode(profile.Name, usedCodes, random);
+                    usedCodes.Add(profile.UserCode);
+                    _connection.Update(profile);
+                }
+            }
+        });
+    }
+
+    private void EnsureUserCode(ChildProfileRecord profile)
+    {
+        if (profile.Id != 0 && !string.IsNullOrWhiteSpace(profile.UserCode))
+            return;
+
+        List<ChildProfileRecord> profiles = _connection.Table<ChildProfileRecord>().ToList();
+        HashSet<string> usedCodes = new(
+            profiles
+                .Where(existing => existing.Id != profile.Id)
+                .Select(existing => existing.UserCode)
+                .Where(code => !string.IsNullOrWhiteSpace(code)),
+            StringComparer.OrdinalIgnoreCase);
+
+        if (string.IsNullOrWhiteSpace(profile.UserCode) || usedCodes.Contains(profile.UserCode))
+            profile.UserCode = GenerateUniqueUserCode(profile.Name, usedCodes, new System.Random());
+    }
+
+    private static string GenerateUniqueUserCode(string name, HashSet<string> usedCodes, System.Random random)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("A profile name is required to generate a user code.", nameof(name));
+
+        char initial = char.ToUpperInvariant(name.Trim()[0]);
+        int firstNumber = random.Next(0, 1000);
+        for (int i = 0; i < 1000; i++)
+        {
+            int number = (firstNumber + i) % 1000;
+            string code = initial + number.ToString("D3", CultureInfo.InvariantCulture);
+            if (!usedCodes.Contains(code))
+                return code;
+        }
+
+        throw new InvalidOperationException($"All three-digit user codes for initial '{initial}' are already in use.");
     }
 
     private void DeleteChildHistoryInternal(int id)

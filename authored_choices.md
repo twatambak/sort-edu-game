@@ -66,8 +66,14 @@ Assumptions and judgement calls made during development. Review and revise as ne
 - Ages offered are 2 to 8+. Names are trimmed, control characters are removed, and names are capped at 24 characters.
 - Settings and the disclaimer acceptance are stored in PlayerPrefs (JSON), not SQLite. They are device preferences, not child data.
 - I have not verified that SQLite data persists across reloads on WebGL (IndexedDB sync). This applied before my changes too.
-- When enabled in Options, creating any new profile adds one to ten simulated matches on distinct random dates from fourteen days ago through today. Match start and finish times are between 9:00 and 20:00 local time. Results improve over the rounds, with at least one error in every match; configured scenarios and both supported game modes are distributed across each profile's games when there are enough matches. Simulated history may include a configured scenario that is not currently playable.
+- When enabled in Options, creating any new profile adds five to twenty-five simulated matches. They are grouped into play sessions of up to five matches per day, with a randomized 30-second-to-two-minute break between matches. Session days are distinct random dates over the previous fourteen days through today, and each session is kept between 9:00 and 20:00 local time. Lower game counts use fewer sessions, increasing their play frequency. Results improve over rounds, with at least one error per match; configured scenarios and both supported game modes are distributed across the profile's matches. Simulated history may include a configured scenario that is not currently playable.
 - `OptionsScreen` has a serialized visibility boolean, enabled by default, that controls whether the simulated-history preference appears. Hiding the preference preserves its last saved value.
+- The Options screen can delete every saved profile after a hold confirmation. This also removes each profile's matches and attempts atomically, clears the active selection, and preserves guest history.
+- Child profiles now receive a stable unique code from their name's initial and three digits; old profiles are assigned codes at database initialization. The profile form can store a name-privacy choice, and UI lists and progress selectors mask each name while retaining its code.
+- Simulated score curves depend on age: ages 3–4 gain only occasional points and remain error-prone, ages 5–7 start low and improve faster, and ages 8+ keep the previous curve. The age-5 overlap is resolved in favor of the 5–7 rule.
+- Consecutive simulated matches now have randomized breaks of 30 seconds to 2 minutes.
+- CSV export uses one UTF-8 file with typed profile, session and attempt rows; session and profile IDs preserve their relationships. It includes guest play, masks names marked private, and omits app preferences. The file is shared through the platform UI on mobile and downloaded by WebGL.
+- The Android CSV-share library reads `compileSdk` from Unity's generated `unity.compileSdkVersion` Gradle property so it remains aligned with the selected Unity Android SDK.
 
 ## Scenarios
 
@@ -184,6 +190,14 @@ Unity was open and I could not enter Play mode, so nothing here was seen running
 - For rows saved before these columns existed, the progress screen computes stars from score and errors and uses `DurationSeconds` as play time. Best streak shows "-".
 - "Itens mais difíceis" lists up to 5 items with at least 2 attempts and 1 error, lowest accuracy first. Items are shown by picture because variant ids such as `toys-and-tools_0` are not readable.
 - The profile list shows age, match count and accuracy per child, from one aggregate query per row.
+
+## Build Assistant
+
+- The generic build tool lives under `Assets/Editor/BuildAssistant` and stores project configuration in an asset created on first open. Its presets cover Windows 64-bit, Linux 64-bit, macOS, Android, iOS and WebGL without depending on the OndeVai gameplay assemblies.
+- Each preset can refer to a native Unity 6 Build Profile and has an optional independent scene list. An empty list deliberately follows the active profile's scene override or the project's enabled Build Settings scenes.
+- A successful build records the draft changelog against the built version, then increments the configured semantic-version component and/or build number. Failed or cancelled builds do not advance either counter. New projects start at version 1.0.0/build 1; patch increment and both automatic counters are enabled by default.
+- For builds started through this tool, the asset's version and build number take precedence over `MobileBuildProfile` during Android/iOS preprocessing. The existing mobile profile continues to supply its other mobile settings.
+- Builds go into a platform-specific subfolder under the selected relative or absolute output directory. Android defaults to APK; iOS exports an Xcode project and remains subject to Unity's host-platform restrictions.
 
 ### Code cleanup
 

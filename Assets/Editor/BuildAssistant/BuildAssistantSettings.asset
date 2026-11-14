@@ -1,0 +1,68 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6cc105290e9345c6a216ccfa5704f645, type: 3}
+  m_Name: BuildAssistantSettings
+  m_EditorClassIdentifier: Assembly-CSharp-Editor::BuildAssistant.BuildAssistantSettings
+  ProductName: Onde Vai?
+  CompanyName: TLW
+  Version: 0.7.8
+  BuildNumber: 2
+  BuildOutputDirectory: C:\Users\twata\Meu Drive\Game Dev Archive\Back2Byte\Builds\OndeVai
+  AutoIncrementVersionOnBuild: 1
+  AutoIncrementBuildNumberOnBuild: 1
+  Increment: 0
+  ChangelogDraft: 
+  Changelog: []
+  DevelopmentBuild: 0
+  Presets:
+  - Name: Windows
+    Target: 0
+    UnityBuildProfile: {fileID: 0}
+    Scenes: []
+    Options: 262144
+    AndroidAppBundle: 0
+    Expanded: 0
+  - Name: Linux
+    Target: 1
+    UnityBuildProfile: {fileID: 0}
+    Scenes: []
+    Options: 262144
+    AndroidAppBundle: 0
+    Expanded: 0
+  - Name: macOS
+    Target: 2
+    UnityBuildProfile: {fileID: 0}
+    Scenes: []
+    Options: 262144
+    AndroidAppBundle: 0
+    Expanded: 0
+  - Name: Android APK
+    Target: 3
+    UnityBuildProfile: {fileID: 0}
+    Scenes: []
+    Options: 262144
+    AndroidAppBundle: 0
+    Expanded: 0
+  - Name: iOS Xcode
+    Target: 4
+    UnityBuildProfile: {fileID: 0}
+    Scenes: []
+    Options: 262144
+    AndroidAppBundle: 0
+    Expanded: 0
+  - Name: WebGL
+    Target: 5
+    UnityBuildProfile: {fileID: 0}
+    Scenes: []
+    Options: 262144
+    AndroidAppBundle: 0
+    Expanded: 0

@@ -123,7 +123,9 @@ namespace OndeVai.UI
             for (int i = 0; i < _children.Count; i++)
             {
                 ChildProfileRecord child = _children[i];
-                _childLabels.Add(child != null ? child.Name : "Sem cadastro");
+                _childLabels.Add(child != null
+                    ? $"{child.DisplayName} • {child.UserCode}"
+                    : "Sem cadastro");
                 if (child != null && data?.ActiveChild != null && child.Id == data.ActiveChild.Id)
                     selected = i;
             }

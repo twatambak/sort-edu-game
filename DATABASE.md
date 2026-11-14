@@ -8,7 +8,7 @@ launches, never synchronized and never sent anywhere.
 
 | Table | Content |
 |---|---|
-| `ChildProfileRecord` | Children registered on the device: name, age, avatar color, creation time. |
+| `ChildProfileRecord` | Children registered on the device: name, user code, name privacy, age, avatar color, creation time. |
 | `GameSessionRecord` | One row per match. |
 | `ItemAttemptRecord` | One row per sorting attempt. |
 
@@ -77,11 +77,17 @@ ChildProgressSummary summary = data.BuildSummary(childId); // full report
 List<GameSessionRecord> recent = data.GetRecentSessions(childId, 20);
 data.DeleteHistory(profile);   // keeps the profile
 data.DeleteProfile(profile);   // removes profile, matches and attempts
+data.DeleteAllProfiles();      // removes every profile and its history
 ```
 
 `ChildProgressSummary` holds accuracy per category, scenario, mode and item,
 total stars, best streak, days played and play time. `ProgressCalculator` builds
 it from raw rows and handles rows that predate the newer columns.
+
+The Options screen offers **Segure: apagar todos os perfis e históricos**.
+After a hold confirmation, this removes every saved profile and associated
+match/attempt history in one transaction, clears the active profile, and
+preserves guest matches that were not tied to a profile.
 
 The legacy helpers on `GameController` still work:
 
@@ -100,13 +106,31 @@ this database.
 ## Simulated profile history
 
 When **Simular histórico em novos perfis** is enabled in Options, every newly
-created profile receives a random number of one to ten imperfect matches on
-unique dates spanning the previous fourteen days through today. Gameplay is
-scheduled between 9:00 and 20:00 local time, with the entire match kept inside
-that window. Results improve over the rounds. Scenarios are drawn from
-definitions in the content catalog and game modes vary between drag and swipe
-when there is more than one match. Each match includes
+created profile receives a random number of five to twenty-five imperfect
+matches. Matches are grouped into play sessions of up to five games on the
+same day; consecutive matches start 30 seconds to two minutes after the previous one
+ends. Profiles with fewer games have fewer, more concentrated play sessions.
+Session dates span the previous fourteen days through today. Gameplay is
+scheduled between 9:00 and 20:00 local time, with each session kept inside that
+window. Results improve over the rounds. Scenarios are drawn from definitions
+in the content catalog and game modes vary between drag and swipe when there is
+more than one match. Each match includes
 realistic attempt records and play duration. The profile, matches and attempts
 are committed in a single transaction. The `OptionsScreen` inspector option
 **Show Simulated History Option** controls whether this preference appears in
 Options; hiding it does not disable a previously saved preference.
+
+Each child profile has a stable, unique code consisting of the first letter of
+the name and three random digits (for example `J923`). Existing profiles receive
+a code when the database opens. The profile form's **Manter nome em sigilo**
+option masks each name after its initials in profile lists and progress
+selectors, while always showing the user code.
+
+## CSV export
+
+Options can export all profiles, matches and attempts, including guest matches,
+as one UTF-8 CSV file. Rows are identified by `record_type` and related by their
+profile and session IDs. Names marked private remain masked in the export.
+Application preferences are not included. Android and iOS open the system share
+sheet, WebGL downloads the file in the browser, and other desktop targets open
+the generated file from `Application.persistentDataPath`.

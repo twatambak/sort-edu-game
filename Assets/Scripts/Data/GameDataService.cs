@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 namespace OndeVai.Data
@@ -53,6 +54,15 @@ namespace OndeVai.Data
         public List<ChildProfileRecord> GetProfiles()
         {
             return IsAvailable ? _database.GetChildProfiles() : new List<ChildProfileRecord>();
+        }
+
+        /// <summary>Writes all saved profiles, matches and attempts as one CSV document.</summary>
+        public void WriteAllDataCsv(TextWriter writer)
+        {
+            if (!IsAvailable)
+                throw new InvalidOperationException("The SQLite game history database is unavailable.");
+
+            GameDataCsvExporter.Write(_database, writer);
         }
 
         /// <summary>Creates or updates a profile. Returns false when the data is invalid or could not be stored.</summary>
@@ -109,6 +119,19 @@ namespace OndeVai.Data
                 return false;
 
             if (ActiveChild != null && ActiveChild.Id == profile.Id)
+                SetActiveChild(null);
+
+            ProfilesChanged?.Invoke();
+            return true;
+        }
+
+        /// <summary>Deletes every saved profile and its history, preserving guest match history.</summary>
+        public bool DeleteAllProfiles()
+        {
+            if (!IsAvailable || !TryRun(_database.DeleteAllChildProfiles))
+                return false;
+
+            if (ActiveChild != null)
                 SetActiveChild(null);
 
             ProfilesChanged?.Invoke();

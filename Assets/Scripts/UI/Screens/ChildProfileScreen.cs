@@ -34,6 +34,7 @@ namespace OndeVai.UI
         [SerializeField] private TMP_Text _formTitle;
         [SerializeField] private TMP_InputField _nameInput;
         [SerializeField] private OptionSelector _ageSelector;
+        [SerializeField] private Toggle _hideNameToggle;
         [SerializeField] private RectTransform _avatarOptionsParent;
         [SerializeField] private Button _avatarOptionTemplate;
         [SerializeField] private AvatarBadge _formPreview;
@@ -77,6 +78,7 @@ namespace OndeVai.UI
                 _nameInput.onValueChanged.AddListener(_ => RefreshPreview());
             }
 
+            EnsureHideNameToggle();
             BuildAvatarOptions();
         }
 
@@ -161,6 +163,9 @@ namespace OndeVai.UI
             if (_ageSelector != null)
                 _ageSelector.SetOptions(_ageLabels, Mathf.Clamp(age, MinSelectableAge, MaxSelectableAge) - MinSelectableAge);
 
+            if (_hideNameToggle != null)
+                _hideNameToggle.SetIsOnWithoutNotify(profile != null && profile.HideName);
+
             _selectedAvatar = profile?.AvatarIndex ?? UnityEngine.Random.Range(0, AvatarPalette.Count);
             if (_deleteButton != null)
                 _deleteButton.gameObject.SetActive(profile != null);
@@ -207,6 +212,7 @@ namespace OndeVai.UI
             profile.Name = childName;
             profile.Age = (_ageSelector != null ? _ageSelector.Index : 2) + MinSelectableAge;
             profile.AvatarIndex = _selectedAvatar;
+            profile.HideName = _hideNameToggle != null && _hideNameToggle.isOn;
 
             bool isNew = _editing == null;
             GameController controller = GameController.Instance;
@@ -222,6 +228,7 @@ namespace OndeVai.UI
                 List<SimulatedMatchData> matches = ProfileHistorySimulator.Generate(
                     controller.Definition,
                     configuration,
+                    profile.Age,
                     DateTime.UtcNow,
                     new System.Random(Guid.NewGuid().GetHashCode()));
                 saved = data.SaveProfileWithSimulatedHistory(profile, matches);
@@ -289,6 +296,69 @@ namespace OndeVai.UI
                 });
                 _avatarOptions.Add(option);
             }
+        }
+
+        private void EnsureHideNameToggle()
+        {
+            if (_hideNameToggle != null)
+                return;
+
+            if (_formRoot == null || _ageSelector == null || _formTitle == null)
+                return;
+
+            Transform panel = _ageSelector.transform.parent;
+            GameObject row = new("HideNameOption", typeof(RectTransform), typeof(LayoutElement), typeof(HorizontalLayoutGroup));
+            row.transform.SetParent(panel, false);
+            row.transform.SetSiblingIndex(_ageSelector.transform.GetSiblingIndex() + 1);
+            RectTransform rowRect = (RectTransform)row.transform;
+            LayoutElement rowLayout = row.GetComponent<LayoutElement>();
+            rowLayout.preferredHeight = 90f;
+            rowLayout.flexibleWidth = 1f;
+            HorizontalLayoutGroup rowLayoutGroup = row.GetComponent<HorizontalLayoutGroup>();
+            rowLayoutGroup.childAlignment = TextAnchor.MiddleLeft;
+            rowLayoutGroup.spacing = 20f;
+            rowLayoutGroup.childControlWidth = true;
+            rowLayoutGroup.childControlHeight = true;
+            rowLayoutGroup.childForceExpandWidth = false;
+            rowLayoutGroup.childForceExpandHeight = false;
+            rowRect.localScale = Vector3.one;
+
+            GameObject labelObject = new("Label", typeof(RectTransform));
+            labelObject.transform.SetParent(row.transform, false);
+            TMP_Text label = labelObject.AddComponent<TextMeshProUGUI>();
+            label.font = _formTitle.font;
+            label.fontSize = 34f;
+            label.color = _formTitle.color;
+            label.text = "Manter nome em sigilo";
+            label.alignment = TextAlignmentOptions.MidlineLeft;
+            LayoutElement labelLayout = labelObject.AddComponent<LayoutElement>();
+            labelLayout.flexibleWidth = 1f;
+
+            GameObject toggleObject = new("Toggle", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Toggle));
+            toggleObject.transform.SetParent(row.transform, false);
+            RectTransform toggleRect = (RectTransform)toggleObject.transform;
+            toggleRect.sizeDelta = new Vector2(76f, 76f);
+            LayoutElement toggleLayout = toggleObject.AddComponent<LayoutElement>();
+            toggleLayout.preferredWidth = 76f;
+            toggleLayout.preferredHeight = 76f;
+            Image background = toggleObject.GetComponent<Image>();
+            background.color = Color.white;
+
+            GameObject checkObject = new("Check", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+            checkObject.transform.SetParent(toggleObject.transform, false);
+            RectTransform checkRect = (RectTransform)checkObject.transform;
+            checkRect.anchorMin = Vector2.zero;
+            checkRect.anchorMax = Vector2.one;
+            checkRect.offsetMin = new Vector2(18f, 18f);
+            checkRect.offsetMax = new Vector2(-18f, -18f);
+            Image check = checkObject.GetComponent<Image>();
+            check.color = new Color(0.25f, 0.65f, 0.25f, 1f);
+            check.raycastTarget = false;
+
+            _hideNameToggle = toggleObject.GetComponent<Toggle>();
+            _hideNameToggle.targetGraphic = background;
+            _hideNameToggle.graphic = check;
+            _hideNameToggle.isOn = false;
         }
 
         private void RefreshAvatarOptions()

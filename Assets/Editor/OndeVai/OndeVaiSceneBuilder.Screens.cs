@@ -350,6 +350,7 @@ namespace OndeVai.EditorTools
             Kit.Wire(screen, "_formTitle", form.Title);
             Kit.Wire(screen, "_nameInput", form.Name);
             Kit.Wire(screen, "_ageSelector", form.Age);
+            Kit.Wire(screen, "_hideNameToggle", form.HideName);
             Kit.Wire(screen, "_avatarOptionsParent", form.AvatarParent);
             Kit.Wire(screen, "_avatarOptionTemplate", form.AvatarTemplate);
             Kit.Wire(screen, "_formPreview", form.Preview);
@@ -411,6 +412,7 @@ namespace OndeVai.EditorTools
             public TMP_Text Title;
             public TMP_InputField Name;
             public OptionSelector Age;
+            public Toggle HideName;
             public RectTransform AvatarParent;
             public Button AvatarTemplate;
             public AvatarBadge Preview;
@@ -447,6 +449,12 @@ namespace OndeVai.EditorTools
 
             FormLabel(kit, panel.transform, "Idade");
             form.Age = kit.Selector("AgeSelector", panel.transform, new Vector2(860f, 110f), Kit.Blue);
+
+            form.HideName = kit.Toggle(
+                "HideNameToggle",
+                OptionRow(kit, panel.rectTransform, "Manter nome em sigilo", new Vector2(100f, 100f)),
+                100f,
+                Kit.Green);
 
             FormLabel(kit, panel.transform, "Cor");
             RectTransform avatars = Kit.Rect("AvatarOptions", panel.transform);
@@ -498,6 +506,24 @@ namespace OndeVai.EditorTools
             OptionSelector errorLimit = kit.Selector("ErrorLimit", OptionRow(kit, list, "Erros permitidos", selectorSize), selectorSize, Kit.Blue);
             OptionSelector itemsOnScreen = kit.Selector("ItemsOnScreen", OptionRow(kit, list, "Objetos na tela", selectorSize), selectorSize, Kit.Blue);
 
+            SectionTitle(kit, list, "Exportar dados");
+            TextMeshProUGUI csvExportStatus = kit.Text(
+                "CsvExportStatus",
+                list,
+                "Exporta perfis, partidas e tentativas. Nomes em sigilo são mascarados.",
+                32f,
+                new Color(Kit.Ink.r, Kit.Ink.g, Kit.Ink.b, 0.7f),
+                TextAlignmentOptions.MidlineLeft);
+            Kit.AddLayout(csvExportStatus.gameObject, new Vector2(-1f, 90f));
+            Button exportCsv = kit.Button(
+                "ExportCsvButton",
+                list,
+                new Vector2(860f, 120f),
+                Kit.Blue,
+                null,
+                "Exportar todos os dados (CSV)",
+                38f);
+
             SectionTitle(kit, list, "Dados do perfil ativo");
             TextMeshProUGUI profileDataStatus = kit.Text(
                 "ProfileDataStatus",
@@ -545,6 +571,8 @@ namespace OndeVai.EditorTools
             Kit.Wire(screen, "_privacyButton", privacy);
             Kit.Wire(screen, "_resetButton", reset);
             Kit.Wire(screen, "_profileDataStatus", profileDataStatus);
+            Kit.Wire(screen, "_exportCsvButton", exportCsv);
+            Kit.Wire(screen, "_csvExportStatus", csvExportStatus);
             Kit.Wire(screen, "_clearProgressButton", clearProgress);
             Kit.Wire(screen, "_deleteProfileButton", deleteProfile);
             return SaveScreenPrefab(screen, "OptionsScreen");

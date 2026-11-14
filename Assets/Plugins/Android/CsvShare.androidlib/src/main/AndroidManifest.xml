@@ -1,0 +1,15 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.SEND" />
+            <data android:mimeType="text/csv" />
+        </intent>
+    </queries>
+    <application>
+        <provider
+            android:name="com.ondevai.csvshare.CsvExportProvider"
+            android:authorities="${applicationId}.csv-export"
+            android:exported="false"
+            android:grantUriPermissions="true" />
+    </application>
+</manifest>
